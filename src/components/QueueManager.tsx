@@ -87,7 +87,7 @@ export function QueueManager({ sessionId }: QueueManagerProps) {
         }}
       >
         {viewMode === 'full' ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {pageOrders.map(order => (
               <QueueRow key={order.id} order={order} onUpdate={updateOrder} />
             ))}

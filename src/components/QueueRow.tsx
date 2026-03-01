@@ -50,9 +50,9 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
   }
 
   return (
-    <div className={`flex items-center gap-2 p-2.5 rounded-2xl border-2 ${statusBg} transition-all overflow-visible`}>
+    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-xl border-2 ${statusBg} transition-all overflow-visible`}>
       {/* Order number */}
-      <div className="w-10 h-10 rounded-xl bg-queue flex items-center justify-center font-black text-lg text-queue-foreground flex-shrink-0 shadow-lg">
+      <div className="w-8 h-8 rounded-lg bg-queue flex items-center justify-center font-black text-sm text-queue-foreground flex-shrink-0 shadow-md">
         {order.order_number}
       </div>
 
@@ -73,7 +73,7 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
         />
       </div>
 
-      {/* Notes - takes remaining ~30% */}
+      {/* Notes */}
       <div className="flex-1 min-w-0 relative">
         <NotesTags
           notes={order.notes}

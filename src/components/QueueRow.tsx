@@ -73,7 +73,7 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
         />
       </div>
 
-      {/* Notes - takes remaining ~30% */}
+      {/* Notes */}
       <div className="flex-1 min-w-0 relative">
         <NotesTags
           notes={order.notes}

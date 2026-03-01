@@ -47,7 +47,7 @@ export function NotesTags({ notes, customNote, onUpdate, compact }: NotesTagsPro
       {/* Tags display */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex flex-wrap gap-1 items-center min-h-[44px] w-full rounded-lg px-2 py-1 bg-muted/50 hover:bg-muted transition-colors active:scale-[0.98]"
+        className="flex flex-wrap gap-1 items-center min-h-[32px] w-full rounded-lg px-1.5 py-0.5 bg-muted/50 hover:bg-muted transition-colors active:scale-[0.98]"
       >
         {notes.map(n => {
           const tag = TAG_OPTIONS.find(t => t.value === n);

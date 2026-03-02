@@ -19,7 +19,7 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
 
   if (compact) {
     return (
-      <div className={`flex items-center gap-2 p-2 rounded-xl border-2 ${statusBg} transition-all relative`}>
+      <div className={`flex items-center gap-2 px-1.5 py-0.5 ${statusBg} transition-all relative h-full`}>
         {/* Order number */}
         <span className="text-xl text-queue flex-shrink-0 w-7 text-center">
           {order.order_number}
@@ -50,7 +50,7 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
   }
 
   return (
-    <div className={`flex items-center gap-1 px-1 py-0 rounded-lg border ${statusBg} transition-all overflow-visible h-full`}>
+    <div className={`flex items-center gap-1 px-1 py-0 ${statusBg} transition-all overflow-visible h-full`}>
       {/* Order number */}
       <span className="text-xl text-queue flex-shrink-0 w-7 text-center">
         {order.order_number}

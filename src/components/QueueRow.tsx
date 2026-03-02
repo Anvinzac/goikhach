@@ -35,10 +35,13 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
         className={`flex items-center gap-1 px-1 py-0 ${statusBg} transition-all relative h-full cursor-pointer`}
         onClick={() => setShowPopup(true)}
       >
-        {/* Order number */}
-        <span className="text-xl text-queue flex-shrink-0 w-7 text-center">
-          {order.order_number}
-        </span>
+      {/* Order number - tap for not_found */}
+      <span
+        className="text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-transform"
+        onClick={(e) => { e.stopPropagation(); onUpdate(order.id, { status: 'not_found' }); }}
+      >
+        {order.order_number}
+      </span>
 
         {/* Group size */}
         <GroupSizeSelector
@@ -96,8 +99,11 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
 
   return (
     <div className={`flex items-center gap-1 px-1 py-0 ${statusBg} transition-all overflow-visible h-full`}>
-      {/* Order number */}
-      <span className="text-xl text-queue flex-shrink-0 w-7 text-center">
+      {/* Order number - tap for not_found */}
+      <span
+        className="text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-transform cursor-pointer"
+        onClick={() => onUpdate(order.id, { status: 'not_found' })}
+      >
         {order.order_number}
       </span>
 

@@ -66,7 +66,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
               : 'border-border bg-card hover:border-primary/30'
           }`}
       >
-        {currentSize && currentSize >= 5 ? currentSize : '5+'}
+        {currentSize && currentSize >= 5 ? currentSize : <span className="text-muted-foreground/40">5<span className="text-[10px]">+</span></span>}
       </button>
 
       {showLargeMenu && (

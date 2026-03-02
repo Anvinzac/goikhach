@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useSession } from '@/hooks/useSession';
+import { useQueueOrders } from '@/hooks/useQueueOrders';
 import { QueueManager } from '@/components/QueueManager';
 import { FloorPlanView } from '@/components/FloorPlanView';
 import { SessionStarter } from '@/components/SessionStarter';
-import { Users, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Tab = 'queue' | 'ground' | 'first';
@@ -12,6 +13,11 @@ const Index = () => {
   const { session, loading, startNewSession } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>('queue');
   const [showReset, setShowReset] = useState(false);
+  const { orders } = useQueueOrders(session?.id);
+
+  const waitingCount = orders
+    .filter(o => o.status === 'waiting' && o.group_size != null)
+    .reduce((sum, o) => sum + (o.group_size || 0), 0);
 
   if (loading) {
     return (
@@ -25,8 +31,8 @@ const Index = () => {
     return <SessionStarter onStart={startNewSession} loading={false} />;
   }
 
-  const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
-    { id: 'queue', label: 'Queue', icon: Users },
+  const tabs: { id: Tab; label: string; icon?: typeof MapPin }[] = [
+    { id: 'queue', label: 'Queue' },
     { id: 'ground', label: 'Ground', icon: MapPin },
     { id: 'first', label: '1st Floor', icon: MapPin },
   ];
@@ -73,7 +79,6 @@ const Index = () => {
       {/* Bottom tabs */}
       <div className="flex border-t border-border bg-card safe-area-bottom flex-shrink-0">
         {tabs.map(tab => {
-          const Icon = tab.icon;
           const active = activeTab === tab.id;
           return (
             <button
@@ -87,7 +92,11 @@ const Index = () => {
               className={`flex-1 flex flex-col items-center py-1 transition-all active:scale-95
                 ${active ? 'text-queue' : 'text-muted-foreground'}`}
             >
-              <Icon className="w-5 h-5" />
+              {tab.id === 'queue' ? (
+                <span className="text-sm font-black tabular-nums leading-tight">{waitingCount}</span>
+              ) : (
+                tab.icon && <tab.icon className="w-5 h-5" />
+              )}
               <span className="text-[10px] font-bold leading-tight">{tab.label}</span>
             </button>
           );

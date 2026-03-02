@@ -19,9 +19,10 @@ interface QueueRowProps {
   order: QueueOrder;
   onUpdate: (id: string, updates: Partial<QueueOrder>) => void;
   compact?: boolean;
+  isNearBottom?: boolean;
 }
 
-export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
+export function QueueRow({ order, onUpdate, compact, isNearBottom }: QueueRowProps) {
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
 
@@ -150,6 +151,7 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
             notes={order.notes}
             customNote={order.custom_note}
             onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+            dropUp={isNearBottom}
           />
         </div>
       ) : <div className="flex-1" />}

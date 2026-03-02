@@ -13,6 +13,7 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
   const { orders, updateOrder } = useQueueOrders(sessionId);
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
+  const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const pageSize = viewMode === 'full' ? 10 : 20;
@@ -24,9 +25,13 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
       navigator.vibrate(15);
     }
     if (direction === 'left' && currentPage < totalPages - 1) {
+      setSlideDir('left');
       setCurrentPage(p => p + 1);
+      setTimeout(() => setSlideDir(null), 250);
     } else if (direction === 'right' && currentPage > 0) {
+      setSlideDir('right');
       setCurrentPage(p => p - 1);
+      setTimeout(() => setSlideDir(null), 250);
     }
   };
 
@@ -98,6 +103,14 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
           }
         }}
       >
+        <div
+          key={currentPage}
+          className={`h-full ${
+            slideDir === 'left' ? 'animate-slide-in-from-right' :
+            slideDir === 'right' ? 'animate-slide-in-from-left' :
+            ''
+          }`}
+        >
         {viewMode === 'full' ? (
           <div className="flex flex-col h-full">
             {pageOrders.map((order, i) => (
@@ -115,6 +128,7 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
             ))}
           </div>
         )}
+        </div>
       </div>
 
       {/* Page dots - minimal */}

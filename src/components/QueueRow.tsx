@@ -13,6 +13,8 @@ const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   separately: Split,
 };
 
+const DISABLED_NUMBERS = [13];
+
 interface QueueRowProps {
   order: QueueOrder;
   onUpdate: (id: string, updates: Partial<QueueOrder>) => void;
@@ -20,6 +22,7 @@ interface QueueRowProps {
 }
 
 export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
+  const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
 
   const statusBg = {
@@ -28,6 +31,14 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
     cancelled: 'bg-occupied/5 border-occupied/20',
     not_found: 'bg-muted/50 border-muted-foreground/10',
   }[order.status];
+
+  if (isDisabled) {
+    return (
+      <div className="flex items-center gap-1 px-1 py-0 bg-muted/30 transition-all relative h-full opacity-30 pointer-events-none">
+        <span className="text-xl text-muted-foreground flex-shrink-0 w-7 text-center line-through">{order.order_number}</span>
+      </div>
+    );
+  }
 
   if (compact) {
     return (

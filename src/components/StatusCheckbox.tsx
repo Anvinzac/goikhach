@@ -3,7 +3,7 @@ import { Check, X, HelpCircle } from 'lucide-react';
 
 interface StatusCheckboxProps {
   status: 'waiting' | 'done' | 'cancelled' | 'not_found';
-  onChange: (status: 'done' | 'cancelled' | 'not_found') => void;
+  onChange: (status: 'waiting' | 'done' | 'cancelled' | 'not_found') => void;
 }
 
 export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
@@ -43,6 +43,11 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
 
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(20);
+    }
+    // If already done/cancelled/not_found, toggle back to waiting
+    if (status !== 'waiting') {
+      onChange('waiting' as any);
+      return;
     }
     onChange('done');
   }, [onChange, showMenu]);

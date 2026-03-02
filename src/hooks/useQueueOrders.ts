@@ -36,6 +36,9 @@ export function useQueueOrders(sessionId: string | undefined) {
   }, [sessionId]);
 
   const updateOrder = useCallback(async (id: string, updates: Partial<QueueOrder>) => {
+    // Optimistic update
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates, updated_at: new Date().toISOString() } : o));
+
     const { error } = await supabase
       .from('queue_orders')
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -43,8 +46,9 @@ export function useQueueOrders(sessionId: string | undefined) {
 
     if (error) {
       toast.error('Failed to update order');
+      fetchOrders(); // Revert on error
     }
-  }, []);
+  }, [fetchOrders]);
 
   useEffect(() => {
     fetchOrders();

@@ -174,23 +174,40 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
 
       {/* Floor plan */}
       <div className="flex-1 overflow-hidden px-1 py-2">
-        <div className="flex justify-around gap-1 h-full">
-          {columns.map(([colIdx, colTables]) => (
-            <div key={colIdx} className="flex flex-col items-center justify-around">
-              {colTables.map(table => (
-                <TableUnit
-                  key={table.id}
-                  table={table}
-                  tableChairs={chairs.filter(c => c.table_id === table.id)}
-                  showTime={showTime}
-                  onChairToggle={handleChairToggle}
-                  onTableTap={handleTableTap}
-                  onExpand={expandTable}
-                />
-              ))}
+        {(() => {
+          // Build a row-aligned grid: each row has one table per column
+          const maxRows = Math.max(...columns.map(([, col]) => col.length));
+          return (
+            <div
+              className="h-full gap-x-1"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${columns.length}, 1fr)`,
+                gridTemplateRows: `repeat(${maxRows}, 1fr)`,
+              }}
+            >
+              {Array.from({ length: maxRows }).map((_, rowIdx) =>
+                columns.map(([colIdx, colTables]) => {
+                  const table = colTables[rowIdx];
+                  return (
+                    <div key={`${colIdx}-${rowIdx}`} className="flex items-center justify-center">
+                      {table && (
+                        <TableUnit
+                          table={table}
+                          tableChairs={chairs.filter(c => c.table_id === table.id)}
+                          showTime={showTime}
+                          onChairToggle={handleChairToggle}
+                          onTableTap={handleTableTap}
+                          onExpand={expandTable}
+                        />
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
-          ))}
-        </div>
+          );
+        })()}
       </div>
 
       {/* Action sheet for mapping orders */}

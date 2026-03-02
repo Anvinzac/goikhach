@@ -7,9 +7,10 @@ interface QueueManagerProps {
   sessionId: string;
   sessionType: string;
   onReset: () => void;
+  estimatedMinutes?: number;
 }
 
-export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0 }: QueueManagerProps) {
   const { orders, updateOrder } = useQueueOrders(sessionId);
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
@@ -42,6 +43,9 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
         <div className="flex items-center gap-1">
           <span className="font-black text-sm text-queue">🍽</span>
           <span className="font-bold text-xs capitalize">{sessionType}</span>
+          {estimatedMinutes > 0 && (
+            <span className="text-[10px] font-bold text-muted-foreground tabular-nums">~{estimatedMinutes} min.</span>
+          )}
           <button
             onClick={() => handleSwipe('right')}
             disabled={currentPage === 0}

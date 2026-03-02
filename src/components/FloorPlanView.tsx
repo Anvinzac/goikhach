@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFloorPlan, RestaurantTable, Chair } from '@/hooks/useFloorPlan';
 import { useQueueOrders, QueueOrder } from '@/hooks/useQueueOrders';
 import { Timer, Plus, Minus } from 'lucide-react';
@@ -26,6 +26,7 @@ function TableUnit({
   onChairToggle,
   onTableTap,
   onExpand,
+  isHighlighted,
 }: {
   table: RestaurantTable;
   tableChairs: Chair[];
@@ -33,6 +34,7 @@ function TableUnit({
   onChairToggle: (id: string, occupied: boolean) => void;
   onTableTap: (table: RestaurantTable) => void;
   onExpand: (tableId: string, newSize: number) => void;
+  isHighlighted?: boolean;
 }) {
   const isBig = table.table_type === 'big';
   const topChairs = tableChairs.filter((_, i) => i < (isBig ? 2 : 1));
@@ -58,7 +60,7 @@ function TableUnit({
       {/* Table */}
       <button
         onClick={() => onTableTap(table)}
-        className={`${isBig ? 'w-20 h-12' : 'w-14 h-10'} rounded-xl border-2 ${tableBg} flex items-center justify-center transition-all active:scale-95 relative`}
+        className={`${isBig ? 'w-20 h-12' : 'w-14 h-10'} rounded-xl border-2 ${tableBg} flex items-center justify-center transition-all active:scale-95 relative ${isHighlighted ? 'animate-pulse-available ring-2 ring-available' : ''}`}
       >
         {showTime && table.occupied_at && (
           <span className="text-[10px] font-bold text-foreground">
@@ -102,6 +104,26 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
   const { orders } = useQueueOrders(sessionId);
   const [showTime, setShowTime] = useState(false);
   const [actionSheet, setActionSheet] = useState<{ table: RestaurantTable } | null>(null);
+  const [highlightedTables, setHighlightedTables] = useState<Set<string>>(new Set());
+  const prevStatuses = useRef<Record<string, string>>({});
+
+  // Track table status changes and highlight newly available ones
+  useEffect(() => {
+    const prev = prevStatuses.current;
+    const newHighlights = new Set(highlightedTables);
+    tables.forEach(t => {
+      if (prev[t.id] && prev[t.id] !== 'available' && t.status === 'available') {
+        newHighlights.add(t.id);
+        setTimeout(() => {
+          setHighlightedTables(s => { const n = new Set(s); n.delete(t.id); return n; });
+        }, 15000);
+      }
+      prev[t.id] = t.status;
+    });
+    if (newHighlights.size !== highlightedTables.size) {
+      setHighlightedTables(newHighlights);
+    }
+  }, [tables]);
 
   const recentDone = useMemo(() =>
     orders.filter(o => o.status === 'done').slice(-10),
@@ -199,6 +221,7 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
                           onChairToggle={handleChairToggle}
                           onTableTap={handleTableTap}
                           onExpand={expandTable}
+                          isHighlighted={highlightedTables.has(table.id)}
                         />
                       )}
                     </div>

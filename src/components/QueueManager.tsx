@@ -40,9 +40,9 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
           <button
             onClick={() => handleSwipe('right')}
             disabled={currentPage === 0}
-            className="w-6 h-6 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
+            className="w-8 h-8 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="font-black text-xs tabular-nums">
             {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, orders.length)}
@@ -50,33 +50,33 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
           <button
             onClick={() => handleSwipe('left')}
             disabled={currentPage === totalPages - 1}
-            className="w-6 h-6 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
+            className="w-8 h-8 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
           >
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         <div className="flex items-center gap-0.5">
-          <div className="flex bg-muted rounded p-0.5">
+          <div className="flex bg-muted rounded p-0.5 gap-0.5">
             <button
               onClick={() => { setViewMode('full'); setCurrentPage(0); }}
-              className={`p-0.5 rounded transition-all ${viewMode === 'full' ? 'bg-card shadow-sm' : ''}`}
+              className={`px-2 py-1 rounded transition-all ${viewMode === 'full' ? 'bg-card shadow-sm' : ''}`}
             >
-              <List className="w-3.5 h-3.5" />
+              <List className="w-4 h-4" />
             </button>
             <button
               onClick={() => { setViewMode('compact'); setCurrentPage(0); }}
-              className={`p-0.5 rounded transition-all ${viewMode === 'compact' ? 'bg-card shadow-sm' : ''}`}
+              className={`px-2 py-1 rounded transition-all ${viewMode === 'compact' ? 'bg-card shadow-sm' : ''}`}
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
+              <LayoutGrid className="w-4 h-4" />
             </button>
           </div>
           <button
             onMouseDown={onReset}
             onTouchStart={onReset}
-            className="w-6 h-6 rounded flex items-center justify-center bg-muted active:bg-occupied active:text-occupied-foreground transition-all"
+            className="w-8 h-8 rounded flex items-center justify-center bg-muted active:bg-occupied active:text-occupied-foreground transition-all"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

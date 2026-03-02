@@ -107,12 +107,15 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 auto-rows-fr h-full">
-            {pageOrders.map((order, i) => (
-              <div key={order.id} style={{ borderBottom: '1px solid', borderColor: Math.floor(i / 2) % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} onUpdate={updateOrder} compact />
-              </div>
-            ))}
+          <div className="grid grid-rows-10 grid-flow-col auto-cols-fr h-full">
+            {pageOrders.map((order, i) => {
+              const rowIdx = i % 10;
+              return (
+                <div key={order.id} style={{ borderBottom: '1px solid', borderColor: rowIdx % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))', borderRight: i < 10 ? '1px solid hsl(var(--border))' : 'none' }}>
+                  <QueueRow order={order} onUpdate={updateOrder} compact />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

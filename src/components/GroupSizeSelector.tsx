@@ -32,30 +32,30 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
   }
 
   return (
-    <div className="relative flex items-center h-[80%]">
+    <div className="relative flex items-center gap-1">
       {[1, 2, 3, 4].map(n => (
         <button
           key={n}
           onClick={() => handleSelect(n)}
-          className={`h-full aspect-square flex items-center justify-center font-bold text-base transition-all active:scale-90
+          className={`w-8 h-8 rounded-lg border-2 font-bold text-xs transition-all active:scale-90
             ${currentSize === n
-              ? 'text-queue-foreground bg-queue rounded-md'
-              : previousSize === n
-                ? 'text-muted-foreground/40 line-through'
-                : 'text-muted-foreground/60'
+              ? 'bg-queue border-queue text-queue-foreground shadow-md'
+              : 'border-border bg-card hover:border-primary/30'
             }`}
         >
-          {n}
+          {currentSize === n ? n : previousSize === n ? (
+            <span className="line-through text-muted-foreground opacity-60">{n}</span>
+          ) : ''}
         </button>
       ))}
 
       {/* 5+ button */}
       <button
         onClick={() => setShowLargeMenu(!showLargeMenu)}
-        className={`h-full aspect-square flex items-center justify-center font-bold text-xs transition-all active:scale-90
+        className={`w-8 h-8 rounded-lg border-2 font-bold text-xs transition-all active:scale-90
           ${currentSize && currentSize >= 5
-            ? 'text-queue-foreground bg-queue rounded-md'
-            : 'text-muted-foreground/60'
+            ? 'bg-queue border-queue text-queue-foreground shadow-md'
+            : 'border-border bg-card hover:border-primary/30'
           }`}
       >
         {currentSize && currentSize >= 5 ? currentSize : '5+'}

@@ -21,9 +21,9 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
     return (
       <div className={`flex items-center gap-2 p-2 rounded-xl border-2 ${statusBg} transition-all relative`}>
         {/* Order number */}
-        <div className="w-8 h-8 rounded-lg bg-queue flex items-center justify-center font-black text-sm text-queue-foreground">
+        <span className="font-black text-lg text-queue flex-shrink-0 w-7 text-center">
           {order.order_number}
-        </div>
+        </span>
 
         {/* Group size */}
         <GroupSizeSelector

@@ -93,7 +93,7 @@ const Index = () => {
                 ${active ? 'text-queue' : 'text-muted-foreground'}`}
             >
               {tab.id === 'queue' ? (
-                <span className="text-lg font-black tabular-nums leading-tight">{waitingCount}</span>
+                <span className="text-xl font-black tabular-nums leading-none">{waitingCount}</span>
               ) : (
                 tab.icon && <tab.icon className="w-5 h-5" />
               )}

@@ -3,7 +3,7 @@ import { useState } from 'react';
 interface GroupSizeSelectorProps {
   currentSize: number | null;
   previousSize: number | null;
-  onSelect: (size: number, prevSize: number | null) => void;
+  onSelect: (size: number | null, prevSize: number | null) => void;
   compact?: boolean;
 }
 
@@ -15,7 +15,12 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(30);
     }
-    onSelect(size, currentSize);
+    // Tapping the already-selected size resets to empty
+    if (currentSize === size) {
+      onSelect(null as unknown as number, currentSize);
+    } else {
+      onSelect(size, currentSize);
+    }
     setShowLargeMenu(false);
   };
 

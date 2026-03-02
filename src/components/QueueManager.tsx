@@ -115,17 +115,22 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
           <div className="flex flex-col h-full">
             {pageOrders.map((order, i) => (
               <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 3} />
+                <QueueRow order={order} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} />
               </div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-2 grid-rows-10 grid-flow-col auto-rows-fr h-full">
-            {pageOrders.map((order, i) => (
+            {pageOrders.map((order, i) => {
+              // In compact grid (2 cols, 10 rows, column-first), determine row index
+              const rowIndex = i % 10;
+              const isBottom = rowIndex >= 6;
+              return (
               <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} onUpdate={updateOrder} compact isNearBottom={i >= pageOrders.length - 3} />
+                <QueueRow order={order} onUpdate={updateOrder} compact isNearBottom={isBottom} />
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
         </div>

@@ -27,7 +27,7 @@ export function QueueRow({ order, onUpdate, compact, isNearBottom }: QueueRowPro
   const [showPopup, setShowPopup] = useState(false);
 
   const statusBg = {
-    waiting: 'bg-card',
+    waiting: '',
     done: 'bg-available/5 border-available/20',
     cancelled: 'bg-occupied/5 border-occupied/20',
     not_found: 'bg-muted/50 border-muted-foreground/10',
@@ -86,7 +86,7 @@ export function QueueRow({ order, onUpdate, compact, isNearBottom }: QueueRowPro
         {showPopup && (
           <>
             <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setShowPopup(false); }} />
-            <div className="absolute left-0 top-full mt-1 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-2 min-w-[220px]" onClick={e => e.stopPropagation()}>
+            <div className={`absolute left-0 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-2 min-w-[220px] ${isNearBottom ? 'bottom-full mb-1' : 'top-full mt-1'}`} onClick={e => e.stopPropagation()}>
               <div className="flex items-center gap-1 mb-2">
                 <span className="text-lg font-bold text-queue">{order.order_number}</span>
                 <GroupSizeSelector

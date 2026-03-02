@@ -40,17 +40,17 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
           <button
             key={n}
             onClick={() => handleSelect(n)}
-            className={`w-8 h-8 rounded-lg border-2 font-bold text-sm transition-all active:scale-90
+            className={`w-8 h-8 rounded-lg border-2 font-black transition-all active:scale-90
               ${isSelected
-                ? 'bg-queue border-queue text-queue-foreground shadow-md'
+                ? 'bg-queue border-queue text-queue-foreground shadow-md text-base'
                 : isFilled
-                  ? 'bg-queue/20 border-queue/30 text-queue/70'
+                  ? 'bg-queue/10 border-queue/15'
                   : 'border-border bg-card hover:border-primary/30'
               }`}
           >
             {isSelected ? n : previousSize === n ? (
-              <span className="line-through text-muted-foreground opacity-60">{n}</span>
-            ) : isFilled ? n : ''}
+              <span className="line-through text-muted-foreground opacity-60 text-xs">{n}</span>
+            ) : ''}
           </button>
         );
       })}

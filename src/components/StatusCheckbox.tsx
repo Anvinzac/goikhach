@@ -9,6 +9,7 @@ interface StatusCheckboxProps {
 export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
   const [showMenu, setShowMenu] = useState(false);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTapTime = useRef<number>(0);
 
   const handleTouchStart = useCallback(() => {
     longPressTimer.current = setTimeout(() => {
@@ -27,11 +28,24 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
 
   const handleQuickTap = useCallback(() => {
     if (showMenu) return;
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapTime.current;
+    lastTapTime.current = now;
+
+    if (timeSinceLastTap < 300) {
+      // Double tap → cancelled
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
+      onChange('cancelled');
+      return;
+    }
+
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(20);
     }
-    onChange(status === 'done' ? 'done' : 'done');
-  }, [status, onChange, showMenu]);
+    onChange('done');
+  }, [onChange, showMenu]);
 
   const statusConfig = {
     waiting: { icon: null, bg: 'border-2 border-muted-foreground/30', text: '' },

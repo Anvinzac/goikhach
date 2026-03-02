@@ -1,7 +1,17 @@
+import { useState } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { GroupSizeSelector } from './GroupSizeSelector';
 import { StatusCheckbox } from './StatusCheckbox';
 import { NotesTags } from './NotesTags';
+import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare } from 'lucide-react';
+
+const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  foreigners: Globe,
+  prefer_downstairs: ArrowDown,
+  prefer_upstairs: ArrowUp,
+  will_return: Clock,
+  separately: Split,
+};
 
 interface QueueRowProps {
   order: QueueOrder;
@@ -10,6 +20,8 @@ interface QueueRowProps {
 }
 
 export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
+  const [showPopup, setShowPopup] = useState(false);
+
   const statusBg = {
     waiting: 'bg-card',
     done: 'bg-available/5 border-available/20',
@@ -19,7 +31,10 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
 
   if (compact) {
     return (
-      <div className={`flex items-center gap-2 px-1.5 py-0.5 ${statusBg} transition-all relative h-full`}>
+      <div
+        className={`flex items-center gap-1 px-1 py-0 ${statusBg} transition-all relative h-full cursor-pointer`}
+        onClick={() => setShowPopup(true)}
+      >
         {/* Order number */}
         <span className="text-xl text-queue flex-shrink-0 w-7 text-center">
           {order.order_number}
@@ -29,7 +44,7 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
         <GroupSizeSelector
           currentSize={order.group_size}
           previousSize={order.previous_group_size}
-          onSelect={(size, prev) => onUpdate(order.id, { group_size: size, previous_group_size: prev })}
+          onSelect={(size, prev) => { onUpdate(order.id, { group_size: size, previous_group_size: prev }); }}
           compact
         />
 
@@ -39,11 +54,41 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
           onChange={status => onUpdate(order.id, { status })}
         />
 
-        {/* Notes badge */}
-        {(order.notes.length > 0 || order.custom_note) && (
-          <div className="absolute -top-1 -right-1">
-            <NotesTags notes={order.notes} customNote={order.custom_note} onUpdate={() => {}} compact />
-          </div>
+        {/* Inline note icons */}
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {order.notes.map(n => {
+            const Icon = TAG_ICONS[n];
+            return Icon ? <Icon key={n} className="w-3 h-3 text-queue" /> : null;
+          })}
+          {order.custom_note && (
+            <MessageSquare className="w-3 h-3 text-sharing" />
+          )}
+        </div>
+
+        {/* Popup */}
+        {showPopup && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setShowPopup(false); }} />
+            <div className="absolute left-0 top-full mt-1 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-2 min-w-[220px]" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center gap-1 mb-2">
+                <span className="text-lg font-bold text-queue">{order.order_number}</span>
+                <GroupSizeSelector
+                  currentSize={order.group_size}
+                  previousSize={order.previous_group_size}
+                  onSelect={(size, prev) => onUpdate(order.id, { group_size: size, previous_group_size: prev })}
+                />
+                <StatusCheckbox
+                  status={order.status}
+                  onChange={status => onUpdate(order.id, { status })}
+                />
+              </div>
+              <NotesTags
+                notes={order.notes}
+                customNote={order.custom_note}
+                onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+              />
+            </div>
+          </>
         )}
       </div>
     );

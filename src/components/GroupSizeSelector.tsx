@@ -33,29 +33,37 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
 
   return (
     <div className="relative flex items-center gap-1">
-      {[1, 2, 3, 4].map(n => (
-        <button
-          key={n}
-          onClick={() => handleSelect(n)}
-          className={`w-8 h-8 rounded-lg border-2 font-bold text-xs transition-all active:scale-90
-            ${currentSize === n
-              ? 'bg-queue border-queue text-queue-foreground shadow-md'
-              : 'border-border bg-card hover:border-primary/30'
-            }`}
-        >
-          {currentSize === n ? n : previousSize === n ? (
-            <span className="line-through text-muted-foreground opacity-60">{n}</span>
-          ) : ''}
-        </button>
-      ))}
+      {[1, 2, 3, 4].map(n => {
+        const isSelected = currentSize === n;
+        const isFilled = currentSize !== null && n < currentSize;
+        return (
+          <button
+            key={n}
+            onClick={() => handleSelect(n)}
+            className={`w-8 h-8 rounded-lg border-2 font-bold text-sm transition-all active:scale-90
+              ${isSelected
+                ? 'bg-queue border-queue text-queue-foreground shadow-md'
+                : isFilled
+                  ? 'bg-queue/20 border-queue/30 text-queue/70'
+                  : 'border-border bg-card hover:border-primary/30'
+              }`}
+          >
+            {isSelected ? n : previousSize === n ? (
+              <span className="line-through text-muted-foreground opacity-60">{n}</span>
+            ) : isFilled ? n : ''}
+          </button>
+        );
+      })}
 
       {/* 5+ button */}
       <button
         onClick={() => setShowLargeMenu(!showLargeMenu)}
-        className={`w-8 h-8 rounded-lg border-2 font-bold text-xs transition-all active:scale-90
+        className={`w-8 h-8 rounded-lg border-2 font-bold text-sm transition-all active:scale-90
           ${currentSize && currentSize >= 5
             ? 'bg-queue border-queue text-queue-foreground shadow-md'
-            : 'border-border bg-card hover:border-primary/30'
+            : currentSize && currentSize > 4
+              ? 'bg-queue/20 border-queue/30 text-queue/70'
+              : 'border-border bg-card hover:border-primary/30'
           }`}
       >
         {currentSize && currentSize >= 5 ? currentSize : '5+'}

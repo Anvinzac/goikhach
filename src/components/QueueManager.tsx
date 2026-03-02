@@ -100,16 +100,18 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
       >
         {viewMode === 'full' ? (
           <div className="flex flex-col h-full">
-            {pageOrders.map(order => (
-              <div key={order.id} className="flex-1 min-h-0">
+            {pageOrders.map((order, i) => (
+              <div key={order.id} className="flex-1 min-h-0" style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
                 <QueueRow order={order} onUpdate={updateOrder} />
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-0.5 h-full">
-            {pageOrders.map(order => (
-              <QueueRow key={order.id} order={order} onUpdate={updateOrder} compact />
+          <div className="grid grid-cols-2 auto-rows-fr h-full">
+            {pageOrders.map((order, i) => (
+              <div key={order.id} style={{ borderBottom: '1px solid', borderColor: Math.floor(i / 2) % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
+                <QueueRow order={order} onUpdate={updateOrder} compact />
+              </div>
             ))}
           </div>
         )}

@@ -1,13 +1,15 @@
 import { useState, useRef } from 'react';
 import { useQueueOrders } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
+  sessionType: string;
+  onReset: () => void;
 }
 
-export function QueueManager({ sessionId }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerProps) {
   const { orders, updateOrder } = useQueueOrders(sessionId);
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
@@ -30,49 +32,59 @@ export function QueueManager({ sessionId }: QueueManagerProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card sticky top-0 z-10">
-        <div className="flex items-center gap-2">
+      {/* Merged header */}
+      <div className="flex items-center justify-between px-1 h-8 bg-card border-b border-border flex-shrink-0">
+        <div className="flex items-center gap-1">
+          <span className="font-black text-sm text-queue">🍽</span>
+          <span className="font-bold text-xs capitalize">{sessionType}</span>
           <button
             onClick={() => handleSwipe('right')}
             disabled={currentPage === 0}
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
+            className="w-6 h-6 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-3.5 h-3.5" />
           </button>
-          <span className="font-black text-lg tabular-nums">
+          <span className="font-black text-xs tabular-nums">
             {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, orders.length)}
           </span>
           <button
             onClick={() => handleSwipe('left')}
             disabled={currentPage === totalPages - 1}
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
+            className="w-6 h-6 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* View toggle */}
-        <div className="flex bg-muted rounded-xl p-1">
+        <div className="flex items-center gap-0.5">
+          <div className="flex bg-muted rounded p-0.5">
+            <button
+              onClick={() => { setViewMode('full'); setCurrentPage(0); }}
+              className={`p-0.5 rounded transition-all ${viewMode === 'full' ? 'bg-card shadow-sm' : ''}`}
+            >
+              <List className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => { setViewMode('compact'); setCurrentPage(0); }}
+              className={`p-0.5 rounded transition-all ${viewMode === 'compact' ? 'bg-card shadow-sm' : ''}`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <button
-            onClick={() => { setViewMode('full'); setCurrentPage(0); }}
-            className={`p-2 rounded-lg transition-all ${viewMode === 'full' ? 'bg-card shadow-sm' : ''}`}
+            onMouseDown={onReset}
+            onTouchStart={onReset}
+            className="w-6 h-6 rounded flex items-center justify-center bg-muted active:bg-occupied active:text-occupied-foreground transition-all"
           >
-            <List className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => { setViewMode('compact'); setCurrentPage(0); }}
-            className={`p-2 rounded-lg transition-all ${viewMode === 'compact' ? 'bg-card shadow-sm' : ''}`}
-          >
-            <LayoutGrid className="w-5 h-5" />
+            <RotateCcw className="w-3 h-3" />
           </button>
         </div>
       </div>
 
-      {/* Queue list */}
+      {/* Queue list - no padding, fill height */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-3"
+        className="flex-1 overflow-hidden px-0.5"
         onTouchStart={(e) => {
           const touch = e.touches[0];
           scrollRef.current?.setAttribute('data-start-x', String(touch.clientX));
@@ -87,13 +99,15 @@ export function QueueManager({ sessionId }: QueueManagerProps) {
         }}
       >
         {viewMode === 'full' ? (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col h-full">
             {pageOrders.map(order => (
-              <QueueRow key={order.id} order={order} onUpdate={updateOrder} />
+              <div key={order.id} className="flex-1 min-h-0">
+                <QueueRow order={order} onUpdate={updateOrder} />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-0.5 h-full">
             {pageOrders.map(order => (
               <QueueRow key={order.id} order={order} onUpdate={updateOrder} compact />
             ))}
@@ -101,16 +115,18 @@ export function QueueManager({ sessionId }: QueueManagerProps) {
         )}
       </div>
 
-      {/* Page dots */}
-      <div className="flex justify-center gap-1.5 py-2 border-t border-border">
-        {Array.from({ length: totalPages }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i)}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${i === currentPage ? 'bg-queue w-6' : 'bg-muted-foreground/20'}`}
-          />
-        ))}
-      </div>
+      {/* Page dots - minimal */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-1 py-0.5 border-t border-border flex-shrink-0">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i)}
+              className={`w-2 h-2 rounded-full transition-all ${i === currentPage ? 'bg-queue w-5' : 'bg-muted-foreground/20'}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

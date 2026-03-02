@@ -3,7 +3,7 @@ import { useSession } from '@/hooks/useSession';
 import { QueueManager } from '@/components/QueueManager';
 import { FloorPlanView } from '@/components/FloorPlanView';
 import { SessionStarter } from '@/components/SessionStarter';
-import { Users, MapPin, RotateCcw } from 'lucide-react';
+import { Users, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Tab = 'queue' | 'ground' | 'first';
@@ -57,30 +57,21 @@ const Index = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border">
-        <div className="flex items-center gap-2">
-          <span className="font-black text-lg text-queue">🍽</span>
-          <span className="font-bold text-sm capitalize">{session.session_type}</span>
-        </div>
-        <button
-          onMouseDown={handleReset}
-          onTouchStart={handleReset}
-          className="w-9 h-9 rounded-xl flex items-center justify-center bg-muted active:bg-occupied active:text-occupied-foreground transition-all"
-        >
-          <RotateCcw className="w-4 h-4" />
-        </button>
-      </div>
-
       {/* Content */}
       <div className="flex-1 overflow-hidden">
-        {activeTab === 'queue' && <QueueManager sessionId={session.id} />}
+        {activeTab === 'queue' && (
+          <QueueManager
+            sessionId={session.id}
+            sessionType={session.session_type}
+            onReset={handleReset}
+          />
+        )}
         {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}
         {activeTab === 'first' && <FloorPlanView sessionId={session.id} floor="first" />}
       </div>
 
       {/* Bottom tabs */}
-      <div className="flex border-t-2 border-border bg-card safe-area-bottom">
+      <div className="flex border-t border-border bg-card safe-area-bottom flex-shrink-0">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -93,11 +84,11 @@ const Index = () => {
                   navigator.vibrate(15);
                 }
               }}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-3 transition-all active:scale-95
+              className={`flex-1 flex flex-col items-center py-1 transition-all active:scale-95
                 ${active ? 'text-queue' : 'text-muted-foreground'}`}
             >
-              <Icon className="w-6 h-6" />
-              <span className="text-xs font-bold">{tab.label}</span>
+              <Icon className="w-5 h-5" />
+              <span className="text-[10px] font-bold leading-tight">{tab.label}</span>
             </button>
           );
         })}

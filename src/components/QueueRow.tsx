@@ -50,9 +50,9 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
   }
 
   return (
-    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-xl border-2 ${statusBg} transition-all overflow-visible`}>
+    <div className={`flex items-center gap-1 px-1 py-0 rounded-lg border ${statusBg} transition-all overflow-visible h-full`}>
       {/* Order number */}
-      <div className="w-8 h-8 rounded-lg bg-queue flex items-center justify-center font-black text-sm text-queue-foreground flex-shrink-0 shadow-md">
+      <div className="w-7 h-7 rounded-md bg-queue flex items-center justify-center font-black text-xs text-queue-foreground flex-shrink-0 shadow-sm">
         {order.order_number}
       </div>
 

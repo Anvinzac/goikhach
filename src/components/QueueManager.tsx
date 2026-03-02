@@ -107,7 +107,7 @@ export function QueueManager({ sessionId, sessionType, onReset }: QueueManagerPr
             ))}
           </div>
         ) : (
-          <div className="flex flex-col h-full">
+          <div className="grid grid-cols-2 auto-rows-fr h-full">
             {pageOrders.map((order, i) => (
               <div key={order.id} style={{ borderBottom: '1px solid', borderColor: Math.floor(i / 2) % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
                 <QueueRow order={order} onUpdate={updateOrder} compact />

@@ -44,13 +44,13 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(20);
     }
-    // If already done/cancelled/not_found, toggle back to waiting
+    // If not waiting, toggle back to waiting; otherwise mark done
     if (status !== 'waiting') {
-      onChange('waiting' as any);
+      onChange('waiting');
       return;
     }
     onChange('done');
-  }, [onChange, showMenu]);
+  }, [onChange, showMenu, status]);
 
   const statusConfig = {
     waiting: { icon: null, bg: 'border-2 border-muted-foreground/30', text: '' },

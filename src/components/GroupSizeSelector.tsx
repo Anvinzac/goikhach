@@ -40,9 +40,9 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
           <button
             key={n}
             onClick={() => handleSelect(n)}
-            className={`w-8 h-8 rounded-lg border-2 font-black transition-all active:scale-90
+            className={`w-8 h-8 rounded-lg border-2 font-semibold transition-all active:scale-90
               ${isSelected
-                ? 'bg-queue border-queue text-queue-foreground shadow-md text-base'
+                ? 'bg-queue border-queue text-queue-foreground shadow-md text-lg'
                 : isFilled
                   ? 'bg-queue/10 border-queue/15'
                   : 'border-border bg-card hover:border-primary/30'
@@ -58,7 +58,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
       {/* 5+ button */}
       <button
         onClick={() => setShowLargeMenu(!showLargeMenu)}
-        className={`w-8 h-8 rounded-lg border-2 font-bold text-sm transition-all active:scale-90
+        className={`w-8 h-8 rounded-lg border-2 font-semibold text-base transition-all active:scale-90
           ${currentSize && currentSize >= 5
             ? 'bg-queue border-queue text-queue-foreground shadow-md'
             : currentSize && currentSize > 4

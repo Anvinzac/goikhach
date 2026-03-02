@@ -52,10 +52,12 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
         />
 
         {/* Status */}
-        <StatusCheckbox
-          status={order.status}
-          onChange={status => onUpdate(order.id, { status })}
-        />
+        {order.group_size ? (
+          <StatusCheckbox
+            status={order.status}
+            onChange={status => onUpdate(order.id, { status })}
+          />
+        ) : <div className="w-11 h-11" />}
 
         {/* Inline note icons */}
         <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -80,16 +82,20 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
                   previousSize={order.previous_group_size}
                   onSelect={(size, prev) => onUpdate(order.id, { group_size: size, previous_group_size: prev })}
                 />
-                <StatusCheckbox
-                  status={order.status}
-                  onChange={status => onUpdate(order.id, { status })}
-                />
+                {order.group_size ? (
+                  <StatusCheckbox
+                    status={order.status}
+                    onChange={status => onUpdate(order.id, { status })}
+                  />
+                ) : <div className="w-11 h-11" />}
               </div>
-              <NotesTags
-                notes={order.notes}
-                customNote={order.custom_note}
-                onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
-              />
+              {order.group_size ? (
+                <NotesTags
+                  notes={order.notes}
+                  customNote={order.custom_note}
+                  onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+                />
+              ) : null}
             </div>
           </>
         )}
@@ -118,20 +124,24 @@ export function QueueRow({ order, onUpdate, compact }: QueueRowProps) {
 
       {/* Status */}
       <div className="flex-shrink-0">
-        <StatusCheckbox
-          status={order.status}
-          onChange={status => onUpdate(order.id, { status })}
-        />
+        {order.group_size ? (
+          <StatusCheckbox
+            status={order.status}
+            onChange={status => onUpdate(order.id, { status })}
+          />
+        ) : <div className="w-11 h-11" />}
       </div>
 
       {/* Notes */}
-      <div className="flex-1 min-w-0 relative">
-        <NotesTags
-          notes={order.notes}
-          customNote={order.custom_note}
-          onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
-        />
-      </div>
+      {order.group_size ? (
+        <div className="flex-1 min-w-0 relative">
+          <NotesTags
+            notes={order.notes}
+            customNote={order.custom_note}
+            onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+          />
+        </div>
+      ) : <div className="flex-1" />}
     </div>
   );
 }

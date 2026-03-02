@@ -45,12 +45,16 @@ html, body, #root {
 
     /* Citrus Rush Semantic Colors */
     --available: 160 84% 39%;
+    --available-end: 180 70% 45%;
     --available-foreground: 0 0% 100%;
     --occupied: 350 89% 60%;
+    --occupied-end: 25 95% 55%;
     --occupied-foreground: 0 0% 100%;
     --sharing: 38 92% 50%;
+    --sharing-end: 45 100% 55%;
     --sharing-foreground: 0 0% 100%;
     --queue: 217 91% 60%;
+    --queue-end: 260 80% 60%;
     --queue-foreground: 0 0% 100%;
     --waiting: 215 16% 47%;
     --done: 160 84% 39%;
@@ -101,20 +105,28 @@ html, body, #root {
   }
 
   .bg-available {
-    background-color: hsl(var(--available));
+    background: linear-gradient(135deg, hsl(var(--available)), hsl(var(--available-end)));
     color: hsl(var(--available-foreground));
   }
   .bg-occupied {
-    background-color: hsl(var(--occupied));
+    background: linear-gradient(135deg, hsl(var(--occupied)), hsl(var(--occupied-end)));
     color: hsl(var(--occupied-foreground));
   }
   .bg-sharing {
-    background-color: hsl(var(--sharing));
+    background: linear-gradient(135deg, hsl(var(--sharing)), hsl(var(--sharing-end)));
     color: hsl(var(--sharing-foreground));
   }
   .bg-queue {
-    background-color: hsl(var(--queue));
+    background: linear-gradient(135deg, hsl(var(--queue)), hsl(var(--queue-end)));
     color: hsl(var(--queue-foreground));
+  }
+
+  @keyframes pulse-available {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--available) / 0.6); }
+    50% { box-shadow: 0 0 12px 4px hsl(var(--available) / 0.3); }
+  }
+  .animate-pulse-available {
+    animation: pulse-available 1.5s ease-in-out infinite;
   }
 
   .text-available { color: hsl(var(--available)); }

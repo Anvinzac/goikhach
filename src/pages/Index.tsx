@@ -92,7 +92,7 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-[100dvh] bg-background">
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {activeTab === 'queue' && (

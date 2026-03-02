@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 html, body, #root {
-  height: 100%;
+  height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: pan-x;
@@ -89,6 +89,10 @@ html, body, #root {
 @layer utilities {
   .touch-target {
     @apply min-h-[48px] min-w-[48px] flex items-center justify-center;
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .status-waiting {

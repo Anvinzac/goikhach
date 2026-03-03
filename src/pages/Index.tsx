@@ -14,7 +14,7 @@ const Index = () => {
   const { session, loading, startNewSession } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>('queue');
   const [showReset, setShowReset] = useState(false);
-  const { orders } = useQueueOrders(session?.id);
+  const { orders, updateOrder } = useQueueOrders(session?.id);
   const [floorBadges, setFloorBadges] = useState<{ ground: number; first: number }>({ ground: 0, first: 0 });
 
   const waitingCount = orders
@@ -101,6 +101,8 @@ const Index = () => {
             sessionType={session.session_type}
             onReset={handleReset}
             estimatedMinutes={estimatedMinutes}
+            orders={orders}
+            updateOrder={updateOrder}
           />
         )}
         {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}

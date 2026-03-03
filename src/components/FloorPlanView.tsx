@@ -144,10 +144,10 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
       navigator.vibrate(20);
     }
     await toggleChair(chairId, occupied);
-    // Update parent table status
+    // Update parent table status with fresh DB data
     const chair = chairs.find(c => c.id === chairId);
     if (chair) {
-      setTimeout(() => updateTableStatus(chair.table_id), 200);
+      await updateTableStatus(chair.table_id);
     }
   };
 
@@ -252,11 +252,12 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
                 </button>
               ))}
               <button
-                onClick={() => {
-                  // Just occupy without order
+                onClick={async () => {
                   const tableChairs = chairs.filter(c => c.table_id === actionSheet.table.id);
-                  tableChairs.forEach(c => toggleChair(c.id, true));
-                  setTimeout(() => updateTableStatus(actionSheet.table.id), 200);
+                  for (const c of tableChairs) {
+                    await toggleChair(c.id, true);
+                  }
+                  await updateTableStatus(actionSheet.table.id);
                   setActionSheet(null);
                 }}
                 className="px-4 py-3 rounded-xl bg-muted font-bold text-lg active:scale-95 transition-all"

@@ -66,17 +66,23 @@ export function useFloorPlan(sessionId: string | undefined, floor: string) {
   }, []);
 
   const updateTableStatus = useCallback(async (tableId: string) => {
-    const tableChairs = chairs.filter(c => c.table_id === tableId);
+    // Fetch fresh chair data from DB to avoid stale state
+    const { data: freshChairs } = await supabase
+      .from('chairs')
+      .select('is_occupied')
+      .eq('table_id', tableId);
+    
+    const tableChairs = freshChairs || [];
     const occupiedCount = tableChairs.filter(c => c.is_occupied).length;
     let status: 'available' | 'occupied' | 'sharing' = 'available';
-    if (occupiedCount === tableChairs.length) status = 'occupied';
+    if (occupiedCount === tableChairs.length && tableChairs.length > 0) status = 'occupied';
     else if (occupiedCount > 0) status = 'sharing';
 
     await supabase.from('restaurant_tables').update({
       status,
       occupied_at: status !== 'available' ? new Date().toISOString() : null,
     }).eq('id', tableId);
-  }, [chairs]);
+  }, []);
 
   const setTableMappedOrder = useCallback(async (tableId: string, orderId: string | null) => {
     await supabase.from('restaurant_tables').update({ mapped_order_id: orderId }).eq('id', tableId);

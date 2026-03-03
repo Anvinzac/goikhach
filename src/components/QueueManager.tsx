@@ -127,12 +127,12 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
         ) : (
           <div className="grid grid-cols-2 grid-rows-10 grid-flow-col auto-rows-fr h-full">
             {pageOrders.map((order, i) => {
-              // In compact grid (2 cols, 10 rows, column-first), determine row index
               const rowIndex = i % 10;
               const isBottom = rowIndex >= 6;
+              const isRightCol = i >= 10;
               return (
               <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} onUpdate={updateOrder} compact isNearBottom={isBottom} />
+                <QueueRow order={order} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} />
               </div>
               );
             })}

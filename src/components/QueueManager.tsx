@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useQueueOrders } from '@/hooks/useQueueOrders';
+import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
 import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
@@ -8,10 +8,11 @@ interface QueueManagerProps {
   sessionType: string;
   onReset: () => void;
   estimatedMinutes?: number;
+  orders: QueueOrder[];
+  updateOrder: (id: string, updates: Partial<QueueOrder>) => void;
 }
 
-export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0 }: QueueManagerProps) {
-  const { orders, updateOrder } = useQueueOrders(sessionId);
+export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0, orders, updateOrder }: QueueManagerProps) {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);

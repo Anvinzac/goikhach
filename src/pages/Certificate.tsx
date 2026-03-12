@@ -649,7 +649,7 @@ export default function Certificate() {
 
       {/* Footer */}
       <div className={`px-4 py-2 ${theme.footerBg} border-t ${theme.border} flex items-center justify-between`}>
-        <p className={`text-[10px] ${theme.footerText} font-medium`}>{t('Phiếu chờ điện tử', 'Digital Queue Card', lang)}</p>
+        {renderStatusBadge()}
         <button onClick={() => setShowPersonalize(!showPersonalize)} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold transition-all active:scale-95 ${isDark ? 'bg-white/10 text-white/50 hover:text-white/70' : 'bg-black/5 text-black/40 hover:text-black/60'}`}>
           <Sparkles className="w-3 h-3" />{t('Cá nhân hóa', 'Personalize', lang)}
         </button>

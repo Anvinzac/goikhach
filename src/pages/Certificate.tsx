@@ -1,7 +1,8 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useCertificate } from '@/hooks/useCertificate';
-import { ShieldX, Users, User, Camera, CheckCircle2, Globe, Sparkles, Clock, XCircle, Loader2 } from 'lucide-react';
+import { ShieldX, Users, User, Camera, CheckCircle2, Globe, Sparkles, Clock, XCircle, Loader2, Download } from 'lucide-react';
+import { toPng } from 'html-to-image';
 
 type Lang = 'vi' | 'en';
 

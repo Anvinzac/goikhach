@@ -279,107 +279,149 @@ export default function Certificate() {
 
   const displayName = activeCert.customer_name;
 
-  // --- LAYOUT: TICKET (horizontal stub feel) ---
+  // --- LAYOUT: TICKET (overwhelming, immersive) ---
   const renderTicketLayout = () => (
-    <div className={`rounded-2xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
-      <ThemeDecorations theme={theme} isDark={isDark} />
+    <div className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
+      {/* Animated background pattern */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Radial glow */}
+        <div className={`absolute -top-20 -right-20 w-60 h-60 rounded-full blur-3xl opacity-30 animate-pulse ${
+          isDark ? 'bg-fuchsia-500' : 'bg-pink-300'
+        }`} />
+        <div className={`absolute -bottom-16 -left-16 w-48 h-48 rounded-full blur-3xl opacity-20 animate-pulse ${
+          isDark ? 'bg-indigo-500' : 'bg-sky-300'
+        }`} style={{ animationDelay: '1s' }} />
+        {/* Scattered decorations */}
+        {[...Array(12)].map((_, i) => (
+          <span
+            key={i}
+            className={`absolute ${theme.decoColor} animate-pulse`}
+            style={{
+              top: `${8 + (i * 37) % 85}%`,
+              left: `${5 + (i * 53) % 90}%`,
+              fontSize: `${10 + (i % 3) * 6}px`,
+              animationDelay: `${i * 0.3}s`,
+              animationDuration: `${2 + (i % 4) * 0.5}s`,
+              transform: `rotate(${i * 30}deg)`,
+            }}
+          >
+            {theme.deco[i % theme.deco.length]}
+          </span>
+        ))}
+      </div>
 
-      {/* Ticket top: giant number + stub */}
+      {/* Hero section — full bleed, cinematic */}
       <div className="relative overflow-hidden">
         {photoUrl && (
           <>
-            <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
+            <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover scale-110" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-[3px]" />
           </>
         )}
-        <div className={`relative ${!photoUrl ? theme.headerBg : ''} px-4 py-4 flex items-center gap-3`}>
-          {/* Giant number circle */}
-          <div className={`w-16 h-16 rounded-full ${isDark ? 'bg-white/10' : 'bg-black/10'} flex flex-col items-center justify-center flex-shrink-0 backdrop-blur-sm`}>
-            <span className={`text-[10px] font-semibold ${theme.headerText} opacity-50`}>{t('số', 'no.', lang)}</span>
-            <span className={`text-3xl font-black leading-none ${theme.headerText}`}>{activeCert.order_number}</span>
-          </div>
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <p className={`text-lg font-extrabold leading-tight ${theme.headerText}`}>
-              {displayName ? t(`Phiếu chờ của ${displayName}`, `${displayName}'s card`, lang) : t('Phiếu chờ', 'Queue Card', lang)}
+        <div className={`relative ${!photoUrl ? theme.headerBg : ''} px-5 pt-5 pb-8`}>
+          {/* Top bar: restaurant + lang */}
+          <div className="flex items-center justify-between mb-4">
+            <p className={`text-[10px] ${theme.headerText} opacity-50 font-semibold uppercase tracking-[0.2em]`}>
+              Quán chay Lá
             </p>
-            <p className={`text-[10px] ${theme.headerText} opacity-40 font-medium mt-0.5`}>
-              Quán chay Lá – Vegetarian restaurant
+            <button onClick={toggleLang} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold backdrop-blur-sm ${isDark ? 'bg-white/15 text-white/80' : 'bg-black/10 text-white/80'}`}>
+              <Globe className="w-3 h-3" />{lang === 'vi' ? 'EN' : 'VI'}
+            </button>
+          </div>
+
+          {/* Massive centered number with glow */}
+          <div className="text-center relative">
+            <p className={`text-[10px] ${theme.headerText} opacity-40 font-bold uppercase tracking-[0.5em] mb-1`}>
+              {t('số', 'no.', lang)}
+            </p>
+            <div className="relative inline-block">
+              {/* Glow behind number */}
+              <span
+                className={`absolute inset-0 text-8xl font-black ${theme.headerText} blur-xl opacity-30`}
+                aria-hidden="true"
+              >
+                {activeCert.order_number}
+              </span>
+              <span
+                className={`relative text-8xl font-black ${theme.headerText} leading-none`}
+                style={{
+                  textShadow: isDark
+                    ? '0 0 60px rgba(255,255,255,0.3), 0 0 120px rgba(255,255,255,0.1)'
+                    : '0 4px 30px rgba(0,0,0,0.15)',
+                }}
+              >
+                {activeCert.order_number}
+              </span>
+            </div>
+            <p className={`text-base font-extrabold ${theme.headerText} mt-2`}>
+              {displayName
+                ? t(`Phiếu chờ của ${displayName}`, `${displayName}'s card`, lang)
+                : t('Phiếu chờ', 'Queue Card', lang)}
             </p>
           </div>
-          {/* Lang */}
-          <button onClick={toggleLang} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold backdrop-blur-sm flex-shrink-0 ${isDark ? 'bg-white/10 text-white/70' : 'bg-black/10 text-white/70'}`}>
-            <Globe className="w-3 h-3" />{lang === 'vi' ? 'EN' : 'VI'}
-          </button>
         </div>
       </div>
 
-      {/* Perforated line */}
-      <div className="flex items-center px-2">
-        <div className={`flex-1 border-t-2 border-dashed ${theme.border}`} />
-        <span className={`px-2 text-lg ${theme.decoColor}`}>{theme.deco[0]}</span>
-        <div className={`flex-1 border-t-2 border-dashed ${theme.border}`} />
+      {/* Diagonal tear / zigzag separator */}
+      <div className="relative h-4 -mt-2">
+        <svg viewBox="0 0 400 16" className="w-full h-4" preserveAspectRatio="none">
+          <path
+            d={`M0,0 ${Array.from({ length: 20 }, (_, i) => `L${i * 20 + 10},${i % 2 ? 0 : 16} L${(i + 1) * 20},${i % 2 ? 16 : 0}`).join(' ')} L400,0 Z`}
+            className={isDark ? 'fill-violet-950' : 'fill-white'}
+            opacity="0.5"
+          />
+        </svg>
       </div>
 
-      {/* Body */}
-      <div className="px-4 py-3 space-y-2.5">
-        {/* Inline: group + time */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Users className={`w-4 h-4 ${theme.number}`} />
-            <span className={`text-xl font-black ${theme.number}`}>{activeCert.group_size}</span>
-            <span className={`text-xs font-semibold ${theme.labelColor}`}>{t('người', 'pax', lang)}</span>
+      {/* Stats dashboard — grid of glowing tiles */}
+      <div className="relative px-4 py-3 space-y-3">
+        {/* Row: group size + time */}
+        <div className="flex gap-2">
+          <div className={`flex-1 ${theme.accentBg} rounded-2xl px-3 py-3 text-center relative overflow-hidden`}>
+            <div className={`absolute inset-0 opacity-5 ${isDark ? 'bg-white' : 'bg-black'}`} style={{ background: 'radial-gradient(circle at 30% 30%, currentColor 0%, transparent 70%)' }} />
+            <Users className={`w-5 h-5 mx-auto ${theme.number} mb-1`} />
+            <p className={`text-3xl font-black ${theme.number}`}>{activeCert.group_size}</p>
+            <p className={`text-[9px] uppercase tracking-wider font-bold ${theme.labelColor}`}>{t('người', 'pax', lang)}</p>
           </div>
-          <div className="text-right">
-            <p className={`text-sm font-bold ${theme.accent} leading-none`}>{timeLabel}</p>
-            <p className={`text-[10px] ${theme.labelColor} font-medium`}>{dayLabel}</p>
+          <div className={`flex-1 ${theme.accentBg} rounded-2xl px-3 py-3 text-center`}>
+            <p className={`text-2xl font-black ${theme.number} leading-tight`}>{timeLabel}</p>
+            <p className={`text-[10px] ${theme.labelColor} font-medium mt-0.5`}>{dayLabel}</p>
           </div>
         </div>
 
         {sessionInfo.daily_notice && (
-          <div className={`${theme.accentBg} rounded-xl px-3 py-2`}>
+          <div className={`${theme.accentBg} rounded-2xl px-4 py-2.5 relative overflow-hidden`}>
+            <span className={`absolute top-1 right-2 text-2xl ${theme.decoColor}`}>{theme.deco[1]}</span>
             <p className={`text-xs font-bold ${theme.accent}`}>{sessionInfo.daily_notice}</p>
           </div>
         )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className={`${theme.accentBg} rounded-xl px-3 py-2 text-center`}>
-            <p className={`text-[10px] uppercase tracking-wider font-semibold ${theme.labelColor}`}>{t('Nhóm trước', 'Before you', lang)}</p>
-            <p className={`text-2xl font-black ${theme.number} mt-0.5`}>{isDone ? <CheckCircle2 className={`w-6 h-6 mx-auto ${theme.number}`} /> : waitingStats.groupsBefore}</p>
+        {/* Big dramatic stat tiles */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className={`${theme.accentBg} rounded-2xl px-2 py-3 text-center`}>
+            <p className={`text-[8px] uppercase tracking-wider font-bold ${theme.labelColor}`}>{t('Trước bạn', 'Before', lang)}</p>
+            <p className={`text-3xl font-black ${theme.number} mt-1`}>{isDone ? '✓' : waitingStats.groupsBefore}</p>
           </div>
-          <div className={`${theme.accentBg} rounded-xl px-3 py-2 text-center`}>
-            <p className={`text-[10px] uppercase tracking-wider font-semibold ${theme.labelColor}`}>{t('Đang chờ', 'Waiting', lang)}</p>
-            <p className={`text-2xl font-black ${theme.number} mt-0.5`}>{isDone ? '—' : waitingStats.totalPeopleWaiting}</p>
+          <div className={`${theme.accentBg} rounded-2xl px-2 py-3 text-center relative`}>
+            <div className={`absolute inset-0 rounded-2xl border-2 ${theme.border} animate-pulse`} style={{ animationDuration: '3s' }} />
+            <p className={`text-[8px] uppercase tracking-wider font-bold ${theme.labelColor}`}>{t('Ước tính', 'Est.', lang)}</p>
+            <p className={`text-3xl font-black ${theme.number} mt-1`}>
+              {isDone ? '—' : <>{waitingStats.estimatedMinutes}<span className="text-sm">'</span></>}
+            </p>
+          </div>
+          <div className={`${theme.accentBg} rounded-2xl px-2 py-3 text-center`}>
+            <p className={`text-[8px] uppercase tracking-wider font-bold ${theme.labelColor}`}>{t('Đã chờ', 'Waited', lang)}</p>
+            <p className={`text-3xl font-black ${theme.number} mt-1`}>{waitingStats.currentWaitMinutes}<span className="text-sm">'</span></p>
           </div>
         </div>
 
-        {/* Wait times — always visible */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center px-1">
-            <p className={`text-xs font-semibold ${theme.accent}`}>
-              {isDone ? t('Thời gian vào bàn', 'Reached table', lang) : t('Ước tính', 'Estimated', lang)}
-            </p>
-            <span className={`text-base font-black ${theme.number}`}>
-              {isDone
-                ? (waitingStats.reachedTableAt ? new Date(waitingStats.reachedTableAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—')
-                : `~${waitingStats.estimatedMinutes} ${t('phút', 'min', lang)}`}
-            </span>
-          </div>
-          <div className="flex justify-between items-center px-1">
-            <p className={`text-xs font-semibold ${theme.accent}`}>
-              {isDone ? t('Tổng chờ', 'Total wait', lang) : t('Đã chờ', 'Waited', lang)}
-            </p>
-            <span className={`text-base font-black ${theme.number}`}>
-              {isDone && waitingStats.reachedTableAt
-                ? `${Math.floor((new Date(waitingStats.reachedTableAt).getTime() - new Date(activeCert.created_at).getTime()) / 60000)} ${t('phút', 'min', lang)}`
-                : `${waitingStats.currentWaitMinutes} ${t('phút', 'min', lang)}`}
-            </span>
-          </div>
+        <div className="flex justify-between items-center px-1">
+          <p className={`text-xs font-semibold ${theme.accent}`}>{t('Tổng đang chờ', 'Total waiting', lang)}</p>
+          <span className={`text-base font-black ${theme.number}`}>{waitingStats.totalPeopleWaiting} {t('người', 'pax', lang)}</span>
         </div>
       </div>
 
-      {/* Footer with personalize */}
+      {/* Footer */}
       <div className={`px-4 py-2 ${theme.footerBg} border-t ${theme.border} flex items-center justify-between`}>
         <p className={`text-[10px] ${theme.footerText} font-medium`}>{t('Phiếu chờ điện tử', 'Digital Queue Card', lang)}</p>
         <button onClick={() => setShowPersonalize(!showPersonalize)} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold transition-all active:scale-95 ${isDark ? 'bg-white/10 text-white/50 hover:text-white/70' : 'bg-black/5 text-black/40 hover:text-black/60'}`}>

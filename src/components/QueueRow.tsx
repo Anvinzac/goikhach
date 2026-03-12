@@ -23,9 +23,10 @@ interface QueueRowProps {
   compact?: boolean;
   isNearBottom?: boolean;
   isRightColumn?: boolean;
+  qrEnabled?: boolean;
 }
 
-export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn }: QueueRowProps) {
+export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true }: QueueRowProps) {
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);

@@ -45,7 +45,7 @@ export function QRCodePopup({ orderId, sessionId, orderNumber, groupSize, onClos
 
       if (existing) {
         setSecretCode(existing.secret_code);
-        const url = `${window.location.origin}/c/${existing.secret_code}`;
+        const url = `${getCertificateBaseUrl()}/c/${existing.secret_code}`;
         setCertificateUrl(url);
         setLoading(false);
         return;

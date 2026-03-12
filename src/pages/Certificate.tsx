@@ -278,6 +278,40 @@ export default function Certificate() {
   if (!activeCert || !sessionInfo) return null;
 
   const displayName = activeCert.customer_name;
+  const orderStatus = waitingStats.orderStatus as string;
+
+  const renderStatusBadge = () => {
+    const statusConfig = {
+      waiting: {
+        icon: <Loader2 className="w-3 h-3 animate-spin" />,
+        label: t('Đang chờ', 'Waiting', lang),
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10',
+        border: 'border-amber-500/30',
+      },
+      done: {
+        icon: <CheckCircle2 className="w-3 h-3" />,
+        label: t('Đã vào bàn', 'Seated', lang),
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-500/10',
+        border: 'border-emerald-500/30',
+      },
+      cancelled: {
+        icon: <XCircle className="w-3 h-3" />,
+        label: t('Đã huỷ', 'Cancelled', lang),
+        color: 'text-red-500',
+        bg: 'bg-red-500/10',
+        border: 'border-red-500/30',
+      },
+    };
+    const cfg = statusConfig[orderStatus as keyof typeof statusConfig] || statusConfig.waiting;
+    return (
+      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+        {cfg.icon}
+        {cfg.label}
+      </div>
+    );
+  };
 
   // --- LAYOUT: TICKET (overwhelming, immersive) ---
   const renderTicketLayout = () => (

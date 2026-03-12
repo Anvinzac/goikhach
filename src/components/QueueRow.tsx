@@ -3,6 +3,7 @@ import { QueueOrder } from '@/hooks/useQueueOrders';
 import { GroupSizeSelector } from './GroupSizeSelector';
 import { StatusCheckbox } from './StatusCheckbox';
 import { NotesTags } from './NotesTags';
+import { QRCodePopup } from './QRCodePopup';
 import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare } from 'lucide-react';
 
 const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -17,15 +18,25 @@ const DISABLED_NUMBERS = [13];
 
 interface QueueRowProps {
   order: QueueOrder;
+  sessionId: string;
   onUpdate: (id: string, updates: Partial<QueueOrder>) => void;
   compact?: boolean;
   isNearBottom?: boolean;
   isRightColumn?: boolean;
 }
 
-export function QueueRow({ order, onUpdate, compact, isNearBottom, isRightColumn }: QueueRowProps) {
+export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn }: QueueRowProps) {
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+
+  const handleGroupSizeSelect = (size: number | null, prev: number | null) => {
+    onUpdate(order.id, { group_size: size, previous_group_size: prev });
+    // Show QR popup when a group size is selected (not cleared)
+    if (size !== null) {
+      setShowQR(true);
+    }
+  };
 
   const statusBg = {
     waiting: '',
@@ -93,7 +104,7 @@ export function QueueRow({ order, onUpdate, compact, isNearBottom, isRightColumn
                 <GroupSizeSelector
                   currentSize={order.group_size}
                   previousSize={order.previous_group_size}
-                  onSelect={(size, prev) => onUpdate(order.id, { group_size: size, previous_group_size: prev })}
+                  onSelect={handleGroupSizeSelect}
                 />
                 {order.group_size ? (
                   <StatusCheckbox
@@ -111,6 +122,17 @@ export function QueueRow({ order, onUpdate, compact, isNearBottom, isRightColumn
               ) : null}
             </div>
           </>
+        )}
+
+        {/* QR Code Popup */}
+        {showQR && order.group_size && (
+          <QRCodePopup
+            orderId={order.id}
+            sessionId={sessionId}
+            orderNumber={order.order_number}
+            groupSize={order.group_size}
+            onClose={() => setShowQR(false)}
+          />
         )}
       </div>
     );
@@ -131,7 +153,7 @@ export function QueueRow({ order, onUpdate, compact, isNearBottom, isRightColumn
         <GroupSizeSelector
           currentSize={order.group_size}
           previousSize={order.previous_group_size}
-          onSelect={(size, prev) => onUpdate(order.id, { group_size: size, previous_group_size: prev })}
+          onSelect={handleGroupSizeSelect}
         />
       </div>
 
@@ -156,6 +178,17 @@ export function QueueRow({ order, onUpdate, compact, isNearBottom, isRightColumn
           />
         </div>
       ) : <div className="flex-1" />}
+
+      {/* QR Code Popup */}
+      {showQR && order.group_size && (
+        <QRCodePopup
+          orderId={order.id}
+          sessionId={sessionId}
+          orderNumber={order.order_number}
+          groupSize={order.group_size}
+          onClose={() => setShowQR(false)}
+        />
+      )}
     </div>
   );
 }

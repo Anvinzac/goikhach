@@ -339,7 +339,7 @@ export default function Certificate() {
 
   // --- LAYOUT: TICKET (overwhelming, immersive) ---
   const renderTicketLayout = () => (
-    <div className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
+    <div ref={cardRef} className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
       {/* Animated background pattern */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Radial glow */}

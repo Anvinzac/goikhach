@@ -59,6 +59,60 @@ export type Database = {
           },
         ]
       }
+      queue_certificates: {
+        Row: {
+          browser_token: string | null
+          created_at: string
+          customer_name: string | null
+          group_size: number
+          id: string
+          is_used: boolean
+          order_id: string
+          order_number: number
+          secret_code: string
+          session_id: string
+        }
+        Insert: {
+          browser_token?: string | null
+          created_at?: string
+          customer_name?: string | null
+          group_size: number
+          id?: string
+          is_used?: boolean
+          order_id: string
+          order_number: number
+          secret_code: string
+          session_id: string
+        }
+        Update: {
+          browser_token?: string | null
+          created_at?: string
+          customer_name?: string | null
+          group_size?: number
+          id?: string
+          is_used?: boolean
+          order_id?: string
+          order_number?: number
+          secret_code?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queue_certificates_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "queue_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "queue_certificates_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       queue_orders: {
         Row: {
           created_at: string
@@ -68,6 +122,7 @@ export type Database = {
           notes: string[] | null
           order_number: number
           previous_group_size: number | null
+          reached_table_at: string | null
           session_id: string | null
           status: string
           updated_at: string
@@ -80,6 +135,7 @@ export type Database = {
           notes?: string[] | null
           order_number: number
           previous_group_size?: number | null
+          reached_table_at?: string | null
           session_id?: string | null
           status?: string
           updated_at?: string
@@ -92,6 +148,7 @@ export type Database = {
           notes?: string[] | null
           order_number?: number
           previous_group_size?: number | null
+          reached_table_at?: string | null
           session_id?: string | null
           status?: string
           updated_at?: string
@@ -168,18 +225,21 @@ export type Database = {
       }
       sessions: {
         Row: {
+          daily_notice: string | null
           id: string
           is_active: boolean
           session_type: string
           started_at: string
         }
         Insert: {
+          daily_notice?: string | null
           id?: string
           is_active?: boolean
           session_type: string
           started_at?: string
         }
         Update: {
+          daily_notice?: string | null
           id?: string
           is_active?: boolean
           session_type?: string

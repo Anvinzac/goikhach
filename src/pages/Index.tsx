@@ -58,7 +58,7 @@ const Index = () => {
   }
 
   if (!session) {
-    return <SessionStarter onStart={startNewSession} loading={false} />;
+    return <SessionStarter onStart={(type, notice) => startNewSession(type, notice)} loading={false} />;
   }
 
   const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [

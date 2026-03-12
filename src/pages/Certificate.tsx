@@ -1,7 +1,8 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useCertificate } from '@/hooks/useCertificate';
-import { ShieldX, Users, User, Camera, CheckCircle2, Globe, Sparkles, Clock, XCircle, Loader2 } from 'lucide-react';
+import { ShieldX, Users, User, Camera, CheckCircle2, Globe, Sparkles, Clock, XCircle, Loader2, Download } from 'lucide-react';
+import { toPng } from 'html-to-image';
 
 type Lang = 'vi' | 'en';
 
@@ -193,10 +194,12 @@ export default function Certificate() {
   const [customerName, setCustomerName] = useState('');
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [demoCertificate, setDemoCertificate] = useState(DEMO_CERTIFICATE);
+  const [demoStatus, setDemoStatus] = useState<string>('waiting');
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const activeCert = isDemo ? demoCertificate : certificate;
 
-  const isDone = waitingStats.orderStatus === 'done';
+  const isDone = (isDemo ? demoStatus : waitingStats.orderStatus) === 'done';
   const isDark = theme.id === 'neon' || theme.id === 'midnight';
 
   useEffect(() => {
@@ -248,6 +251,24 @@ export default function Certificate() {
 
   const toggleLang = () => setLang(l => l === 'vi' ? 'en' : 'vi');
 
+  const handleExportCard = useCallback(async () => {
+    if (!cardRef.current) return;
+    try {
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3 });
+      const link = document.createElement('a');
+      link.download = `queue-card-${activeCert?.order_number || 'unknown'}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Export failed', err);
+    }
+  }, [activeCert]);
+
+  const cycleStatus = () => {
+    const statuses = ['waiting', 'done', 'cancelled'];
+    setDemoStatus(s => statuses[(statuses.indexOf(s) + 1) % statuses.length]);
+  };
+
   if (accessState === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -278,7 +299,7 @@ export default function Certificate() {
   if (!activeCert || !sessionInfo) return null;
 
   const displayName = activeCert.customer_name;
-  const orderStatus = waitingStats.orderStatus as string;
+  const orderStatus = isDemo ? demoStatus : (waitingStats.orderStatus as string);
 
   const renderStatusBadge = () => {
     const statusConfig = {
@@ -306,7 +327,10 @@ export default function Certificate() {
     };
     const cfg = statusConfig[orderStatus as keyof typeof statusConfig] || statusConfig.waiting;
     return (
-      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+      <div
+        onClick={isDemo ? cycleStatus : undefined}
+        className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold ${cfg.color} ${cfg.bg} ${cfg.border} ${isDemo ? 'cursor-pointer active:scale-95 transition-all' : ''}`}
+      >
         {cfg.icon}
         {cfg.label}
       </div>
@@ -315,7 +339,7 @@ export default function Certificate() {
 
   // --- LAYOUT: TICKET (overwhelming, immersive) ---
   const renderTicketLayout = () => (
-    <div className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
+    <div ref={cardRef} className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
       {/* Animated background pattern */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Radial glow */}
@@ -469,7 +493,7 @@ export default function Certificate() {
 
   // --- LAYOUT: POSTER (big dramatic) ---
   const renderPosterLayout = () => (
-    <div className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
+    <div ref={cardRef} className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
       <ThemeDecorations theme={theme} isDark={isDark} />
 
       {/* Dramatic hero: massive number */}
@@ -554,7 +578,7 @@ export default function Certificate() {
 
   // --- LAYOUT: CLASSIC ---
   const renderClassicLayout = () => (
-    <div className={`rounded-2xl overflow-hidden shadow-2xl border ${theme.card} ${theme.border} relative`}>
+    <div ref={cardRef} className={`rounded-2xl overflow-hidden shadow-2xl border ${theme.card} ${theme.border} relative`}>
       <ThemeDecorations theme={theme} isDark={isDark} />
 
       {/* Header */}
@@ -575,14 +599,9 @@ export default function Certificate() {
                 Quán chay Lá – Vegetarian restaurant
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-              <button onClick={toggleLang} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold backdrop-blur-sm ${isDark ? 'bg-white/10 text-white/70' : 'bg-black/10 text-white/70'}`}>
-                <Globe className="w-3 h-3" />{lang === 'vi' ? 'EN' : 'VI'}
-              </button>
-              <div className="text-right">
-                <p className={`text-[10px] ${theme.headerText} opacity-40 font-semibold`}>{t('số', 'no.', lang)}</p>
-                <span className={`text-4xl font-black leading-none ${theme.headerText}`}>{activeCert.order_number}</span>
-              </div>
+            <div className="text-right flex-shrink-0 ml-3">
+              <p className={`text-[10px] ${theme.headerText} opacity-40 font-semibold`}>{t('số', 'no.', lang)}</p>
+              <span className={`text-4xl font-black leading-none ${theme.headerText}`}>{activeCert.order_number}</span>
             </div>
           </div>
         </div>
@@ -647,9 +666,12 @@ export default function Certificate() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer: status | lang | personalize */}
       <div className={`px-4 py-2 ${theme.footerBg} border-t ${theme.border} flex items-center justify-between`}>
         {renderStatusBadge()}
+        <button onClick={toggleLang} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold transition-all active:scale-95 ${isDark ? 'bg-white/10 text-white/50' : 'bg-black/5 text-black/40'}`}>
+          <Globe className="w-3 h-3" />{lang === 'vi' ? 'EN' : 'VI'}
+        </button>
         <button onClick={() => setShowPersonalize(!showPersonalize)} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold transition-all active:scale-95 ${isDark ? 'bg-white/10 text-white/50 hover:text-white/70' : 'bg-black/5 text-black/40 hover:text-black/60'}`}>
           <Sparkles className="w-3 h-3" />{t('Cá nhân hóa', 'Personalize', lang)}
         </button>
@@ -701,6 +723,17 @@ export default function Certificate() {
 
         {/* THE CARD — layout-dependent */}
         {layout.id === 'ticket' ? renderTicketLayout() : layout.id === 'poster' ? renderPosterLayout() : renderClassicLayout()}
+
+        {/* Export button */}
+        <button
+          onClick={handleExportCard}
+          className={`w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+            isDark ? 'bg-white/10 text-white/50 hover:text-white/70' : 'bg-black/5 text-black/40 hover:text-black/60'
+          }`}
+        >
+          <Download className="w-3.5 h-3.5" />
+          {t('Lưu ảnh phiếu chờ', 'Save card as image', lang)}
+        </button>
 
         {/* Customization row 1: Theme */}
         <div className="space-y-1.5">

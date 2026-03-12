@@ -33,8 +33,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
 
   const handleGroupSizeSelect = (size: number | null, prev: number | null) => {
     onUpdate(order.id, { group_size: size, previous_group_size: prev });
-    // Show QR popup when a group size is selected (not cleared)
-    if (size !== null) {
+    // Show QR popup when a group size is selected (not cleared) and QR is enabled
+    if (size !== null && qrEnabled) {
       setShowQR(true);
     }
   };

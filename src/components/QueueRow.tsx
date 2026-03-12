@@ -112,7 +112,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         {/* Inline note icons or wait time */}
         <div className="flex items-center gap-0.5 flex-shrink-0">
           {shouldShowTime && waitTimeText ? (
-            <span className={`text-[11px] font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+            <span className={`text-[11px] font-bold tabular-nums ${waitColor}`}>
               {waitTimeText}
             </span>
           ) : (

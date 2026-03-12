@@ -7,8 +7,18 @@
 
 html, body, #root {
   height: 100dvh;
-  overflow: hidden;
   overscroll-behavior: none;
+}
+
+/* Allow scrolling on certificate page */
+.certificate-page {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Keep main app locked */
+.app-locked {
+  overflow: hidden;
   touch-action: pan-x;
 }
 

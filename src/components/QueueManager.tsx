@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw, QrCode } from 'lucide-react';
+import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw, QrCode, Timer } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;

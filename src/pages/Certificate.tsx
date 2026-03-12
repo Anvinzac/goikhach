@@ -578,7 +578,7 @@ export default function Certificate() {
 
   // --- LAYOUT: CLASSIC ---
   const renderClassicLayout = () => (
-    <div className={`rounded-2xl overflow-hidden shadow-2xl border ${theme.card} ${theme.border} relative`}>
+    <div ref={cardRef} className={`rounded-2xl overflow-hidden shadow-2xl border ${theme.card} ${theme.border} relative`}>
       <ThemeDecorations theme={theme} isDark={isDark} />
 
       {/* Header */}
@@ -599,14 +599,9 @@ export default function Certificate() {
                 Quán chay Lá – Vegetarian restaurant
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-              <button onClick={toggleLang} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold backdrop-blur-sm ${isDark ? 'bg-white/10 text-white/70' : 'bg-black/10 text-white/70'}`}>
-                <Globe className="w-3 h-3" />{lang === 'vi' ? 'EN' : 'VI'}
-              </button>
-              <div className="text-right">
-                <p className={`text-[10px] ${theme.headerText} opacity-40 font-semibold`}>{t('số', 'no.', lang)}</p>
-                <span className={`text-4xl font-black leading-none ${theme.headerText}`}>{activeCert.order_number}</span>
-              </div>
+            <div className="text-right flex-shrink-0 ml-3">
+              <p className={`text-[10px] ${theme.headerText} opacity-40 font-semibold`}>{t('số', 'no.', lang)}</p>
+              <span className={`text-4xl font-black leading-none ${theme.headerText}`}>{activeCert.order_number}</span>
             </div>
           </div>
         </div>
@@ -671,9 +666,12 @@ export default function Certificate() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer: status | lang | personalize */}
       <div className={`px-4 py-2 ${theme.footerBg} border-t ${theme.border} flex items-center justify-between`}>
         {renderStatusBadge()}
+        <button onClick={toggleLang} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold transition-all active:scale-95 ${isDark ? 'bg-white/10 text-white/50' : 'bg-black/5 text-black/40'}`}>
+          <Globe className="w-3 h-3" />{lang === 'vi' ? 'EN' : 'VI'}
+        </button>
         <button onClick={() => setShowPersonalize(!showPersonalize)} className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold transition-all active:scale-95 ${isDark ? 'bg-white/10 text-white/50 hover:text-white/70' : 'bg-black/5 text-black/40 hover:text-black/60'}`}>
           <Sparkles className="w-3 h-3" />{t('Cá nhân hóa', 'Personalize', lang)}
         </button>

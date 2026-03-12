@@ -104,6 +104,8 @@ const Index = () => {
             estimatedMinutes={estimatedMinutes}
             orders={orders}
             updateOrder={updateOrder}
+            qrEnabled={qrEnabled}
+            onToggleQr={() => setQrEnabled(v => !v)}
           />
         )}
         {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}

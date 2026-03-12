@@ -50,6 +50,15 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
             <span className="text-[10px] font-bold text-muted-foreground tabular-nums">~{estimatedMinutes} min.</span>
           )}
           <button
+            onClick={onToggleQr}
+            className={`w-7 h-7 rounded flex items-center justify-center transition-all active:scale-90 ${
+              qrEnabled ? 'bg-queue text-queue-foreground' : 'bg-muted text-muted-foreground opacity-40'
+            }`}
+            title={qrEnabled ? 'QR enabled' : 'QR disabled'}
+          >
+            <QrCode className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={() => handleSwipe('right')}
             disabled={currentPage === 0}
             className="w-8 h-8 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"

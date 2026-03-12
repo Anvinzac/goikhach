@@ -6,6 +6,17 @@ import { NotesTags } from './NotesTags';
 import { QRCodePopup } from './QRCodePopup';
 import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare } from 'lucide-react';
 
+function formatWaitTime(startTime: string, endTime?: string): string {
+  const start = new Date(startTime).getTime();
+  const end = endTime ? new Date(endTime).getTime() : Date.now();
+  const diffMin = Math.floor((end - start) / 60000);
+  if (diffMin < 1) return '<1m';
+  if (diffMin < 60) return `${diffMin}m`;
+  const h = Math.floor(diffMin / 60);
+  const m = diffMin % 60;
+  return m > 0 ? `${h}h${m}m` : `${h}h`;
+}
+
 const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   foreigners: Globe,
   prefer_downstairs: ArrowDown,

@@ -6,15 +6,24 @@ import { NotesTags } from './NotesTags';
 import { QRCodePopup } from './QRCodePopup';
 import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare } from 'lucide-react';
 
-function formatWaitTime(startTime: string, endTime?: string): string {
+function getWaitMinutes(startTime: string, endTime?: string): number {
   const start = new Date(startTime).getTime();
   const end = endTime ? new Date(endTime).getTime() : Date.now();
-  const diffMin = Math.floor((end - start) / 60000);
-  if (diffMin < 1) return '<1m';
-  if (diffMin < 60) return `${diffMin}m`;
-  const h = Math.floor(diffMin / 60);
-  const m = diffMin % 60;
+  return Math.floor((end - start) / 60000);
+}
+
+function formatWaitTime(minutes: number): string {
+  if (minutes < 1) return '<1m';
+  if (minutes < 60) return `${minutes}m`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
   return m > 0 ? `${h}h${m}m` : `${h}h`;
+}
+
+function waitTimeColor(minutes: number): string {
+  if (minutes < 10) return 'text-available';
+  if (minutes <= 20) return 'text-sharing';
+  return 'text-occupied';
 }
 
 const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {

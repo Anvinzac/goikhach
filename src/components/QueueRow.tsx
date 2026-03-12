@@ -98,14 +98,22 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
           />
         ) : <div className="w-11 h-11" />}
 
-        {/* Inline note icons */}
+        {/* Inline note icons or wait time */}
         <div className="flex items-center gap-0.5 flex-shrink-0">
-          {order.notes.map(n => {
-            const Icon = TAG_ICONS[n];
-            return Icon ? <Icon key={n} className="w-3 h-3 text-queue" /> : null;
-          })}
-          {order.custom_note && (
-            <MessageSquare className="w-3 h-3 text-sharing" />
+          {shouldShowTime && waitTimeText ? (
+            <span className={`text-[11px] font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+              {waitTimeText}
+            </span>
+          ) : (
+            <>
+              {order.notes.map(n => {
+                const Icon = TAG_ICONS[n];
+                return Icon ? <Icon key={n} className="w-3 h-3 text-queue" /> : null;
+              })}
+              {order.custom_note && (
+                <MessageSquare className="w-3 h-3 text-sharing" />
+              )}
+            </>
           )}
         </div>
 

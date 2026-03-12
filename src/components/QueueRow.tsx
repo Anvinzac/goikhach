@@ -35,6 +35,7 @@ interface QueueRowProps {
   isNearBottom?: boolean;
   isRightColumn?: boolean;
   qrEnabled?: boolean;
+  showWaitTime?: boolean;
 }
 
 export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true }: QueueRowProps) {

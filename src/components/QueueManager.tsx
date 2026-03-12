@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw, QrCode } from 'lucide-react';
+import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw, QrCode, Timer } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
@@ -18,6 +18,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
+  const [showWaitTime, setShowWaitTime] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const pageSize = viewMode === 'full' ? 10 : 20;
@@ -93,6 +94,15 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
             </button>
           </div>
           <button
+            onClick={() => setShowWaitTime(v => !v)}
+            className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
+              showWaitTime ? 'bg-queue text-queue-foreground' : 'bg-muted'
+            }`}
+            title={showWaitTime ? 'Hide wait times' : 'Show wait times'}
+          >
+            <Timer className="w-3.5 h-3.5" />
+          </button>
+          <button
             onMouseDown={onReset}
             onTouchStart={onReset}
             className="w-8 h-8 rounded flex items-center justify-center bg-muted active:bg-occupied active:text-occupied-foreground transition-all"
@@ -131,7 +141,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
           <div className="flex flex-col h-full">
             {pageOrders.map((order, i) => (
               <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} />
+                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
               </div>
             ))}
           </div>
@@ -143,7 +153,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
               const isRightCol = i >= 10;
               return (
               <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} />
+                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
               </div>
               );
             })}

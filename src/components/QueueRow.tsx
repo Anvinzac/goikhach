@@ -6,6 +6,17 @@ import { NotesTags } from './NotesTags';
 import { QRCodePopup } from './QRCodePopup';
 import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare } from 'lucide-react';
 
+function formatWaitTime(startTime: string, endTime?: string): string {
+  const start = new Date(startTime).getTime();
+  const end = endTime ? new Date(endTime).getTime() : Date.now();
+  const diffMin = Math.floor((end - start) / 60000);
+  if (diffMin < 1) return '<1m';
+  if (diffMin < 60) return `${diffMin}m`;
+  const h = Math.floor(diffMin / 60);
+  const m = diffMin % 60;
+  return m > 0 ? `${h}h${m}m` : `${h}h`;
+}
+
 const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   foreigners: Globe,
   prefer_downstairs: ArrowDown,
@@ -24,9 +35,12 @@ interface QueueRowProps {
   isNearBottom?: boolean;
   isRightColumn?: boolean;
   qrEnabled?: boolean;
+  showWaitTime?: boolean;
 }
 
-export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true }: QueueRowProps) {
+export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true, showWaitTime = false }: QueueRowProps) {
+  const shouldShowTime = showWaitTime || order.status === 'done';
+  const waitTimeText = order.group_size ? formatWaitTime(order.created_at, order.status === 'done' ? order.updated_at : undefined) : '';
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);
@@ -84,14 +98,22 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
           />
         ) : <div className="w-11 h-11" />}
 
-        {/* Inline note icons */}
+        {/* Inline note icons or wait time */}
         <div className="flex items-center gap-0.5 flex-shrink-0">
-          {order.notes.map(n => {
-            const Icon = TAG_ICONS[n];
-            return Icon ? <Icon key={n} className="w-3 h-3 text-queue" /> : null;
-          })}
-          {order.custom_note && (
-            <MessageSquare className="w-3 h-3 text-sharing" />
+          {shouldShowTime && waitTimeText ? (
+            <span className={`text-[11px] font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+              {waitTimeText}
+            </span>
+          ) : (
+            <>
+              {order.notes.map(n => {
+                const Icon = TAG_ICONS[n];
+                return Icon ? <Icon key={n} className="w-3 h-3 text-queue" /> : null;
+              })}
+              {order.custom_note && (
+                <MessageSquare className="w-3 h-3 text-sharing" />
+              )}
+            </>
           )}
         </div>
 
@@ -168,16 +190,24 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         ) : <div className="w-11 h-11" />}
       </div>
 
-      {/* Notes */}
+      {/* Notes or wait time */}
       {order.group_size ? (
-        <div className="flex-1 min-w-0 relative">
-          <NotesTags
-            notes={order.notes}
-            customNote={order.custom_note}
-            onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
-            dropUp={isNearBottom}
-          />
-        </div>
+        shouldShowTime ? (
+          <div className="flex-1 min-w-0 flex items-center justify-end pr-1">
+            <span className={`text-sm font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+              {waitTimeText}
+            </span>
+          </div>
+        ) : (
+          <div className="flex-1 min-w-0 relative">
+            <NotesTags
+              notes={order.notes}
+              customNote={order.custom_note}
+              onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+              dropUp={isNearBottom}
+            />
+          </div>
+        )
       ) : <div className="flex-1" />}
 
       {/* QR Code Popup */}

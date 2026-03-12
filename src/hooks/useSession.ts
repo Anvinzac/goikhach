@@ -7,6 +7,7 @@ export interface Session {
   session_type: string;
   started_at: string;
   is_active: boolean;
+  daily_notice: string;
 }
 
 export function useSession() {

@@ -493,7 +493,7 @@ export default function Certificate() {
 
   // --- LAYOUT: POSTER (big dramatic) ---
   const renderPosterLayout = () => (
-    <div className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
+    <div ref={cardRef} className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${theme.card} ${theme.border} relative`}>
       <ThemeDecorations theme={theme} isDark={isDark} />
 
       {/* Dramatic hero: massive number */}

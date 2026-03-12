@@ -251,6 +251,24 @@ export default function Certificate() {
 
   const toggleLang = () => setLang(l => l === 'vi' ? 'en' : 'vi');
 
+  const handleExportCard = useCallback(async () => {
+    if (!cardRef.current) return;
+    try {
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3 });
+      const link = document.createElement('a');
+      link.download = `queue-card-${activeCert?.order_number || 'unknown'}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Export failed', err);
+    }
+  }, [activeCert]);
+
+  const cycleStatus = () => {
+    const statuses = ['waiting', 'done', 'cancelled'];
+    setDemoStatus(s => statuses[(statuses.indexOf(s) + 1) % statuses.length]);
+  };
+
   if (accessState === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">

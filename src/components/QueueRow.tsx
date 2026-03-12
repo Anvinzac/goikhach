@@ -6,15 +6,24 @@ import { NotesTags } from './NotesTags';
 import { QRCodePopup } from './QRCodePopup';
 import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare } from 'lucide-react';
 
-function formatWaitTime(startTime: string, endTime?: string): string {
+function getWaitMinutes(startTime: string, endTime?: string): number {
   const start = new Date(startTime).getTime();
   const end = endTime ? new Date(endTime).getTime() : Date.now();
-  const diffMin = Math.floor((end - start) / 60000);
-  if (diffMin < 1) return '<1m';
-  if (diffMin < 60) return `${diffMin}m`;
-  const h = Math.floor(diffMin / 60);
-  const m = diffMin % 60;
+  return Math.floor((end - start) / 60000);
+}
+
+function formatWaitTime(minutes: number): string {
+  if (minutes < 1) return '<1m';
+  if (minutes < 60) return `${minutes}m`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
   return m > 0 ? `${h}h${m}m` : `${h}h`;
+}
+
+function waitTimeColor(minutes: number): string {
+  if (minutes < 10) return 'text-available';
+  if (minutes <= 20) return 'text-sharing';
+  return 'text-occupied';
 }
 
 const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -40,7 +49,9 @@ interface QueueRowProps {
 
 export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true, showWaitTime = false }: QueueRowProps) {
   const shouldShowTime = showWaitTime || order.status === 'done';
-  const waitTimeText = order.group_size ? formatWaitTime(order.created_at, order.status === 'done' ? order.updated_at : undefined) : '';
+  const waitMinutes = order.group_size ? getWaitMinutes(order.created_at, order.status === 'done' ? order.updated_at : undefined) : 0;
+  const waitTimeText = order.group_size ? formatWaitTime(waitMinutes) : '';
+  const waitColor = waitTimeColor(waitMinutes);
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);
@@ -101,7 +112,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         {/* Inline note icons or wait time */}
         <div className="flex items-center gap-0.5 flex-shrink-0">
           {shouldShowTime && waitTimeText ? (
-            <span className={`text-[11px] font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+            <span className={`text-[11px] font-bold tabular-nums ${waitColor}`}>
               {waitTimeText}
             </span>
           ) : (
@@ -194,7 +205,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
       {order.group_size ? (
         shouldShowTime ? (
           <div className="flex-1 min-w-0 flex items-center justify-end pr-1">
-            <span className={`text-sm font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+            <span className={`text-sm font-bold tabular-nums ${waitColor}`}>
               {waitTimeText}
             </span>
           </div>

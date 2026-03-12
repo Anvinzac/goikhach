@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
+import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw, QrCode } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
@@ -10,9 +10,11 @@ interface QueueManagerProps {
   estimatedMinutes?: number;
   orders: QueueOrder[];
   updateOrder: (id: string, updates: Partial<QueueOrder>) => void;
+  qrEnabled: boolean;
+  onToggleQr: () => void;
 }
 
-export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0, orders, updateOrder }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0, orders, updateOrder, qrEnabled, onToggleQr }: QueueManagerProps) {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);

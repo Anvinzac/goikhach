@@ -23,17 +23,18 @@ interface QueueRowProps {
   compact?: boolean;
   isNearBottom?: boolean;
   isRightColumn?: boolean;
+  qrEnabled?: boolean;
 }
 
-export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn }: QueueRowProps) {
+export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true }: QueueRowProps) {
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
   const handleGroupSizeSelect = (size: number | null, prev: number | null) => {
     onUpdate(order.id, { group_size: size, previous_group_size: prev });
-    // Show QR popup when a group size is selected (not cleared)
-    if (size !== null) {
+    // Show QR popup when a group size is selected (not cleared) and QR is enabled
+    if (size !== null && qrEnabled) {
       setShowQR(true);
     }
   };

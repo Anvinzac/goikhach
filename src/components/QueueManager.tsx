@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
+import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw, QrCode } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
@@ -10,9 +10,11 @@ interface QueueManagerProps {
   estimatedMinutes?: number;
   orders: QueueOrder[];
   updateOrder: (id: string, updates: Partial<QueueOrder>) => void;
+  qrEnabled: boolean;
+  onToggleQr: () => void;
 }
 
-export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0, orders, updateOrder }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0, orders, updateOrder, qrEnabled, onToggleQr }: QueueManagerProps) {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
@@ -47,6 +49,15 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
           {estimatedMinutes > 0 && (
             <span className="text-[10px] font-bold text-muted-foreground tabular-nums">~{estimatedMinutes} min.</span>
           )}
+          <button
+            onClick={onToggleQr}
+            className={`w-7 h-7 rounded flex items-center justify-center transition-all active:scale-90 ${
+              qrEnabled ? 'bg-queue text-queue-foreground' : 'bg-muted text-muted-foreground opacity-40'
+            }`}
+            title={qrEnabled ? 'QR enabled' : 'QR disabled'}
+          >
+            <QrCode className="w-3.5 h-3.5" />
+          </button>
           <button
             onClick={() => handleSwipe('right')}
             disabled={currentPage === 0}
@@ -120,7 +131,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
           <div className="flex flex-col h-full">
             {pageOrders.map((order, i) => (
               <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} />
+                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} />
               </div>
             ))}
           </div>
@@ -132,7 +143,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
               const isRightCol = i >= 10;
               return (
               <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} />
+                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} />
               </div>
               );
             })}

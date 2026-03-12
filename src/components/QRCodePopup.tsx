@@ -11,6 +11,15 @@ interface QRCodePopupProps {
   onClose: () => void;
 }
 
+const PUBLISHED_APP_URL = 'https://goikhach.lovable.app';
+
+function getCertificateBaseUrl() {
+  if (typeof window === 'undefined') return PUBLISHED_APP_URL;
+  const host = window.location.hostname;
+  const isPreviewHost = host.includes('lovableproject.com') || host.includes('id-preview--') || host.includes('preview--');
+  return isPreviewHost ? PUBLISHED_APP_URL : window.location.origin;
+}
+
 function generateSecretCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
   let code = '';

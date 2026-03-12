@@ -299,7 +299,7 @@ export default function Certificate() {
   if (!activeCert || !sessionInfo) return null;
 
   const displayName = activeCert.customer_name;
-  const orderStatus = waitingStats.orderStatus as string;
+  const orderStatus = isDemo ? demoStatus : (waitingStats.orderStatus as string);
 
   const renderStatusBadge = () => {
     const statusConfig = {
@@ -327,7 +327,10 @@ export default function Certificate() {
     };
     const cfg = statusConfig[orderStatus as keyof typeof statusConfig] || statusConfig.waiting;
     return (
-      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+      <div
+        onClick={isDemo ? cycleStatus : undefined}
+        className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold ${cfg.color} ${cfg.bg} ${cfg.border} ${isDemo ? 'cursor-pointer active:scale-95 transition-all' : ''}`}
+      >
         {cfg.icon}
         {cfg.label}
       </div>

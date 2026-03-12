@@ -38,7 +38,9 @@ interface QueueRowProps {
   showWaitTime?: boolean;
 }
 
-export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true }: QueueRowProps) {
+export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true, showWaitTime = false }: QueueRowProps) {
+  const shouldShowTime = showWaitTime || order.status === 'done';
+  const waitTimeText = order.group_size ? formatWaitTime(order.created_at, order.status === 'done' ? order.updated_at : undefined) : '';
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);

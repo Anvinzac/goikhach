@@ -18,6 +18,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
+  const [showWaitTime, setShowWaitTime] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const pageSize = viewMode === 'full' ? 10 : 20;

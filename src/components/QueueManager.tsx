@@ -94,6 +94,15 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
             </button>
           </div>
           <button
+            onClick={() => setShowWaitTime(v => !v)}
+            className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
+              showWaitTime ? 'bg-queue text-queue-foreground' : 'bg-muted'
+            }`}
+            title={showWaitTime ? 'Hide wait times' : 'Show wait times'}
+          >
+            <Timer className="w-3.5 h-3.5" />
+          </button>
+          <button
             onMouseDown={onReset}
             onTouchStart={onReset}
             className="w-8 h-8 rounded flex items-center justify-center bg-muted active:bg-occupied active:text-occupied-foreground transition-all"

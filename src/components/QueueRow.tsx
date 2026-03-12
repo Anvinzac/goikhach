@@ -205,7 +205,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
       {order.group_size ? (
         shouldShowTime ? (
           <div className="flex-1 min-w-0 flex items-center justify-end pr-1">
-            <span className={`text-sm font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+            <span className={`text-sm font-bold tabular-nums ${waitColor}`}>
               {waitTimeText}
             </span>
           </div>

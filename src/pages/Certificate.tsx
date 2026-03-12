@@ -724,6 +724,17 @@ export default function Certificate() {
         {/* THE CARD — layout-dependent */}
         {layout.id === 'ticket' ? renderTicketLayout() : layout.id === 'poster' ? renderPosterLayout() : renderClassicLayout()}
 
+        {/* Export button */}
+        <button
+          onClick={handleExportCard}
+          className={`w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+            isDark ? 'bg-white/10 text-white/50 hover:text-white/70' : 'bg-black/5 text-black/40 hover:text-black/60'
+          }`}
+        >
+          <Download className="w-3.5 h-3.5" />
+          {t('Lưu ảnh phiếu chờ', 'Save card as image', lang)}
+        </button>
+
         {/* Customization row 1: Theme */}
         <div className="space-y-1.5">
           <p className={`text-[10px] font-bold text-center ${isDark ? 'text-white/20' : 'text-black/20'}`}>

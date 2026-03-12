@@ -190,16 +190,24 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         ) : <div className="w-11 h-11" />}
       </div>
 
-      {/* Notes */}
+      {/* Notes or wait time */}
       {order.group_size ? (
-        <div className="flex-1 min-w-0 relative">
-          <NotesTags
-            notes={order.notes}
-            customNote={order.custom_note}
-            onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
-            dropUp={isNearBottom}
-          />
-        </div>
+        shouldShowTime ? (
+          <div className="flex-1 min-w-0 flex items-center justify-end pr-1">
+            <span className={`text-sm font-bold tabular-nums ${order.status === 'done' ? 'text-available' : 'text-muted-foreground'}`}>
+              {waitTimeText}
+            </span>
+          </div>
+        ) : (
+          <div className="flex-1 min-w-0 relative">
+            <NotesTags
+              notes={order.notes}
+              customNote={order.custom_note}
+              onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+              dropUp={isNearBottom}
+            />
+          </div>
+        )
       ) : <div className="flex-1" />}
 
       {/* QR Code Popup */}

@@ -30,13 +30,13 @@ export function useSession() {
     setLoading(false);
   }, []);
 
-  const startNewSession = useCallback(async (type: 'lunch' | 'dinner') => {
+  const startNewSession = useCallback(async (type: 'lunch' | 'dinner', dailyNotice?: string) => {
     // Deactivate old sessions
     await supabase.from('sessions').update({ is_active: false }).eq('is_active', true);
 
     const { data, error } = await supabase
       .from('sessions')
-      .insert({ session_type: type, is_active: true })
+      .insert({ session_type: type, is_active: true, daily_notice: dailyNotice || '' })
       .select()
       .single();
 

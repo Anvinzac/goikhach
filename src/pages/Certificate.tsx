@@ -194,10 +194,12 @@ export default function Certificate() {
   const [customerName, setCustomerName] = useState('');
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [demoCertificate, setDemoCertificate] = useState(DEMO_CERTIFICATE);
+  const [demoStatus, setDemoStatus] = useState<string>('waiting');
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const activeCert = isDemo ? demoCertificate : certificate;
 
-  const isDone = waitingStats.orderStatus === 'done';
+  const isDone = (isDemo ? demoStatus : waitingStats.orderStatus) === 'done';
   const isDark = theme.id === 'neon' || theme.id === 'midnight';
 
   useEffect(() => {

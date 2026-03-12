@@ -143,7 +143,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
               const isRightCol = i >= 10;
               return (
               <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} />
+                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} />
               </div>
               );
             })}

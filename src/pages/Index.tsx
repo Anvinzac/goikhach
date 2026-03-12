@@ -14,6 +14,7 @@ const Index = () => {
   const { session, loading, startNewSession } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>('queue');
   const [showReset, setShowReset] = useState(false);
+  const [qrEnabled, setQrEnabled] = useState(false);
   const { orders, updateOrder } = useQueueOrders(session?.id);
   const [floorBadges, setFloorBadges] = useState<{ ground: number; first: number }>({ ground: 0, first: 0 });
 

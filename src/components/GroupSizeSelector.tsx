@@ -64,7 +64,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
   }
 
   return (
-    <div className="relative flex items-center gap-px min-w-0">
+    <div className="relative flex items-center gap-1">
       {[1, 2, 3, 4].map(n => {
         const isSelected = currentSize === n;
         const isFilled = currentSize !== null && n < currentSize;

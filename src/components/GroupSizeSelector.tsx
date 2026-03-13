@@ -30,46 +30,30 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
     const now = Date.now();
     const last = lastTapRef.current;
 
-    // Double-tap detection for sizes 1 and 2
-    if ((size === 1 || size === 2) && last.size === size && now - last.time < 350) {
-      // Double tap detected
+    // Double-tap: only for 1 & 2, and only when already selected
+    if ((size === 1 || size === 2) && currentSize === size && last.size === size && now - last.time < 400) {
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate(50);
       }
-      // If size is already selected, just toggle dedicated
-      if (currentSize === size) {
-        onToggleDedicated?.();
-      } else {
-        // Select the size first, then toggle dedicated
-        onSelect(size, currentSize);
-        setTimeout(() => onToggleDedicated?.(), 50);
-      }
+      onToggleDedicated?.();
       lastTapRef.current = { time: 0, size: 0 };
       return;
     }
 
     lastTapRef.current = { time: now, size };
-
-    // Delay single tap to wait for potential double tap
-    if (size === 1 || size === 2) {
-      setTimeout(() => {
-        if (lastTapRef.current.time === now) {
-          handleSelect(size);
-        }
-      }, 350);
-    } else {
-      handleSelect(size);
-    }
+    handleSelect(size);
   };
+
+  const showDedicatedBadge = dedicated && (currentSize === 1 || currentSize === 2);
 
   if (compact) {
     return (
       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted font-bold text-lg">
         {currentSize ? (
-          <span className="text-queue relative">
+          <span className="text-queue flex items-baseline justify-center">
             {currentSize}
-            {dedicated && (currentSize === 1 || currentSize === 2) && (
-              <sup className="text-[9px] font-black text-sharing absolute -top-1 -right-2.5">đ</sup>
+            {showDedicatedBadge && (
+              <span className="text-[9px] font-black text-sharing ml-px" style={{ verticalAlign: 'super' }}>đ</span>
             )}
           </span>
         ) : (
@@ -84,36 +68,34 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
       {[1, 2, 3, 4].map(n => {
         const isSelected = currentSize === n;
         const isFilled = currentSize !== null && n < currentSize;
-        const showDedicated = dedicated && isSelected && (n === 1 || n === 2);
+        const isDedicated = dedicated && isSelected && (n === 1 || n === 2);
         return (
           <button
             key={n}
             onClick={() => handleTap(n)}
-            className={`w-8 h-8 rounded-lg border-2 font-semibold transition-all active:scale-90 relative
+            className={`w-8 h-8 rounded-lg border-2 font-semibold transition-all active:scale-90 overflow-visible
               ${isSelected
-                ? showDedicated
-                  ? 'border-sharing text-sharing-foreground shadow-md text-lg'
+                ? isDedicated
+                  ? 'border-sharing text-white shadow-md text-lg'
                   : 'bg-queue border-queue text-queue-foreground shadow-md text-lg'
                 : isFilled
                   ? 'bg-queue/10 border-queue/15'
                   : 'border-border bg-card hover:border-primary/30'
               }`}
-            style={showDedicated ? {
+            style={isDedicated ? {
               background: 'linear-gradient(135deg, hsl(var(--sharing)), hsl(var(--sharing-end)))',
             } : undefined}
           >
-            <span className="flex items-center justify-center">
-              {isSelected ? (
-                <>
-                  {n}
-                  {showDedicated && (
-                    <sup className="text-[8px] font-black absolute -top-0.5 -right-0.5 text-white">đ</sup>
-                  )}
-                </>
-              ) : previousSize === n ? (
-                <span className="line-through text-muted-foreground opacity-60 text-xs">{n}</span>
-              ) : ''}
-            </span>
+            {isSelected ? (
+              <span className="flex items-baseline justify-center">
+                {n}
+                {isDedicated && (
+                  <span className="text-[8px] font-black ml-px" style={{ verticalAlign: 'super' }}>đ</span>
+                )}
+              </span>
+            ) : previousSize === n ? (
+              <span className="line-through text-muted-foreground opacity-60 text-xs">{n}</span>
+            ) : ''}
           </button>
         );
       })}

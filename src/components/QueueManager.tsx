@@ -138,9 +138,9 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
           }`}
         >
         {viewMode === 'full' ? (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full" style={{ gap: '0', paddingTop: '0', paddingBottom: '0' }}>
             {pageOrders.map((order, i) => (
-              <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
+              <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))', marginTop: '-1px' }}>
                 <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
               </div>
             ))}
@@ -164,14 +164,16 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
 
       {/* Page dots - minimal */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-1 py-0.5 border-t border-border flex-shrink-0">
-          {Array.from({ length: totalPages }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i)}
-              className={`w-2 h-2 rounded-full transition-all ${i === currentPage ? 'bg-queue w-5' : 'bg-muted-foreground/20'}`}
-            />
-          ))}
+        <div className="flex justify-center py-1 border-t border-border flex-shrink-0">
+          <div className="flex w-4/5 gap-1">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i)}
+                className={`flex-1 h-2 rounded-full transition-all ${i === currentPage ? 'bg-queue' : 'bg-muted-foreground/20'}`}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

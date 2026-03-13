@@ -49,7 +49,7 @@ interface QueueRowProps {
 
 export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true, showWaitTime = false }: QueueRowProps) {
   const shouldShowTime = showWaitTime || order.status === 'done';
-  const waitMinutes = order.group_size ? getWaitMinutes(order.created_at, order.status === 'done' ? order.updated_at : undefined) : 0;
+  const waitMinutes = order.group_size ? getWaitMinutes(order.updated_at, order.status === 'done' ? undefined : undefined) : 0;
   const waitTimeText = order.group_size ? formatWaitTime(waitMinutes) : '';
   const waitColor = waitTimeColor(waitMinutes);
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
@@ -122,7 +122,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         {/* Inline note icons or wait time */}
         <div className="flex items-center gap-0.5 flex-shrink-0">
           {shouldShowTime && waitTimeText ? (
-            <span className={`text-[11px] font-bold tabular-nums ${waitColor}`}>
+            <span className={`text-[11px] font-medium tabular-nums ${waitColor}`}>
               {waitTimeText}
             </span>
           ) : (
@@ -219,7 +219,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
       {order.group_size ? (
         shouldShowTime ? (
           <div className="flex-1 min-w-0 flex items-center justify-end pr-1">
-            <span className={`text-sm font-bold tabular-nums ${waitColor}`}>
+            <span className={`text-xs font-medium tabular-nums ${waitColor}`}>
               {waitTimeText}
             </span>
           </div>

@@ -50,7 +50,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
     return (
       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted font-bold text-lg flex-shrink-0">
         {currentSize ? (
-          <span className="text-queue flex items-baseline justify-center">
+          <span className={`${showDedicatedBadge ? 'text-sharing' : 'text-queue'} flex items-baseline justify-center`}>
             {currentSize}
             {showDedicatedBadge && (
               <span className="text-[11px] font-normal text-sharing ml-px" style={{ verticalAlign: 'sub' }}>đ</span>

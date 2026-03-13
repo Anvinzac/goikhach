@@ -90,7 +90,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   if (compact) {
     return (
       <div
-        className={`flex items-center gap-1 px-1 py-0 ${statusBg} transition-all relative h-full cursor-pointer`}
+        className={`flex items-center gap-px px-0.5 py-px ${statusBg} transition-all relative h-full min-h-0 cursor-pointer`}
         onClick={() => setShowPopup(true)}
       >
       {/* Order number - tap for not_found */}

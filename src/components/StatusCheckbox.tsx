@@ -70,7 +70,7 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
         onMouseDown={handleTouchStart}
         onMouseUp={handleTouchEnd}
         onMouseLeave={handleTouchEnd}
-        className={`w-9 h-9 max-w-[44px] max-h-[44px] rounded-full flex items-center justify-center transition-all active:scale-90 flex-shrink-0 ${current.bg}`}
+        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-90 touch-target ${current.bg}`}
       >
         {current.icon}
       </button>

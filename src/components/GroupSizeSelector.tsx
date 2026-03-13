@@ -48,7 +48,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
 
   if (compact) {
     return (
-      <div className="flex items-center justify-center w-8 h-8 rounded-md bg-muted font-bold text-base flex-shrink-0">
+      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted font-bold text-lg flex-shrink-0">
         {currentSize ? (
           <span className="text-queue flex items-baseline justify-center">
             {currentSize}
@@ -64,7 +64,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
   }
 
   return (
-    <div className="relative flex items-center gap-px min-w-0">
+    <div className="relative flex items-center gap-1">
       {[1, 2, 3, 4].map(n => {
         const isSelected = currentSize === n;
         const isFilled = currentSize !== null && n < currentSize;
@@ -73,7 +73,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
           <button
             key={n}
             onClick={() => handleTap(n)}
-            className={`w-7 h-7 rounded-md border-2 font-semibold text-sm transition-all active:scale-90 overflow-visible flex-shrink-0
+            className={`w-8 h-8 rounded-lg border-2 font-semibold transition-all active:scale-90 overflow-visible
               ${isSelected
                 ? isDedicated
                   ? 'border-sharing text-white shadow-md text-lg'
@@ -103,7 +103,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
       {/* 5+ button */}
       <button
         onClick={() => setShowLargeMenu(!showLargeMenu)}
-        className={`w-7 h-7 rounded-md border-2 font-semibold text-sm transition-all active:scale-90 flex-shrink-0
+        className={`w-8 h-8 rounded-lg border-2 font-semibold text-base transition-all active:scale-90
           ${currentSize && currentSize >= 5
             ? 'bg-queue border-queue text-queue-foreground shadow-md'
             : currentSize && currentSize > 4

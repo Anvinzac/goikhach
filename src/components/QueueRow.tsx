@@ -90,12 +90,12 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   if (compact) {
     return (
       <div
-        className={`flex items-center gap-px px-0.5 py-px ${statusBg} transition-all relative h-full min-h-0 cursor-pointer`}
+        className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all relative h-full min-h-0 cursor-pointer`}
         onClick={() => setShowPopup(true)}
       >
       {/* Order number - tap for not_found */}
       <span
-        className="text-lg text-queue flex-shrink-0 w-6 text-center active:scale-90 transition-transform"
+        className="text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-transform"
         onClick={(e) => { e.stopPropagation(); onUpdate(order.id, { status: 'not_found' }); }}
       >
         {order.order_number}
@@ -185,10 +185,10 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   }
 
   return (
-    <div className={`flex items-center gap-px px-0.5 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
+    <div className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
       {/* Order number - tap for not_found */}
       <span
-        className="text-lg text-queue flex-shrink-0 w-6 text-center active:scale-90 transition-transform cursor-pointer"
+        className="text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-transform cursor-pointer"
         onClick={() => onUpdate(order.id, { status: 'not_found' })}
       >
         {order.order_number}

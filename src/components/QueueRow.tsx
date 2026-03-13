@@ -57,11 +57,19 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   const [showQR, setShowQR] = useState(false);
 
   const isDedicated = order.notes.includes('dedicated');
+  const isCircled = order.notes.includes('circled') && order.status === 'waiting';
 
   const toggleDedicated = () => {
     const newNotes = isDedicated
       ? order.notes.filter(n => n !== 'dedicated')
       : [...order.notes, 'dedicated'];
+    onUpdate(order.id, { notes: newNotes });
+  };
+
+  const toggleCircled = () => {
+    const newNotes = order.notes.includes('circled')
+      ? order.notes.filter(n => n !== 'circled')
+      : [...order.notes, 'circled'];
     onUpdate(order.id, { notes: newNotes });
   };
 
@@ -93,12 +101,12 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all relative h-full min-h-0 cursor-pointer`}
         onClick={() => setShowPopup(true)}
       >
-      {/* Order number - tap to toggle dashed circle notice */}
+      {/* Order number - tap to toggle dashed circle */}
       <span
         className={`text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-all ${
-          order.status === 'not_found' ? 'border border-dashed border-muted-foreground rounded-full' : ''
+          isCircled ? 'border border-dashed border-muted-foreground rounded-full' : ''
         }`}
-        onClick={(e) => { e.stopPropagation(); }}
+        onClick={(e) => { e.stopPropagation(); toggleCircled(); }}
       >
         {order.order_number}
       </span>
@@ -188,11 +196,12 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
 
   return (
     <div className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
-      {/* Order number - dashed circle when not_found */}
+      {/* Order number - tap to toggle dashed circle */}
       <span
-        className={`text-xl text-queue flex-shrink-0 w-7 text-center transition-all ${
-          order.status === 'not_found' ? 'border border-dashed border-muted-foreground rounded-full' : ''
+        className={`text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-all cursor-pointer ${
+          isCircled ? 'border border-dashed border-muted-foreground rounded-full' : ''
         }`}
+        onClick={toggleCircled}
       >
         {order.order_number}
       </span>

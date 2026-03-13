@@ -73,7 +73,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
           <button
             key={n}
             onClick={() => handleTap(n)}
-            className={`w-8 h-8 rounded-lg border-2 font-semibold transition-all active:scale-90 overflow-visible
+            className={`w-7 h-7 rounded-md border-2 font-semibold text-sm transition-all active:scale-90 overflow-visible flex-shrink-0
               ${isSelected
                 ? isDedicated
                   ? 'border-sharing text-white shadow-md text-lg'

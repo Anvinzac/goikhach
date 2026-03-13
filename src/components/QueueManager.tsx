@@ -46,7 +46,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
       <div className="flex items-center justify-between px-1 h-8 bg-card border-b border-border flex-shrink-0">
         <div className="flex items-center gap-1">
           <span className="font-black text-sm text-queue">🍽</span>
-          <span className="font-bold text-xs capitalize">{sessionType}</span>
+          <span className="font-bold text-xs">{(() => { const h = new Date().getHours(), m = new Date().getMinutes(); return (h > 10 || (h === 10 && m >= 30)) && h < 15 ? 'Trưa' : 'Tối'; })()}</span>
           {estimatedMinutes > 0 && (
             <span className="text-[10px] font-bold text-muted-foreground tabular-nums">~{estimatedMinutes} min.</span>
           )}

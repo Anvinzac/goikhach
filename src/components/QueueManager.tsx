@@ -105,7 +105,7 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
           <button
             onMouseDown={onReset}
             onTouchStart={onReset}
-            className="w-8 h-8 rounded flex items-center justify-center bg-muted active:bg-occupied active:text-occupied-foreground transition-all"
+            className="w-8 h-8 rounded flex items-center justify-center bg-occupied/15 text-occupied active:bg-occupied active:text-occupied-foreground transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>

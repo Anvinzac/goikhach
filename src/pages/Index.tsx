@@ -73,7 +73,7 @@ const Index = () => {
     let held = 0;
     const interval = setInterval(() => {
       held++;
-      if (held >= 3) {
+      if (held >= 1) {
         clearInterval(interval);
         setShowReset(false);
         startNewSession(session.session_type as 'lunch' | 'dinner');
@@ -83,8 +83,8 @@ const Index = () => {
 
     const handleUp = () => {
       clearInterval(interval);
-      if (held < 3) {
-        toast.info('Hold for 3 seconds to reset');
+      if (held < 1) {
+        toast.info('Giữ 1 giây để reset');
       }
       document.removeEventListener('touchend', handleUp);
       document.removeEventListener('mouseup', handleUp);

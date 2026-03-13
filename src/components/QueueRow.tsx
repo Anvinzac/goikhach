@@ -56,9 +56,17 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
+  const isDedicated = order.notes.includes('dedicated');
+
+  const toggleDedicated = () => {
+    const newNotes = isDedicated
+      ? order.notes.filter(n => n !== 'dedicated')
+      : [...order.notes, 'dedicated'];
+    onUpdate(order.id, { notes: newNotes });
+  };
+
   const handleGroupSizeSelect = (size: number | null, prev: number | null) => {
     onUpdate(order.id, { group_size: size, previous_group_size: prev });
-    // Show QR popup when a group size is selected (not cleared) and QR is enabled
     if (size !== null && qrEnabled) {
       setShowQR(true);
     }

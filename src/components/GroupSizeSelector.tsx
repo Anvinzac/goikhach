@@ -48,7 +48,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
 
   if (compact) {
     return (
-      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted font-bold text-lg">
+      <div className="flex items-center justify-center w-8 h-8 rounded-md bg-muted font-bold text-base flex-shrink-0">
         {currentSize ? (
           <span className="text-queue flex items-baseline justify-center">
             {currentSize}

@@ -101,12 +101,12 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all relative h-full min-h-0 cursor-pointer`}
         onClick={() => setShowPopup(true)}
       >
-      {/* Order number - tap to toggle dashed circle notice */}
+      {/* Order number - tap to toggle dashed circle */}
       <span
         className={`text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-all ${
-          order.status === 'not_found' ? 'border border-dashed border-muted-foreground rounded-full' : ''
+          isCircled ? 'border border-dashed border-muted-foreground rounded-full' : ''
         }`}
-        onClick={(e) => { e.stopPropagation(); }}
+        onClick={(e) => { e.stopPropagation(); toggleCircled(); }}
       >
         {order.order_number}
       </span>

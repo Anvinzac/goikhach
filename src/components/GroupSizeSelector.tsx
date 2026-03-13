@@ -1,21 +1,23 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface GroupSizeSelectorProps {
   currentSize: number | null;
   previousSize: number | null;
   onSelect: (size: number | null, prevSize: number | null) => void;
   compact?: boolean;
+  dedicated?: boolean;
+  onToggleDedicated?: () => void;
 }
 
-export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact }: GroupSizeSelectorProps) {
+export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact, dedicated, onToggleDedicated }: GroupSizeSelectorProps) {
   const [showLargeMenu, setShowLargeMenu] = useState(false);
   const [customInput, setCustomInput] = useState('');
+  const lastTapRef = useRef<{ time: number; size: number }>({ time: 0, size: 0 });
 
   const handleSelect = (size: number) => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(30);
     }
-    // Tapping the already-selected size resets to empty
     if (currentSize === size) {
       onSelect(null as unknown as number, currentSize);
     } else {
@@ -24,11 +26,52 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
     setShowLargeMenu(false);
   };
 
+  const handleTap = (size: number) => {
+    const now = Date.now();
+    const last = lastTapRef.current;
+
+    // Double-tap detection for sizes 1 and 2
+    if ((size === 1 || size === 2) && last.size === size && now - last.time < 350) {
+      // Double tap detected
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
+      // If size is already selected, just toggle dedicated
+      if (currentSize === size) {
+        onToggleDedicated?.();
+      } else {
+        // Select the size first, then toggle dedicated
+        onSelect(size, currentSize);
+        setTimeout(() => onToggleDedicated?.(), 50);
+      }
+      lastTapRef.current = { time: 0, size: 0 };
+      return;
+    }
+
+    lastTapRef.current = { time: now, size };
+
+    // Delay single tap to wait for potential double tap
+    if (size === 1 || size === 2) {
+      setTimeout(() => {
+        if (lastTapRef.current.time === now) {
+          handleSelect(size);
+        }
+      }, 350);
+    } else {
+      handleSelect(size);
+    }
+  };
+
   if (compact) {
     return (
       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted font-bold text-lg">
         {currentSize ? (
-          <span className="text-queue">{currentSize}</span>
+          <span className="text-queue relative">
+            {currentSize}
+            {dedicated && (currentSize === 1 || currentSize === 2) && (
+              <sup className="text-[9px] font-black text-sharing absolute -top-1 -right-2.5">đ</sup>
+            )}
+          </span>
         ) : (
           <span className="text-muted-foreground">–</span>
         )}
@@ -41,21 +84,36 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
       {[1, 2, 3, 4].map(n => {
         const isSelected = currentSize === n;
         const isFilled = currentSize !== null && n < currentSize;
+        const showDedicated = dedicated && isSelected && (n === 1 || n === 2);
         return (
           <button
             key={n}
-            onClick={() => handleSelect(n)}
-            className={`w-8 h-8 rounded-lg border-2 font-semibold transition-all active:scale-90
+            onClick={() => handleTap(n)}
+            className={`w-8 h-8 rounded-lg border-2 font-semibold transition-all active:scale-90 relative
               ${isSelected
-                ? 'bg-queue border-queue text-queue-foreground shadow-md text-lg'
+                ? showDedicated
+                  ? 'border-sharing text-sharing-foreground shadow-md text-lg'
+                  : 'bg-queue border-queue text-queue-foreground shadow-md text-lg'
                 : isFilled
                   ? 'bg-queue/10 border-queue/15'
                   : 'border-border bg-card hover:border-primary/30'
               }`}
+            style={showDedicated ? {
+              background: 'linear-gradient(135deg, hsl(var(--sharing)), hsl(var(--sharing-end)))',
+            } : undefined}
           >
-            {isSelected ? n : previousSize === n ? (
-              <span className="line-through text-muted-foreground opacity-60 text-xs">{n}</span>
-            ) : ''}
+            <span className="flex items-center justify-center">
+              {isSelected ? (
+                <>
+                  {n}
+                  {showDedicated && (
+                    <sup className="text-[8px] font-black absolute -top-0.5 -right-0.5 text-white">đ</sup>
+                  )}
+                </>
+              ) : previousSize === n ? (
+                <span className="line-through text-muted-foreground opacity-60 text-xs">{n}</span>
+              ) : ''}
+            </span>
           </button>
         );
       })}

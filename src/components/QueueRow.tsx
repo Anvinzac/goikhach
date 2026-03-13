@@ -56,9 +56,17 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
+  const isDedicated = order.notes.includes('dedicated');
+
+  const toggleDedicated = () => {
+    const newNotes = isDedicated
+      ? order.notes.filter(n => n !== 'dedicated')
+      : [...order.notes, 'dedicated'];
+    onUpdate(order.id, { notes: newNotes });
+  };
+
   const handleGroupSizeSelect = (size: number | null, prev: number | null) => {
     onUpdate(order.id, { group_size: size, previous_group_size: prev });
-    // Show QR popup when a group size is selected (not cleared) and QR is enabled
     if (size !== null && qrEnabled) {
       setShowQR(true);
     }
@@ -99,6 +107,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
           previousSize={order.previous_group_size}
           onSelect={(size, prev) => { onUpdate(order.id, { group_size: size, previous_group_size: prev }); }}
           compact
+          dedicated={isDedicated}
+          onToggleDedicated={toggleDedicated}
         />
 
         {/* Status */}
@@ -139,6 +149,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
                   currentSize={order.group_size}
                   previousSize={order.previous_group_size}
                   onSelect={handleGroupSizeSelect}
+                  dedicated={isDedicated}
+                  onToggleDedicated={toggleDedicated}
                 />
                 {order.group_size ? (
                   <StatusCheckbox
@@ -188,6 +200,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
           currentSize={order.group_size}
           previousSize={order.previous_group_size}
           onSelect={handleGroupSizeSelect}
+          dedicated={isDedicated}
+          onToggleDedicated={toggleDedicated}
         />
       </div>
 

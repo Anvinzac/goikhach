@@ -53,7 +53,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
           <span className="text-queue flex items-baseline justify-center">
             {currentSize}
             {showDedicatedBadge && (
-              <span className="text-[9px] font-black text-sharing ml-px" style={{ verticalAlign: 'super' }}>đ</span>
+              <span className="text-[11px] font-normal text-sharing ml-px" style={{ verticalAlign: 'sub' }}>đ</span>
             )}
           </span>
         ) : (
@@ -90,7 +90,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
               <span className="flex items-baseline justify-center">
                 {n}
                 {isDedicated && (
-                  <span className="text-[8px] font-black ml-px" style={{ verticalAlign: 'super' }}>đ</span>
+                  <span className="text-[10px] font-normal ml-px" style={{ verticalAlign: 'sub' }}>đ</span>
                 )}
               </span>
             ) : previousSize === n ? (

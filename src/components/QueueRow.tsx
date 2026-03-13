@@ -185,7 +185,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   }
 
   return (
-    <div className={`flex items-center gap-px px-0.5 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
+    <div className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
       {/* Order number - tap for not_found */}
       <span
         className="text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-transform cursor-pointer"

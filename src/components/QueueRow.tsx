@@ -57,11 +57,19 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   const [showQR, setShowQR] = useState(false);
 
   const isDedicated = order.notes.includes('dedicated');
+  const isCircled = order.notes.includes('circled') && order.status === 'waiting';
 
   const toggleDedicated = () => {
     const newNotes = isDedicated
       ? order.notes.filter(n => n !== 'dedicated')
       : [...order.notes, 'dedicated'];
+    onUpdate(order.id, { notes: newNotes });
+  };
+
+  const toggleCircled = () => {
+    const newNotes = order.notes.includes('circled')
+      ? order.notes.filter(n => n !== 'circled')
+      : [...order.notes, 'circled'];
     onUpdate(order.id, { notes: newNotes });
   };
 

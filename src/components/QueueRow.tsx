@@ -107,6 +107,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
           previousSize={order.previous_group_size}
           onSelect={(size, prev) => { onUpdate(order.id, { group_size: size, previous_group_size: prev }); }}
           compact
+          dedicated={isDedicated}
+          onToggleDedicated={toggleDedicated}
         />
 
         {/* Status */}

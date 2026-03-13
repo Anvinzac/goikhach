@@ -36,19 +36,27 @@ export function useQueueOrders(sessionId: string | undefined) {
   }, [sessionId]);
 
   const updateOrder = useCallback(async (id: string, updates: Partial<QueueOrder>) => {
+    // Only update the registration timestamp (updated_at) when group_size is first set (from null)
+    const currentOrder = orders.find(o => o.id === id);
+    const isFirstRegistration = currentOrder && currentOrder.group_size === null && updates.group_size != null;
+    const dbUpdates: Record<string, unknown> = { ...updates };
+    if (isFirstRegistration) {
+      dbUpdates.updated_at = new Date().toISOString();
+    }
+
     // Optimistic update
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates, updated_at: new Date().toISOString() } : o));
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates, ...(isFirstRegistration ? { updated_at: new Date().toISOString() } : {}) } : o));
 
     const { error } = await supabase
       .from('queue_orders')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(dbUpdates)
       .eq('id', id);
 
     if (error) {
       toast.error('Failed to update order');
       fetchOrders(); // Revert on error
     }
-  }, [fetchOrders]);
+  }, [fetchOrders, orders]);
 
   useEffect(() => {
     fetchOrders();

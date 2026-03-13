@@ -188,12 +188,11 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
 
   return (
     <div className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
-      {/* Order number - tap to toggle not_found circle */}
+      {/* Order number - dashed circle when not_found */}
       <span
-        className={`text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-all cursor-pointer ${
+        className={`text-xl text-queue flex-shrink-0 w-7 text-center transition-all ${
           order.status === 'not_found' ? 'border border-dashed border-muted-foreground rounded-full' : ''
         }`}
-        onClick={() => onUpdate(order.id, { status: order.status === 'not_found' ? 'waiting' : 'not_found' })}
       >
         {order.order_number}
       </span>

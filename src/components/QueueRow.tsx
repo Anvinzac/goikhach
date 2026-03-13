@@ -95,7 +95,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
       >
       {/* Order number - tap for not_found */}
       <span
-        className="text-lg text-queue flex-shrink-0 w-6 text-center active:scale-90 transition-transform"
+        className="text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-transform"
         onClick={(e) => { e.stopPropagation(); onUpdate(order.id, { status: 'not_found' }); }}
       >
         {order.order_number}

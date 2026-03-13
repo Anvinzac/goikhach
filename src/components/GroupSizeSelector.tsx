@@ -30,10 +30,14 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
     const now = Date.now();
     const last = lastTapRef.current;
 
-    // Double-tap: only for 1 & 2, and only when already selected
-    if ((size === 1 || size === 2) && currentSize === size && last.size === size && now - last.time < 400) {
+    // Double-tap detection for sizes 1 & 2
+    if ((size === 1 || size === 2) && last.size === size && now - last.time < 400) {
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate(50);
+      }
+      // If not already selected, select it first
+      if (currentSize !== size) {
+        onSelect(size, currentSize);
       }
       onToggleDedicated?.();
       lastTapRef.current = { time: 0, size: 0 };

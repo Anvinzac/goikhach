@@ -164,14 +164,16 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
 
       {/* Page dots - minimal */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-1 py-0.5 border-t border-border flex-shrink-0">
-          {Array.from({ length: totalPages }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i)}
-              className={`w-2 h-2 rounded-full transition-all ${i === currentPage ? 'bg-queue w-5' : 'bg-muted-foreground/20'}`}
-            />
-          ))}
+        <div className="flex justify-center py-1 border-t border-border flex-shrink-0">
+          <div className="flex w-4/5 gap-1">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i)}
+                className={`flex-1 h-2 rounded-full transition-all ${i === currentPage ? 'bg-queue' : 'bg-muted-foreground/20'}`}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

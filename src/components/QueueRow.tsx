@@ -196,11 +196,12 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
 
   return (
     <div className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
-      {/* Order number - dashed circle when not_found */}
+      {/* Order number - tap to toggle dashed circle */}
       <span
-        className={`text-xl text-queue flex-shrink-0 w-7 text-center transition-all ${
-          order.status === 'not_found' ? 'border border-dashed border-muted-foreground rounded-full' : ''
+        className={`text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-all cursor-pointer ${
+          isCircled ? 'border border-dashed border-muted-foreground rounded-full' : ''
         }`}
+        onClick={toggleCircled}
       >
         {order.order_number}
       </span>

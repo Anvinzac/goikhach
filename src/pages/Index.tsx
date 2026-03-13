@@ -94,6 +94,7 @@ const Index = () => {
   };
 
   return (
+    <PinGate>
     <div className="flex flex-col h-[100dvh] bg-background">
       {/* Content */}
       <div className="flex-1 overflow-hidden">
@@ -150,6 +151,7 @@ const Index = () => {
         })}
       </div>
     </div>
+    </PinGate>
   );
 };
 

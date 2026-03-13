@@ -4,6 +4,7 @@ import { useQueueOrders } from '@/hooks/useQueueOrders';
 import { QueueManager } from '@/components/QueueManager';
 import { FloorPlanView } from '@/components/FloorPlanView';
 import { SessionStarter } from '@/components/SessionStarter';
+import { PinGate } from '@/components/PinGate';
 import { MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';

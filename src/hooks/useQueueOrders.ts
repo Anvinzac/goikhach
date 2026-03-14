@@ -36,12 +36,18 @@ export function useQueueOrders(sessionId: string | undefined) {
   }, [sessionId]);
 
   const updateOrder = useCallback(async (id: string, updates: Partial<QueueOrder>) => {
-    // Only update the registration timestamp (updated_at) when group_size is first set (from null)
     const currentOrder = orders.find(o => o.id === id);
     const isFirstRegistration = currentOrder && currentOrder.group_size === null && updates.group_size != null;
+    const isBecomingDone = updates.status === 'done' && currentOrder?.status !== 'done';
     const dbUpdates: Record<string, unknown> = { ...updates };
     if (isFirstRegistration) {
       dbUpdates.updated_at = new Date().toISOString();
+    }
+    if (isBecomingDone) {
+      dbUpdates.reached_table_at = new Date().toISOString();
+    }
+    if (updates.status && updates.status !== 'done') {
+      dbUpdates.reached_table_at = null;
     }
 
     // Optimistic update

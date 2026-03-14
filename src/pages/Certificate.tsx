@@ -619,7 +619,7 @@ export default function Certificate() {
             </div>
           </div>
           <div className="text-right">
-            <p className={`text-sm font-bold ${theme.accent} leading-none`}><span className={`text-[10px] font-medium ${theme.labelColor}`}>{t('từ lúc', 'since', lang)} </span>{timeLabel}</p>
+            <p className={`text-sm font-bold ${theme.accent} leading-none`}><span className={`text-[10px] font-medium ${theme.labelColor} opacity-60`}>{t('từ lúc', 'since', lang)} </span>{timeLabel}</p>
             <p className={`text-[10px] ${theme.labelColor} font-medium`}>{dayLabel}</p>
           </div>
         </div>

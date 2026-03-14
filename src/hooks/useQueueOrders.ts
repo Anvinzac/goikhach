@@ -11,6 +11,7 @@ export interface QueueOrder {
   status: 'waiting' | 'done' | 'cancelled' | 'not_found';
   notes: string[];
   custom_note: string | null;
+  reached_table_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -712,7 +712,7 @@ export default function Certificate() {
       }`}>
         <Camera className="w-4 h-4" />
         <span className="text-xs font-semibold">{photoUrl ? t('Đổi ảnh', 'Change Photo', lang) : t('Thêm ảnh', 'Add Photo', lang)}</span>
-        <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} />
+        <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
       </label>
     </div>
   );

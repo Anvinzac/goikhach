@@ -52,7 +52,7 @@ export function useQueueOrders(sessionId: string | undefined) {
     }
 
     // Optimistic update
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates, ...(isFirstRegistration ? { updated_at: new Date().toISOString() } : {}) } : o));
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates, ...(isFirstRegistration ? { updated_at: new Date().toISOString() } : {}), ...(isBecomingDone ? { reached_table_at: new Date().toISOString() } : {}), ...(updates.status && updates.status !== 'done' ? { reached_table_at: null } : {}) } : o));
 
     const { error } = await supabase
       .from('queue_orders')

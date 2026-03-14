@@ -11,6 +11,7 @@ export interface QueueOrder {
   status: 'waiting' | 'done' | 'cancelled' | 'not_found';
   notes: string[];
   custom_note: string | null;
+  reached_table_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -36,16 +37,22 @@ export function useQueueOrders(sessionId: string | undefined) {
   }, [sessionId]);
 
   const updateOrder = useCallback(async (id: string, updates: Partial<QueueOrder>) => {
-    // Only update the registration timestamp (updated_at) when group_size is first set (from null)
     const currentOrder = orders.find(o => o.id === id);
     const isFirstRegistration = currentOrder && currentOrder.group_size === null && updates.group_size != null;
+    const isBecomingDone = updates.status === 'done' && currentOrder?.status !== 'done';
     const dbUpdates: Record<string, unknown> = { ...updates };
     if (isFirstRegistration) {
       dbUpdates.updated_at = new Date().toISOString();
     }
+    if (isBecomingDone) {
+      dbUpdates.reached_table_at = new Date().toISOString();
+    }
+    if (updates.status && updates.status !== 'done') {
+      dbUpdates.reached_table_at = null;
+    }
 
     // Optimistic update
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates, ...(isFirstRegistration ? { updated_at: new Date().toISOString() } : {}) } : o));
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates, ...(isFirstRegistration ? { updated_at: new Date().toISOString() } : {}), ...(isBecomingDone ? { reached_table_at: new Date().toISOString() } : {}), ...(updates.status && updates.status !== 'done' ? { reached_table_at: null } : {}) } : o));
 
     const { error } = await supabase
       .from('queue_orders')

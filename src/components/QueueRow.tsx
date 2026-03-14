@@ -49,7 +49,7 @@ interface QueueRowProps {
 
 export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true, showWaitTime = false }: QueueRowProps) {
   const shouldShowTime = showWaitTime || order.status === 'done';
-  const waitMinutes = order.group_size ? getWaitMinutes(order.updated_at, order.status === 'done' ? undefined : undefined) : 0;
+  const waitMinutes = order.group_size ? getWaitMinutes(order.updated_at, order.status === 'done' ? order.reached_table_at ?? undefined : undefined) : 0;
   const waitTimeText = order.group_size ? formatWaitTime(waitMinutes) : '';
   const waitColor = waitTimeColor(waitMinutes);
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);

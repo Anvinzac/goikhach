@@ -45,8 +45,8 @@ export function useSession() {
       return;
     }
 
-    // Initialize 80 queue orders
-    const orders = Array.from({ length: 80 }, (_, i) => ({
+    // Initialize 120 queue orders
+    const orders = Array.from({ length: 120 }, (_, i) => ({
       session_id: data.id,
       order_number: i + 1,
       status: 'waiting' as const,

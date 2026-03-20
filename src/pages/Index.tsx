@@ -53,24 +53,6 @@ const Index = () => {
     return () => { supabase.removeChannel(channel); };
   }, [session?.id]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-queue border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return <SessionStarter onStart={(type, notice) => startNewSession(type, notice)} loading={false} />;
-  }
-
-  const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [
-    { id: 'queue', label: 'Queue' },
-    { id: 'ground', label: 'Ground', icon: MapPin, badgeKey: 'ground' },
-    { id: 'first', label: '1st Floor', icon: MapPin, badgeKey: 'first' },
-  ];
-
   const handleResetPressStart = useCallback(() => {
     if (!session || resetTimerRef.current !== null) return;
 
@@ -100,6 +82,24 @@ const Index = () => {
     await refetch();
     toast.success('Đã tải dữ liệu mới nhất');
   }, [refetch]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-queue border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <SessionStarter onStart={(type, notice) => startNewSession(type, notice)} loading={false} />;
+  }
+
+  const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [
+    { id: 'queue', label: 'Queue' },
+    { id: 'ground', label: 'Ground', icon: MapPin, badgeKey: 'ground' },
+    { id: 'first', label: '1st Floor', icon: MapPin, badgeKey: 'first' },
+  ];
 
   return (
     <PinGate>

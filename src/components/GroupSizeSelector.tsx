@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface GroupSizeSelectorProps {
   currentSize: number | null;
@@ -7,12 +7,37 @@ interface GroupSizeSelectorProps {
   compact?: boolean;
   dedicated?: boolean;
   onToggleDedicated?: () => void;
+  preferDropUp?: boolean;
 }
 
-export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact, dedicated, onToggleDedicated }: GroupSizeSelectorProps) {
+export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact, dedicated, onToggleDedicated, preferDropUp }: GroupSizeSelectorProps) {
   const [showLargeMenu, setShowLargeMenu] = useState(false);
   const [customInput, setCustomInput] = useState('');
+  const [openUpward, setOpenUpward] = useState(false);
   const lastTapRef = useRef<{ time: number; size: number }>({ time: 0, size: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showLargeMenu) return;
+
+    const updateDirection = () => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const estimatedMenuHeight = 340;
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const shouldOpenUpward = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
+
+      setOpenUpward(preferDropUp || shouldOpenUpward);
+    };
+
+    updateDirection();
+    window.addEventListener('resize', updateDirection);
+
+    return () => window.removeEventListener('resize', updateDirection);
+  }, [preferDropUp, showLargeMenu]);
 
   const handleSelect = (size: number) => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -68,7 +93,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
   }
 
   return (
-    <div className="relative flex items-center gap-1">
+    <div ref={containerRef} className="relative flex items-center gap-1">
       {[1, 2, 3, 4].map(n => {
         const isSelected = currentSize === n;
         const isFilled = currentSize !== null && n < currentSize;
@@ -119,7 +144,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
       </button>
 
       {showLargeMenu && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-2 flex flex-col gap-1 min-w-[52px]">
+        <div className={`absolute left-0 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-2 flex flex-col gap-1 min-w-[52px] max-h-[min(340px,calc(100vh-96px))] overflow-y-auto ${openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
           {[5, 6, 7, 8, 9, 10].map(n => (
             <button
               key={n}

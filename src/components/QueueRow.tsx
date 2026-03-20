@@ -34,6 +34,15 @@ const TAG_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   separately: Split,
 };
 
+const TAG_LABELS: Record<string, string> = {
+  foreigners: 'Khách NN',
+  prefer_downstairs: 'Tầng dưới',
+  prefer_upstairs: 'Tầng trên',
+  will_return: 'Quay lại',
+  separately: 'Tách bàn',
+  dedicated: 'Bàn riêng',
+};
+
 const DISABLED_NUMBERS = [13];
 
 interface QueueRowProps {
@@ -49,7 +58,8 @@ interface QueueRowProps {
 
 export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, isRightColumn, qrEnabled = true, showWaitTime = false }: QueueRowProps) {
   const shouldShowTime = showWaitTime || order.status === 'done';
-  const waitMinutes = order.group_size ? getWaitMinutes(order.updated_at, order.status === 'done' ? order.reached_table_at ?? undefined : undefined) : 0;
+  const registrationTime = order.registered_at ?? order.updated_at;
+  const waitMinutes = order.group_size ? getWaitMinutes(registrationTime, order.status === 'done' ? order.reached_table_at ?? undefined : undefined) : 0;
   const waitTimeText = order.group_size ? formatWaitTime(waitMinutes) : '';
   const waitColor = waitTimeColor(waitMinutes);
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
@@ -58,6 +68,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
 
   const isDedicated = order.notes.includes('dedicated');
   const isCircled = order.notes.includes('circled') && order.status === 'waiting';
+  const visibleNotes = order.notes.filter(note => note !== 'circled');
 
   const toggleDedicated = () => {
     const newNotes = isDedicated
@@ -138,12 +149,22 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
           ) : (
             <>
               {order.notes.map(n => {
+                const label = TAG_LABELS[n];
                 const Icon = TAG_ICONS[n];
-                return Icon ? <Icon key={n} className="w-3 h-3 text-queue" /> : null;
+                if (!label || n === 'circled') return null;
+                return (
+                  <span key={n} className="inline-flex items-center gap-1 rounded-md bg-queue/10 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-queue break-words">
+                    {Icon ? <Icon className="w-2.5 h-2.5 flex-shrink-0" /> : null}
+                    <span>{label}</span>
+                  </span>
+                );
               })}
-              {order.custom_note && (
-                <MessageSquare className="w-3 h-3 text-sharing" />
-              )}
+              {order.custom_note ? (
+                <span className="inline-flex items-center gap-1 rounded-md bg-sharing/10 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-sharing break-words">
+                  <MessageSquare className="w-2.5 h-2.5 flex-shrink-0" />
+                  <span>{order.custom_note}</span>
+                </span>
+              ) : null}
             </>
           )}
         </div>
@@ -161,6 +182,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
                   onSelect={handleGroupSizeSelect}
                   dedicated={isDedicated}
                   onToggleDedicated={toggleDedicated}
+                  preferDropUp={isNearBottom}
                 />
                 {order.group_size ? (
                   <StatusCheckbox
@@ -214,6 +236,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
           onSelect={handleGroupSizeSelect}
           dedicated={isDedicated}
           onToggleDedicated={toggleDedicated}
+          preferDropUp={isNearBottom}
         />
       </div>
 
@@ -238,7 +261,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         ) : (
           <div className="flex-1 min-w-0 relative">
             <NotesTags
-              notes={order.notes}
+              notes={visibleNotes}
               customNote={order.custom_note}
               onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
               dropUp={isNearBottom}

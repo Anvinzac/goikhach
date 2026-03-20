@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, ChevronLeft, ChevronRight, RotateCcw, QrCode, Timer } from 'lucide-react';
+import { LayoutGrid, List, RotateCcw, QrCode, Timer } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
@@ -20,6 +20,12 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
   const [showWaitTime, setShowWaitTime] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isLunchSession = (() => {
+    const h = new Date().getHours();
+    const m = new Date().getMinutes();
+    return (h > 10 || (h === 10 && m >= 30)) && h < 15;
+  })();
+  const sessionLabel = isLunchSession ? 'Ca trưa' : 'Ca tối';
 
   const pageSize = viewMode === 'full' ? 10 : 20;
   const totalPages = Math.ceil(orders.length / pageSize);
@@ -44,11 +50,14 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
     <div className="flex flex-col h-full">
       {/* Merged header */}
       <div className="flex items-center justify-between px-1 h-8 bg-card border-b border-border flex-shrink-0">
-        <div className="flex items-center gap-1">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 pr-2 [font-family:'Be_Vietnam_Pro',sans-serif]">
           <span className="font-black text-sm text-queue">🍽</span>
-          <span className="font-bold text-xs">{(() => { const h = new Date().getHours(), m = new Date().getMinutes(); return (h > 10 || (h === 10 && m >= 30)) && h < 15 ? 'Trưa' : 'Tối'; })()}</span>
+          <span className="truncate font-bold text-sm leading-none">{sessionLabel}</span>
+          <span className="truncate text-[11px] font-medium text-muted-foreground leading-none">
+            Danh sách chờ
+          </span>
           {estimatedMinutes > 0 && (
-            <span className="text-[10px] font-bold text-muted-foreground tabular-nums">~{estimatedMinutes} min.</span>
+            <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums leading-none">Ước tính ~{estimatedMinutes} phút</span>
           )}
           <button
             onClick={onToggleQr}
@@ -58,23 +67,6 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
             title={qrEnabled ? 'QR enabled' : 'QR disabled'}
           >
             <QrCode className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => handleSwipe('right')}
-            disabled={currentPage === 0}
-            className="w-8 h-8 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="font-black text-xs tabular-nums">
-            {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, orders.length)}
-          </span>
-          <button
-            onClick={() => handleSwipe('left')}
-            disabled={currentPage === totalPages - 1}
-            className="w-8 h-8 rounded flex items-center justify-center bg-muted disabled:opacity-30 active:scale-90 transition-all"
-          >
-            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 

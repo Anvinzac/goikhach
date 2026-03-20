@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from '@/hooks/useSession';
 import { useQueueOrders } from '@/hooks/useQueueOrders';
 import { QueueManager } from '@/components/QueueManager';
@@ -16,8 +16,10 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>('queue');
   const [showReset, setShowReset] = useState(false);
   const [qrEnabled, setQrEnabled] = useState(false);
-  const { orders, updateOrder } = useQueueOrders(session?.id);
+  const { orders, updateOrder, refetch } = useQueueOrders(session?.id);
   const [floorBadges, setFloorBadges] = useState<{ ground: number; first: number }>({ ground: 0, first: 0 });
+  const resetTimerRef = useRef<number | null>(null);
+  const resetTriggeredRef = useRef(false);
 
   const waitingCount = orders
     .filter(o => o.status === 'waiting' && o.group_size != null)
@@ -69,29 +71,35 @@ const Index = () => {
     { id: 'first', label: '1st Floor', icon: MapPin, badgeKey: 'first' },
   ];
 
-  const handleReset = () => {
-    let held = 0;
-    const interval = setInterval(() => {
-      held++;
-      if (held >= 1) {
-        clearInterval(interval);
-        setShowReset(false);
-        startNewSession(session.session_type as 'lunch' | 'dinner');
-        toast.success('Session reset!');
-      }
-    }, 1000);
+  const handleResetPressStart = useCallback(() => {
+    if (!session || resetTimerRef.current !== null) return;
 
-    const handleUp = () => {
-      clearInterval(interval);
-      if (held < 1) {
-        toast.info('Giữ 1 giây để reset');
-      }
-      document.removeEventListener('touchend', handleUp);
-      document.removeEventListener('mouseup', handleUp);
-    };
-    document.addEventListener('touchend', handleUp);
-    document.addEventListener('mouseup', handleUp);
-  };
+    resetTriggeredRef.current = false;
+    resetTimerRef.current = window.setTimeout(() => {
+      resetTriggeredRef.current = true;
+      resetTimerRef.current = null;
+      setShowReset(false);
+      startNewSession(session.session_type as 'lunch' | 'dinner');
+      toast.success('Session reset!');
+    }, 1000);
+  }, [session, startNewSession]);
+
+  const handleResetPressEnd = useCallback(() => {
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    if (resetTriggeredRef.current) {
+      resetTriggeredRef.current = false;
+      return;
+    }
+
+    await refetch();
+    toast.success('Đã tải dữ liệu mới nhất');
+  }, [refetch]);
 
   return (
     <PinGate>
@@ -102,7 +110,9 @@ const Index = () => {
           <QueueManager
             sessionId={session.id}
             sessionType={session.session_type}
-            onReset={handleReset}
+            onResetPressStart={handleResetPressStart}
+            onResetPressEnd={handleResetPressEnd}
+            onRefresh={handleRefresh}
             estimatedMinutes={estimatedMinutes}
             orders={orders}
             updateOrder={updateOrder}

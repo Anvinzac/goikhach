@@ -48,7 +48,7 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp }: Note
       {/* Tags display */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex flex-wrap gap-1 items-center min-h-[32px] w-full rounded-lg px-1.5 py-1 bg-muted/50 hover:bg-muted transition-colors active:scale-[0.98]"
+        className="flex flex-wrap gap-1 items-center min-h-[32px] w-full rounded-lg px-1.5 py-1 bg-muted/50 hover:bg-muted transition-colors active:scale-[0.98] [font-family:'Be_Vietnam_Pro',sans-serif]"
       >
         {notes.map(n => {
           const tag = TAG_OPTIONS.find(t => t.value === n);
@@ -83,11 +83,11 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp }: Note
                   <button
                     key={tag.value}
                     onClick={() => toggleTag(tag.value)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold text-sm transition-all active:scale-95
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold text-sm transition-all active:scale-95 [font-family:'Be_Vietnam_Pro',sans-serif]
                       ${active ? 'bg-queue text-queue-foreground shadow-md' : 'bg-muted hover:bg-muted/80'}`}
                   >
                     <Icon className="w-4 h-4" />
-                    <span className="text-xs">{tag.value.replace(/_/g, ' ')}</span>
+                    <span className="text-xs leading-tight">{tag.label}</span>
                   </button>
                 );
               })}
@@ -98,7 +98,7 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp }: Note
               value={tempNote}
               onChange={e => setTempNote(e.target.value)}
               onBlur={() => onUpdate(notes, tempNote || null)}
-              className="w-full h-10 rounded-lg border border-border px-3 text-sm bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full h-10 rounded-lg border border-border px-3 text-sm bg-muted focus:outline-none focus:ring-2 focus:ring-primary [font-family:'Be_Vietnam_Pro',sans-serif]"
             />
           </div>
         </>

@@ -53,11 +53,8 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
         <div className="flex min-w-0 flex-1 items-center gap-1.5 pr-2 [font-family:'Be_Vietnam_Pro',sans-serif]">
           <span className="font-black text-sm text-queue">🍽</span>
           <span className="truncate font-bold text-sm leading-none">{sessionLabel}</span>
-          <span className="truncate text-[11px] font-medium text-muted-foreground leading-none">
-            Danh sách chờ
-          </span>
           {estimatedMinutes > 0 && (
-            <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums leading-none">Ước tính ~{estimatedMinutes} phút</span>
+            <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums leading-none">~{estimatedMinutes} phút</span>
           )}
           <button
             onClick={onToggleQr}

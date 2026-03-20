@@ -162,12 +162,17 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
       {/* Page dots - minimal */}
       {totalPages > 1 && (
         <div className="flex justify-center py-1 border-t border-border flex-shrink-0">
-          <div className="flex w-4/5 gap-1">
+          <div className="flex w-4/5 items-center gap-1">
             {Array.from({ length: totalPages }).map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i)}
-                className={`flex-1 h-2 rounded-full transition-all ${i === currentPage ? 'bg-queue' : 'bg-muted-foreground/20'}`}
+                className={`h-2 rounded-full transition-all duration-200 active:scale-95 ${
+                  i < 4 || i === currentPage
+                    ? 'flex-1 min-w-6 bg-queue'
+                    : 'w-2 flex-none bg-muted-foreground/20'
+                } ${i >= 4 && i === currentPage ? 'min-w-6' : ''}`}
+                aria-label={`Go to page ${i + 1}`}
               />
             ))}
           </div>

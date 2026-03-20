@@ -6,7 +6,9 @@ import { LayoutGrid, List, RotateCcw, QrCode, Timer } from 'lucide-react';
 interface QueueManagerProps {
   sessionId: string;
   sessionType: string;
-  onReset: () => void;
+  onResetPressStart: () => void;
+  onResetPressEnd: () => void;
+  onRefresh: () => void;
   estimatedMinutes?: number;
   orders: QueueOrder[];
   updateOrder: (id: string, updates: Partial<QueueOrder>) => void;
@@ -14,7 +16,7 @@ interface QueueManagerProps {
   onToggleQr: () => void;
 }
 
-export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes = 0, orders, updateOrder, qrEnabled, onToggleQr }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled, onToggleQr }: QueueManagerProps) {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
@@ -92,9 +94,15 @@ export function QueueManager({ sessionId, sessionType, onReset, estimatedMinutes
             <Timer className="w-3.5 h-3.5" />
           </button>
           <button
-            onMouseDown={onReset}
-            onTouchStart={onReset}
+            onClick={onRefresh}
+            onMouseDown={onResetPressStart}
+            onMouseUp={onResetPressEnd}
+            onMouseLeave={onResetPressEnd}
+            onTouchStart={onResetPressStart}
+            onTouchEnd={onResetPressEnd}
+            onTouchCancel={onResetPressEnd}
             className="w-8 h-8 rounded flex items-center justify-center bg-occupied/15 text-occupied active:bg-occupied active:text-occupied-foreground transition-all"
+            title="Chạm để tải lại, giữ để reset"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>

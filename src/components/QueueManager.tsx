@@ -32,6 +32,18 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
   const pageSize = viewMode === 'full' ? 10 : 20;
   const totalPages = Math.ceil(orders.length / pageSize);
   const pageOrders = orders.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+  const pageStates = Array.from({ length: totalPages }, (_, i) => {
+    const start = i * pageSize;
+    const end = Math.min((i + 1) * pageSize, orders.length);
+    const hasAssignedNumbers = orders.slice(start, end).some(order => order.group_size !== null);
+
+    return {
+      index: i,
+      isCurrent: i === currentPage,
+      hasAssignedNumbers,
+      isExpanded: i < 4 || hasAssignedNumbers,
+    };
+  });
 
   const handleSwipe = (direction: 'left' | 'right') => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -162,17 +174,21 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
       {/* Page dots - minimal */}
       {totalPages > 1 && (
         <div className="flex justify-center py-1 border-t border-border flex-shrink-0">
-          <div className="flex w-4/5 items-center gap-1">
-            {Array.from({ length: totalPages }).map((_, i) => (
+          <div className="flex w-full max-w-full min-w-0 items-center gap-1 px-2">
+            {pageStates.map(({ index, isCurrent, hasAssignedNumbers, isExpanded }) => (
               <button
-                key={i}
-                onClick={() => setCurrentPage(i)}
+                key={index}
+                onClick={() => setCurrentPage(index)}
                 className={`h-2 rounded-full transition-all duration-200 active:scale-95 ${
-                  i < 4 || i === currentPage
-                    ? 'flex-1 min-w-6 bg-queue'
-                    : 'w-2 flex-none bg-muted-foreground/20'
-                } ${i >= 4 && i === currentPage ? 'min-w-6' : ''}`}
-                aria-label={`Go to page ${i + 1}`}
+                  isExpanded
+                    ? hasAssignedNumbers
+                      ? 'min-w-0 flex-[1.2_1_0%] bg-queue'
+                      : 'min-w-0 flex-1 bg-muted-foreground/30'
+                    : hasAssignedNumbers
+                      ? 'w-5 flex-none bg-queue'
+                      : 'w-1.5 flex-none bg-muted-foreground/20'
+                } ${isCurrent ? 'ring-2 ring-background ring-offset-1 ring-offset-queue/35' : ''}`}
+                aria-label={`Go to page ${index + 1}`}
               />
             ))}
           </div>

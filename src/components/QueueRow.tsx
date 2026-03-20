@@ -65,6 +65,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   const isDisabled = DISABLED_NUMBERS.includes(order.order_number);
   const [showPopup, setShowPopup] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const numberCellClass = order.order_number >= 100 ? 'w-10 text-[18px]' : 'w-7 text-xl';
+  const numberBadgeClass = order.order_number >= 100 ? 'min-h-8 px-1.5' : 'min-h-7 px-0';
 
   const isDedicated = order.notes.includes('dedicated');
   const isCircled = order.notes.includes('circled') && order.status === 'waiting';
@@ -115,8 +117,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
       >
       {/* Order number - tap to toggle dashed circle */}
       <span
-        className={`text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-all ${
-          isCircled ? 'border border-dashed border-muted-foreground rounded-full' : ''
+        className={`text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all ${numberCellClass} ${numberBadgeClass} ${
+          isCircled ? 'border border-dashed border-muted-foreground' : ''
         }`}
         onClick={(e) => { e.stopPropagation(); toggleCircled(); }}
       >
@@ -154,14 +156,14 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
                 const Icon = TAG_ICONS[n];
                 if (!label || n === 'circled') return null;
                 return (
-                  <span key={n} className="inline-flex items-center gap-1 rounded-md bg-queue/10 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-queue break-words">
+                  <span key={n} className="inline-flex items-center gap-1 rounded-md bg-queue/10 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-queue break-words [font-family:'Be_Vietnam_Pro',sans-serif]">
                     {Icon ? <Icon className="w-2.5 h-2.5 flex-shrink-0" /> : null}
                     <span>{label}</span>
                   </span>
                 );
               })}
               {order.custom_note ? (
-                <span className="inline-flex items-center gap-1 rounded-md bg-sharing/10 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-sharing break-words">
+                <span className="inline-flex items-center gap-1 rounded-md bg-sharing/10 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-sharing break-words [font-family:'Be_Vietnam_Pro',sans-serif]">
                   <MessageSquare className="w-2.5 h-2.5 flex-shrink-0" />
                   <span>{order.custom_note}</span>
                 </span>
@@ -221,8 +223,8 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
     <div className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
       {/* Order number - tap to toggle dashed circle */}
       <span
-        className={`text-xl text-queue flex-shrink-0 w-7 text-center active:scale-90 transition-all cursor-pointer ${
-          isCircled ? 'border border-dashed border-muted-foreground rounded-full' : ''
+        className={`text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all cursor-pointer ${numberCellClass} ${numberBadgeClass} ${
+          isCircled ? 'border border-dashed border-muted-foreground' : ''
         }`}
         onClick={toggleCircled}
       >

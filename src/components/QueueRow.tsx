@@ -69,6 +69,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
   const isDedicated = order.notes.includes('dedicated');
   const isCircled = order.notes.includes('circled') && order.status === 'waiting';
   const visibleNotes = order.notes.filter(note => note !== 'circled');
+  const hiddenNotes = order.notes.filter(note => note === 'circled');
 
   const toggleDedicated = () => {
     const newNotes = isDedicated
@@ -193,9 +194,9 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
               </div>
               {order.group_size ? (
                 <NotesTags
-                  notes={order.notes}
+                  notes={visibleNotes}
                   customNote={order.custom_note}
-                  onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+                  onUpdate={(notes, customNote) => onUpdate(order.id, { notes: [...hiddenNotes, ...notes], custom_note: customNote })}
                 />
               ) : null}
             </div>
@@ -263,7 +264,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
             <NotesTags
               notes={visibleNotes}
               customNote={order.custom_note}
-              onUpdate={(notes, customNote) => onUpdate(order.id, { notes, custom_note: customNote })}
+              onUpdate={(notes, customNote) => onUpdate(order.id, { notes: [...hiddenNotes, ...notes], custom_note: customNote })}
               dropUp={isNearBottom}
             />
           </div>

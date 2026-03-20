@@ -123,6 +123,7 @@ export type Database = {
           order_number: number
           previous_group_size: number | null
           reached_table_at: string | null
+          registered_at: string | null
           session_id: string | null
           status: string
           updated_at: string
@@ -136,6 +137,7 @@ export type Database = {
           order_number: number
           previous_group_size?: number | null
           reached_table_at?: string | null
+          registered_at?: string | null
           session_id?: string | null
           status?: string
           updated_at?: string
@@ -149,6 +151,7 @@ export type Database = {
           order_number?: number
           previous_group_size?: number | null
           reached_table_at?: string | null
+          registered_at?: string | null
           session_id?: string | null
           status?: string
           updated_at?: string

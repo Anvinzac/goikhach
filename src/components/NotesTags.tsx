@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare, ChevronDown } from 'lucide-react';
 
 const TAG_OPTIONS = [
-  { value: 'foreigners', icon: Globe, label: 'F' },
-  { value: 'prefer_downstairs', icon: ArrowDown, label: '↓' },
-  { value: 'prefer_upstairs', icon: ArrowUp, label: '↑' },
-  { value: 'will_return', icon: Clock, label: '⟳' },
-  { value: 'separately', icon: Split, label: '⇋' },
+  { value: 'foreigners', icon: Globe, label: 'Khách NN' },
+  { value: 'prefer_downstairs', icon: ArrowDown, label: 'Tầng dưới' },
+  { value: 'prefer_upstairs', icon: ArrowUp, label: 'Tầng trên' },
+  { value: 'will_return', icon: Clock, label: 'Quay lại' },
+  { value: 'separately', icon: Split, label: 'Tách bàn' },
 ] as const;
 
 interface NotesTagsProps {
@@ -48,21 +48,23 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp }: Note
       {/* Tags display */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex flex-wrap gap-1 items-center min-h-[32px] w-full rounded-lg px-1.5 py-0.5 bg-muted/50 hover:bg-muted transition-colors active:scale-[0.98]"
+        className="flex flex-wrap gap-1 items-center min-h-[32px] w-full rounded-lg px-1.5 py-1 bg-muted/50 hover:bg-muted transition-colors active:scale-[0.98]"
       >
         {notes.map(n => {
           const tag = TAG_OPTIONS.find(t => t.value === n);
           if (!tag) return null;
           const Icon = tag.icon;
           return (
-            <span key={n} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-queue/10 text-queue text-xs font-semibold">
+            <span key={n} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-queue/10 text-queue text-[11px] font-medium leading-tight">
               <Icon className="w-3 h-3" />
+              <span>{tag.label}</span>
             </span>
           );
         })}
         {customNote && (
-          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-sharing/10 text-sharing text-xs font-semibold truncate max-w-[60px]">
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-sharing/10 text-sharing text-[11px] font-medium leading-tight max-w-full">
             <MessageSquare className="w-3 h-3 flex-shrink-0" />
+            <span className="break-words text-left">{customNote}</span>
           </span>
         )}
         {!hasNotes && <ChevronDown className="w-4 h-4 text-muted-foreground mx-auto" />}

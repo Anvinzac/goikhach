@@ -14,7 +14,7 @@ function ChairIcon({ chair, onPing, isHighlighted }: { chair: Chair; onPing: (id
     <button
       onClick={() => onPing(chair.id)}
       className={`relative w-8 h-5 rounded-md transition-all active:scale-90 shadow-sm
-        ${chair.is_occupied ? 'bg-occupied' : 'bg-available'} ${isHighlighted ? 'return-signal-emphasis return-signal-surface' : ''}`}
+        ${chair.is_occupied ? 'bg-floor-neutral-occupied' : 'bg-floor-neutral-available'} ${isHighlighted ? 'return-signal-emphasis return-signal-surface' : ''}`}
     >
       {isHighlighted && (
         <span className="pointer-events-none absolute -top-2 -right-2 rounded-full bg-card/95 p-0.5 text-signal shadow-sm">
@@ -49,9 +49,9 @@ function TableUnit({
   const bottomChairs = tableChairs.filter((_, i) => i >= (isBig ? 2 : 1));
 
   const tableBg = {
-    available: 'bg-available/20 border-available',
-    occupied: 'bg-occupied/20 border-occupied',
-    sharing: 'bg-sharing/20 border-sharing',
+    available: 'bg-floor-neutral-available border-floor-neutral-available',
+    occupied: 'bg-floor-neutral-occupied border-floor-neutral-occupied',
+    sharing: 'bg-floor-neutral-sharing border-floor-neutral-sharing',
   }[table.status];
 
   const currentChairCount = tableChairs.length;
@@ -169,9 +169,9 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
         <div className="flex items-center gap-2">
           <h2 className="font-semibold text-base">{floor === 'ground' ? 'Ground' : '1st Floor'}</h2>
           <div className="flex gap-2 text-[10px] font-semibold">
-            <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded-sm bg-available" />Avail</span>
-            <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded-sm bg-occupied" />Occ</span>
-            <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded-sm bg-sharing" />Share</span>
+            <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded-sm bg-floor-neutral-available" />Avail</span>
+            <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded-sm bg-floor-neutral-occupied" />Occ</span>
+            <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded-sm bg-floor-neutral-sharing" />Share</span>
           </div>
         </div>
         <button

@@ -82,6 +82,12 @@ export function useCertificate(secretCode: string | undefined) {
         return;
       }
 
+      // Kiosk placeholders (group_size=0) should only be claimed via /join/:secret, not /c/:secret
+      if (cert.group_size === 0) {
+        setAccessState(cert.is_used ? 'denied' : 'not_found');
+        return;
+      }
+
       const storedToken = localStorage.getItem(STORAGE_KEY);
 
       if (!cert.is_used) {

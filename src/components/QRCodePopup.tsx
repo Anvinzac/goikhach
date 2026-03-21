@@ -36,11 +36,12 @@ export function QRCodePopup({ orderId, sessionId, orderNumber, groupSize, onClos
 
   useEffect(() => {
     const createCertificate = async () => {
-      // Check if certificate already exists for this order
+      // Check if a staff-created certificate already exists (skip kiosk placeholders with group_size=0)
       const { data: existing } = await supabase
         .from('queue_certificates')
         .select('secret_code')
         .eq('order_id', orderId)
+        .gt('group_size', 0)
         .maybeSingle();
 
       if (existing) {
@@ -50,6 +51,14 @@ export function QRCodePopup({ orderId, sessionId, orderNumber, groupSize, onClos
         setLoading(false);
         return;
       }
+
+      // Invalidate any kiosk placeholders for this order before creating staff cert
+      await supabase
+        .from('queue_certificates')
+        .update({ is_used: true })
+        .eq('order_id', orderId)
+        .eq('group_size', 0)
+        .eq('is_used', false);
 
       const code = generateSecretCode();
       const { error } = await supabase.from('queue_certificates').insert({

@@ -46,19 +46,6 @@ export function useSession() {
     const sessionIds = (existingSessions || []).map((item) => item.id);
 
     if (sessionIds.length > 0) {
-      const [{ error: certificatesError }, { error: ordersError }, { error: signalsError }, { error: tablesError }] = await Promise.all([
-        supabase.from('queue_certificates').delete().in('session_id', sessionIds),
-        supabase.from('queue_orders').delete().in('session_id', sessionIds),
-        supabase.from('floor_return_signals').delete().in('session_id', sessionIds),
-        supabase.from('restaurant_tables').delete().in('session_id', sessionIds),
-      ]);
-
-      if (certificatesError || ordersError || signalsError || tablesError) {
-        toast.error('Failed to clear previous queue data');
-        setLoading(false);
-        return;
-      }
-
       const { data: existingTables, error: existingTablesFetchError } = await supabase
         .from('restaurant_tables')
         .select('id')
@@ -83,6 +70,19 @@ export function useSession() {
           setLoading(false);
           return;
         }
+      }
+
+      const [{ error: certificatesError }, { error: ordersError }, { error: signalsError }, { error: tablesError }] = await Promise.all([
+        supabase.from('queue_certificates').delete().in('session_id', sessionIds),
+        supabase.from('queue_orders').delete().in('session_id', sessionIds),
+        supabase.from('floor_return_signals').delete().in('session_id', sessionIds),
+        supabase.from('restaurant_tables').delete().in('session_id', sessionIds),
+      ]);
+
+      if (certificatesError || ordersError || signalsError || tablesError) {
+        toast.error('Failed to clear previous queue data');
+        setLoading(false);
+        return;
       }
 
       const { error: sessionsError } = await supabase

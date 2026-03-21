@@ -44,6 +44,10 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
       isExpanded: i < 4 || hasAssignedNumbers,
     };
   });
+  const expandedPageCount = pageStates.filter(page => page.isExpanded).length;
+  const paginationWidthPercent = totalPages > 0
+    ? Math.min(85, Math.max(60, 60 + Math.max(0, expandedPageCount - 4) * 2.5))
+    : 60;
 
   const handleSwipe = (direction: 'left' | 'right') => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -174,22 +178,25 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
       {/* Page dots - minimal */}
       {totalPages > 1 && (
         <div className="flex justify-center py-1 border-t border-border flex-shrink-0">
-          <div className="flex w-full max-w-full min-w-0 items-center gap-1 px-2">
+          <div
+            className="flex min-w-0 items-center gap-1 px-2 transition-[width] duration-200 ease-out"
+            style={{ width: `${paginationWidthPercent}%`, maxWidth: '85%' }}
+          >
             {pageStates.map(({ index, isCurrent, hasAssignedNumbers, isExpanded }) => (
               <button
                 key={index}
                 onClick={() => setCurrentPage(index)}
-                className={`h-2 rounded-full transition-all duration-200 active:scale-95 ${
-                  isExpanded
-                    ? hasAssignedNumbers
-                      ? 'min-w-0 flex-[1.2_1_0%] bg-queue'
-                      : 'min-w-0 flex-1 bg-muted-foreground/30'
-                    : hasAssignedNumbers
-                      ? 'w-5 flex-none bg-queue'
-                      : 'w-1.5 flex-none bg-muted-foreground/20'
-                } ${isCurrent ? 'ring-2 ring-background ring-offset-1 ring-offset-queue/35' : ''}`}
+                className={`group relative flex-1 basis-0 rounded-full transition-all duration-200 active:scale-95 ${isCurrent ? 'ring-2 ring-background ring-offset-1 ring-offset-queue/35' : ''}`}
                 aria-label={`Go to page ${index + 1}`}
-              />
+              >
+                <span
+                  className={`mx-auto block transition-all duration-200 ${
+                    isExpanded
+                      ? `h-2.5 w-full rounded-full ${hasAssignedNumbers ? 'bg-queue' : 'bg-muted-foreground/30'}`
+                      : `h-1.5 w-1.5 rounded-full ${hasAssignedNumbers ? 'bg-queue' : 'bg-muted-foreground/20'}`
+                  }`}
+                />
+              </button>
             ))}
           </div>
         </div>

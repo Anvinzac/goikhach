@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFloorPlan, RestaurantTable, Chair } from '@/hooks/useFloorPlan';
-import { useQueueOrders, QueueOrder } from '@/hooks/useQueueOrders';
-import { Timer, Plus, Minus } from 'lucide-react';
+import { useFloorReturnSignals } from '@/hooks/useFloorReturnSignals';
+import { Timer, Plus, Minus, Bell } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface FloorPlanViewProps {
@@ -9,13 +9,19 @@ interface FloorPlanViewProps {
   floor: 'ground' | 'first';
 }
 
-function ChairIcon({ chair, onToggle }: { chair: Chair; onToggle: (id: string, occupied: boolean) => void }) {
+function ChairIcon({ chair, onPing, isHighlighted }: { chair: Chair; onPing: (id: string) => void; isHighlighted: boolean }) {
   return (
     <button
-      onClick={() => onToggle(chair.id, !chair.is_occupied)}
-      className={`w-8 h-5 rounded-md transition-all active:scale-90 shadow-sm
-        ${chair.is_occupied ? 'bg-occupied' : 'bg-available'}`}
-    />
+      onClick={() => onPing(chair.id)}
+      className={`relative w-8 h-5 rounded-md transition-all active:scale-90 shadow-sm
+        ${chair.is_occupied ? 'bg-occupied' : 'bg-available'} ${isHighlighted ? 'return-signal-emphasis return-signal-surface' : ''}`}
+    >
+      {isHighlighted && (
+        <span className="pointer-events-none absolute -top-2 -right-2 rounded-full bg-card/95 p-0.5 text-signal shadow-sm">
+          <Bell className="h-2.5 w-2.5 animate-bell-nudge" />
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -23,18 +29,20 @@ function TableUnit({
   table,
   tableChairs,
   showTime,
-  onChairToggle,
-  onTableTap,
+   onChairPing,
+   onTablePing,
   onExpand,
-  isHighlighted,
+   isTableHighlighted,
+   highlightedChairIds,
 }: {
   table: RestaurantTable;
   tableChairs: Chair[];
   showTime: boolean;
-  onChairToggle: (id: string, occupied: boolean) => void;
-  onTableTap: (table: RestaurantTable) => void;
+   onChairPing: (id: string) => void;
+   onTablePing: (table: RestaurantTable) => void;
   onExpand: (tableId: string, newSize: number) => void;
-  isHighlighted?: boolean;
+   isTableHighlighted?: boolean;
+   highlightedChairIds: Set<string>;
 }) {
   const isBig = table.table_type === 'big';
   const topChairs = tableChairs.filter((_, i) => i < (isBig ? 2 : 1));
@@ -53,17 +61,22 @@ function TableUnit({
       {/* Top chairs */}
       <div className="flex gap-1 justify-center">
         {topChairs.map(c => (
-          <ChairIcon key={c.id} chair={c} onToggle={onChairToggle} />
+          <ChairIcon key={c.id} chair={c} onPing={onChairPing} isHighlighted={highlightedChairIds.has(c.id)} />
         ))}
       </div>
 
       {/* Table */}
       <button
-        onClick={() => onTableTap(table)}
-        className={`${isBig ? 'w-20 h-12' : 'w-14 h-10'} rounded-xl border-2 ${tableBg} flex items-center justify-center transition-all active:scale-95 relative ${isHighlighted ? 'animate-pulse-available ring-2 ring-available' : ''}`}
+        onClick={() => onTablePing(table)}
+        className={`${isBig ? 'w-20 h-12' : 'w-14 h-10'} rounded-xl border-2 ${tableBg} flex items-center justify-center transition-all active:scale-95 relative ${isTableHighlighted ? 'return-signal-emphasis return-signal-surface' : ''}`}
       >
+        {isTableHighlighted && (
+          <span className="pointer-events-none absolute -top-2 -right-2 z-20 rounded-full bg-card p-1 text-signal shadow-md">
+            <Bell className="h-3 w-3 animate-bell-nudge" />
+          </span>
+        )}
         {showTime && table.occupied_at && (
-          <span className="text-[10px] font-bold text-foreground">
+          <span className="relative z-10 text-[10px] font-bold text-foreground">
             {formatDistanceToNow(new Date(table.occupied_at), { addSuffix: false })}
           </span>
         )}
@@ -92,7 +105,7 @@ function TableUnit({
       {/* Bottom chairs */}
       <div className="flex gap-1 justify-center">
         {bottomChairs.map(c => (
-          <ChairIcon key={c.id} chair={c} onToggle={onChairToggle} />
+          <ChairIcon key={c.id} chair={c} onPing={onChairPing} isHighlighted={highlightedChairIds.has(c.id)} />
         ))}
       </div>
     </div>
@@ -100,10 +113,9 @@ function TableUnit({
 }
 
 export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
-  const { tables, chairs, toggleChair, updateTableStatus, setTableMappedOrder, expandTable } = useFloorPlan(sessionId, floor);
-  const { orders } = useQueueOrders(sessionId);
+  const { tables, chairs, expandTable } = useFloorPlan(sessionId, floor);
+  const { highlightedTableIds: returnedTableIds, highlightedChairIds, pingTable, pingChair } = useFloorReturnSignals(sessionId, floor);
   const [showTime, setShowTime] = useState(false);
-  const [actionSheet, setActionSheet] = useState<{ table: RestaurantTable } | null>(null);
   const [highlightedTables, setHighlightedTables] = useState<Set<string>>(new Set());
   const prevStatuses = useRef<Record<string, string>>({});
 
@@ -125,11 +137,6 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
     }
   }, [tables]);
 
-  const recentDone = useMemo(() =>
-    orders.filter(o => o.status === 'done').slice(-10),
-    [orders]
-  );
-
   const columns = useMemo(() => {
     const cols: Record<number, RestaurantTable[]> = {};
     tables.forEach(t => {
@@ -139,36 +146,18 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
     return Object.entries(cols).sort(([a], [b]) => Number(a) - Number(b));
   }, [tables]);
 
-  const handleChairToggle = async (chairId: string, occupied: boolean) => {
+  const handleChairPing = async (chairId: string) => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(20);
     }
-    await toggleChair(chairId, occupied);
-    // Update parent table status with fresh DB data
-    const chair = chairs.find(c => c.id === chairId);
-    if (chair) {
-      await updateTableStatus(chair.table_id);
-    }
+    await pingChair(chairId);
   };
 
-  const handleTableTap = (table: RestaurantTable) => {
+  const handleTablePing = async (table: RestaurantTable) => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(30);
     }
-    if (recentDone.length > 0) {
-      setActionSheet({ table });
-    }
-  };
-
-  const handleAssignOrder = async (table: RestaurantTable, order: QueueOrder) => {
-    await setTableMappedOrder(table.id, order.id);
-    // Mark all chairs as occupied
-    const tableChairs = chairs.filter(c => c.table_id === table.id);
-    for (const chair of tableChairs) {
-      await toggleChair(chair.id, true, order.id);
-    }
-    await updateTableStatus(table.id);
-    setActionSheet(null);
+    await pingTable(table.id);
   };
 
   // columnLabels removed - no longer needed
@@ -218,10 +207,11 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
                           table={table}
                           tableChairs={chairs.filter(c => c.table_id === table.id)}
                           showTime={showTime}
-                          onChairToggle={handleChairToggle}
-                          onTableTap={handleTableTap}
+                          onChairPing={handleChairPing}
+                          onTablePing={handleTablePing}
                           onExpand={expandTable}
-                          isHighlighted={highlightedTables.has(table.id)}
+                          isTableHighlighted={highlightedTables.has(table.id) || returnedTableIds.has(table.id)}
+                          highlightedChairIds={highlightedChairIds}
                         />
                       )}
                     </div>
@@ -233,41 +223,6 @@ export function FloorPlanView({ sessionId, floor }: FloorPlanViewProps) {
         })()}
       </div>
 
-      {/* Action sheet for mapping orders */}
-      {actionSheet && (
-        <>
-          <div className="fixed inset-0 bg-foreground/20 z-40" onClick={() => setActionSheet(null)} />
-          <div className="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-border rounded-t-3xl p-4 z-50 max-h-[40vh] overflow-y-auto">
-            <div className="w-10 h-1 rounded-full bg-muted mx-auto mb-3" />
-            <h3 className="font-bold text-lg mb-3">Assign to order</h3>
-            <div className="flex flex-wrap gap-2">
-              {recentDone.map(order => (
-                <button
-                  key={order.id}
-                  onClick={() => handleAssignOrder(actionSheet.table, order)}
-                  className="px-4 py-3 rounded-xl bg-queue text-queue-foreground font-bold text-lg active:scale-95 transition-all shadow-md"
-                >
-                  #{order.order_number}
-                  {order.group_size && <span className="text-sm ml-1 opacity-80">({order.group_size}p)</span>}
-                </button>
-              ))}
-              <button
-                onClick={async () => {
-                  const tableChairs = chairs.filter(c => c.table_id === actionSheet.table.id);
-                  for (const c of tableChairs) {
-                    await toggleChair(c.id, true);
-                  }
-                  await updateTableStatus(actionSheet.table.id);
-                  setActionSheet(null);
-                }}
-                className="px-4 py-3 rounded-xl bg-muted font-bold text-lg active:scale-95 transition-all"
-              >
-                No order
-              </button>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 }

@@ -59,6 +59,33 @@ export type Database = {
           },
         ]
       }
+      floor_return_signals: {
+        Row: {
+          chair_id: string | null
+          created_at: string
+          floor: string
+          id: string
+          session_id: string
+          table_id: string | null
+        }
+        Insert: {
+          chair_id?: string | null
+          created_at?: string
+          floor: string
+          id?: string
+          session_id: string
+          table_id?: string | null
+        }
+        Update: {
+          chair_id?: string | null
+          created_at?: string
+          floor?: string
+          id?: string
+          session_id?: string
+          table_id?: string | null
+        }
+        Relationships: []
+      }
       queue_certificates: {
         Row: {
           browser_token: string | null

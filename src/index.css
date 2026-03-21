@@ -67,6 +67,9 @@ html, body, #root {
     --queue: 217 91% 60%;
     --queue-end: 260 80% 60%;
     --queue-foreground: 0 0% 100%;
+    --signal: 188 96% 47%;
+    --signal-end: 48 100% 56%;
+    --signal-foreground: 0 0% 100%;
     --waiting: 215 16% 47%;
     --done: 160 84% 39%;
     --cancelled: 350 89% 60%;
@@ -140,14 +143,49 @@ html, body, #root {
     0%, 100% { box-shadow: 0 0 0 0 hsl(var(--available) / 0.6); }
     50% { box-shadow: 0 0 12px 4px hsl(var(--available) / 0.3); }
   }
+
+  @keyframes return-signal-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsl(var(--signal) / 0.95), 0 0 20px hsl(var(--signal-end) / 0.35);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 0 3px hsl(var(--signal) / 0.95), 0 0 28px hsl(var(--signal-end) / 0.6);
+      transform: scale(1.03);
+    }
+  }
+
+  @keyframes bell-nudge {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(14deg); }
+    40% { transform: rotate(-12deg); }
+    60% { transform: rotate(8deg); }
+    80% { transform: rotate(-6deg); }
+  }
+
   .animate-pulse-available {
     animation: pulse-available 1.5s ease-in-out infinite;
+  }
+  .animate-bell-nudge {
+    animation: bell-nudge 1.1s ease-in-out infinite;
+    transform-origin: top center;
+  }
+
+  .return-signal-emphasis {
+    animation: return-signal-pulse 1.3s ease-in-out infinite;
+    border-color: hsl(var(--signal));
+  }
+
+  .return-signal-surface {
+    background: linear-gradient(135deg, hsl(var(--signal) / 0.28), hsl(var(--signal-end) / 0.34));
+    color: hsl(var(--signal-foreground));
   }
 
   .text-available { color: hsl(var(--available)); }
   .text-occupied { color: hsl(var(--occupied)); }
   .text-sharing { color: hsl(var(--sharing)); }
   .text-queue { color: hsl(var(--queue)); }
+  .text-signal { color: hsl(var(--signal)); }
 
   .border-available { border-color: hsl(var(--available)); }
   .border-occupied { border-color: hsl(var(--occupied)); }

@@ -45,9 +45,15 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
     };
   });
   const expandedPageCount = pageStates.filter(page => page.isExpanded).length;
+  const compactPageCount = pageStates.length - expandedPageCount;
   const paginationWidthPercent = totalPages > 0
     ? Math.min(85, Math.max(60, 60 + Math.max(0, expandedPageCount - 4) * 2.5))
     : 60;
+  const compactDotWidth = 6;
+  const paginationGap = 4;
+  const expandedSlotWidth = expandedPageCount > 0
+    ? `calc((100% - ${compactPageCount * compactDotWidth + Math.max(0, totalPages - 1) * paginationGap}px) / ${expandedPageCount})`
+    : undefined;
 
   const handleSwipe = (direction: 'left' | 'right') => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -186,7 +192,10 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
               <button
                 key={index}
                 onClick={() => setCurrentPage(index)}
-                className={`group relative flex-1 basis-0 rounded-full transition-all duration-200 active:scale-95 ${isCurrent ? 'ring-2 ring-background ring-offset-1 ring-offset-queue/35' : ''}`}
+                className={`group relative shrink-0 rounded-full transition-all duration-200 active:scale-95 ${isCurrent ? 'ring-2 ring-background ring-offset-1 ring-offset-queue/35' : ''}`}
+                style={{
+                  width: isExpanded ? expandedSlotWidth : `${compactDotWidth}px`,
+                }}
                 aria-label={`Go to page ${index + 1}`}
               >
                 <span

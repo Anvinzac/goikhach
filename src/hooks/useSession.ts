@@ -31,8 +31,71 @@ export function useSession() {
   }, []);
 
   const startNewSession = useCallback(async (type: 'lunch' | 'dinner', dailyNotice?: string) => {
-    // Deactivate old sessions
-    await supabase.from('sessions').update({ is_active: false }).eq('is_active', true);
+    setLoading(true);
+
+    const { data: existingSessions, error: existingSessionsError } = await supabase
+      .from('sessions')
+      .select('id');
+
+    if (existingSessionsError) {
+      toast.error('Failed to reset previous session data');
+      setLoading(false);
+      return;
+    }
+
+    const sessionIds = (existingSessions || []).map((item) => item.id);
+
+    if (sessionIds.length > 0) {
+      const { data: existingTables, error: existingTablesFetchError } = await supabase
+        .from('restaurant_tables')
+        .select('id')
+        .in('session_id', sessionIds);
+
+      if (existingTablesFetchError) {
+        toast.error('Failed to reset previous floor data');
+        setLoading(false);
+        return;
+      }
+
+      const tableIds = (existingTables || []).map((item) => item.id);
+
+      if (tableIds.length > 0) {
+        const { error: chairsError } = await supabase
+          .from('chairs')
+          .delete()
+          .in('table_id', tableIds);
+
+        if (chairsError) {
+          toast.error('Failed to clear previous chair data');
+          setLoading(false);
+          return;
+        }
+      }
+
+      const [{ error: certificatesError }, { error: ordersError }, { error: signalsError }, { error: tablesError }] = await Promise.all([
+        supabase.from('queue_certificates').delete().in('session_id', sessionIds),
+        supabase.from('queue_orders').delete().in('session_id', sessionIds),
+        supabase.from('floor_return_signals').delete().in('session_id', sessionIds),
+        supabase.from('restaurant_tables').delete().in('session_id', sessionIds),
+      ]);
+
+      if (certificatesError || ordersError || signalsError || tablesError) {
+        toast.error('Failed to clear previous queue data');
+        setLoading(false);
+        return;
+      }
+
+      const { error: sessionsError } = await supabase
+        .from('sessions')
+        .delete()
+        .in('id', sessionIds);
+
+      if (sessionsError) {
+        toast.error('Failed to clear previous sessions');
+        setLoading(false);
+        return;
+      }
+    }
 
     const { data, error } = await supabase
       .from('sessions')
@@ -42,6 +105,7 @@ export function useSession() {
 
     if (error) {
       toast.error('Failed to start session');
+      setLoading(false);
       return;
     }
 
@@ -104,6 +168,7 @@ export function useSession() {
     }
 
     setSession(data);
+    setLoading(false);
     toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} session started!`);
   }, []);
 

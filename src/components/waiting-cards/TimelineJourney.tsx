@@ -7,7 +7,7 @@ const nodeReveal = {
   hidden: { opacity: 0, scale: 0.5 },
   visible: (i: number) => ({
     opacity: 1, scale: 1,
-    transition: { delay: 0.3 + i * 0.2, duration: 0.4, type: 'spring', stiffness: 200, damping: 20 },
+    transition: { delay: 0.3 + i * 0.2, duration: 0.4, type: 'spring' as const, stiffness: 200, damping: 20 },
   }),
 };
 

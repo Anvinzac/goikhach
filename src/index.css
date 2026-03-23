@@ -12,6 +12,8 @@ html, body, #root {
 
 /* Allow scrolling on certificate page */
 .certificate-page {
+  height: auto !important;
+  min-height: 100dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

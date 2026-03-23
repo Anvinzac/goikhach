@@ -15,7 +15,7 @@ const lineGrow = {
   hidden: { scaleY: 0 },
   visible: (i: number) => ({
     scaleY: 1,
-    transition: { delay: 0.2 + i * 0.2, duration: 0.5, ease: 'easeOut' },
+    transition: { delay: 0.2 + i * 0.2, duration: 0.5, ease: 'easeOut' as const },
   }),
 };
 

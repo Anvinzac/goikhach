@@ -201,8 +201,8 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
                 <span
                   className={`mx-auto block transition-all duration-200 ${
                     isExpanded
-                      ? `h-2.5 w-full rounded-full ${hasAssignedNumbers ? 'bg-queue' : 'bg-muted-foreground/30'}`
-                      : `h-1.5 w-1.5 rounded-full ${hasAssignedNumbers ? 'bg-queue' : 'bg-muted-foreground/20'}`
+                      ? `h-2.5 w-full rounded-full ${isCurrent ? 'bg-blue-500' : hasAssignedNumbers ? 'bg-blue-300' : 'bg-muted-foreground/30'}`
+                      : `h-1.5 w-1.5 rounded-full ${hasAssignedNumbers ? 'bg-blue-300' : 'bg-muted-foreground/20'}`
                   }`}
                 />
               </button>

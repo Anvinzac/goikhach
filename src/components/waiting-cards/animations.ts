@@ -44,12 +44,12 @@ export const glowPulse = {
 
 export const shimmer = {
   x: ['-100%', '200%'],
-  transition: { duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 2 },
+  transition: { duration: 3, repeat: Infinity, ease: 'linear' as const, repeatDelay: 2 },
 };
 
 export const gradientShift = {
   backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-  transition: { duration: 8, repeat: Infinity, ease: 'easeInOut' },
+  transition: { duration: 8, repeat: Infinity, ease: 'easeInOut' as const },
 };
 
 // Interaction animations

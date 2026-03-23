@@ -192,7 +192,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
               <button
                 key={index}
                 onClick={() => setCurrentPage(index)}
-                className={`group relative shrink-0 rounded-full transition-all duration-200 active:scale-95 ${isCurrent ? 'ring-2 ring-background ring-offset-1 ring-offset-queue/35' : ''}`}
+                className={`group relative shrink-0 rounded-full transition-all duration-200 active:scale-95 ${isCurrent ? 'ring-2 ring-background ring-offset-1 ring-offset-blue-500/40' : ''}`}
                 style={{
                   width: isExpanded ? expandedSlotWidth : `${compactDotWidth}px`,
                 }}

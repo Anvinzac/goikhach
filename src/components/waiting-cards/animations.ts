@@ -34,12 +34,12 @@ export const staggerContainerSlow: Variants = {
 // Loop animations
 export const breathe = {
   scale: [1, 1.02, 1],
-  transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+  transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' as const },
 };
 
 export const glowPulse = {
   opacity: [0.5, 1, 0.5],
-  transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+  transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' as const },
 };
 
 export const shimmer = {

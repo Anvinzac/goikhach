@@ -5,14 +5,14 @@ import { ThemedNumber, ThemedStatusBadge } from './ThemedParts';
 
 const slideInLeft = {
   hidden: { opacity: 0, x: -30 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
 };
 
 const slideInRight = {
   hidden: { opacity: 0, x: 30 },
   visible: (i: number) => ({
     opacity: 1, x: 0,
-    transition: { delay: 0.15 + i * 0.08, duration: 0.4, ease: 'easeOut' },
+    transition: { delay: 0.15 + i * 0.08, duration: 0.4, ease: 'easeOut' as const },
   }),
 };
 

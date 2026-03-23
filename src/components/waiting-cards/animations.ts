@@ -87,13 +87,13 @@ export const statusPulse = {
 // Neon flicker
 export const neonFlicker = {
   opacity: [1, 0.8, 1, 0.9, 1, 0.85, 1],
-  transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+  transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' as const },
 };
 
 // Scanline sweep
 export const scanlineSweep = {
   y: ['-100%', '200%'],
-  transition: { duration: 4, repeat: Infinity, ease: 'linear', repeatDelay: 3 },
+  transition: { duration: 4, repeat: Infinity, ease: 'linear' as const, repeatDelay: 3 },
 };
 
 // Number count up

@@ -23,7 +23,7 @@ const contentSlide = {
   hidden: { opacity: 0, x: 20 },
   visible: (i: number) => ({
     opacity: 1, x: 0,
-    transition: { delay: 0.4 + i * 0.2, duration: 0.4, ease: 'easeOut' },
+    transition: { delay: 0.4 + i * 0.2, duration: 0.4, ease: 'easeOut' as const },
   }),
 };
 

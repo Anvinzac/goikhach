@@ -69,7 +69,7 @@ export function ThemedActions({
     border: `1px solid ${theme.surfaceBorder}`,
   };
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full">
       <ThemedStatusBadge status={status} language={language} theme={theme} />
       <div className="flex items-center gap-3">
         {onToggleLanguage && (

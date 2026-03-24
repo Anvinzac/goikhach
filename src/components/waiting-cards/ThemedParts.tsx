@@ -71,7 +71,7 @@ export function ThemedActions({
   return (
     <div className="flex items-center justify-between">
       <ThemedStatusBadge status={status} language={language} theme={theme} />
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-3">
         {onToggleLanguage && (
           <motion.button
             onClick={onToggleLanguage}

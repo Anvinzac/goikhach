@@ -83,6 +83,7 @@ export default function Certificate() {
 
   const layout = LAYOUTS[layoutIdx];
   const theme = THEME_PRESETS[themeIdx];
+  const isLight = theme.mode === 'light';
   const activeCert = isDemo ? demoCertificate : certificate;
 
   useEffect(() => {
@@ -235,23 +236,24 @@ export default function Certificate() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 space-y-2">
+              <div className={`backdrop-blur-sm rounded-2xl border p-4 space-y-2 ${isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
                 <div className="flex gap-2">
                   <div className="flex-1 relative">
-                    <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                    <User className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-black/30' : 'text-white/30'}`} />
                     <input
                       type="text"
                       placeholder={lang === 'VN' ? 'Tên của bạn' : 'Your name'}
                       value={customerName}
                       onChange={e => setCustomerName(e.target.value)}
-                      className="w-full pl-8 pr-3 py-2 rounded-xl border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50 bg-white/10 border-white/10 text-white placeholder:text-white/30"
+                      className={`w-full pl-8 pr-3 py-2 rounded-xl border text-sm font-medium focus:outline-none focus:ring-2 ${isLight ? 'bg-black/5 border-black/10 text-black placeholder:text-black/30 focus:ring-black/20' : 'bg-white/10 border-white/10 text-white placeholder:text-white/30 focus:ring-fuchsia-400/50'}`}
                       onKeyDown={e => e.key === 'Enter' && handleNameSubmit()}
                     />
                   </div>
                   <button
                     onClick={handleNameSubmit}
                     disabled={!customerName.trim()}
-                    className="px-3 py-2 rounded-xl font-bold text-sm bg-fuchsia-600 text-white disabled:opacity-30 active:scale-95 transition-all"
+                    className="px-3 py-2 rounded-xl font-bold text-sm disabled:opacity-30 active:scale-95 transition-all"
+                    style={{ background: theme.primary, color: isLight ? '#fff' : '#fff' }}
                   >
                     OK
                   </button>
@@ -264,7 +266,7 @@ export default function Certificate() {
         {/* Export button */}
         <button
           onClick={handleExportCard}
-          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 bg-white/10 text-white/50 hover:text-white/70"
+          className={`w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${isLight ? 'bg-black/8 text-black/40 hover:text-black/60' : 'bg-white/10 text-white/50 hover:text-white/70'}`}
         >
           <Download className="w-3.5 h-3.5" />
           {lang === 'VN' ? 'Lưu ảnh phiếu chờ' : 'Save card as image'}
@@ -272,7 +274,7 @@ export default function Certificate() {
 
         {/* ─── LAYOUT SELECTOR ─── */}
         <div className="space-y-1.5">
-          <p className="text-[10px] font-bold text-center text-white/20">
+          <p className={`text-[10px] font-bold text-center ${isLight ? 'text-black/25' : 'text-white/20'}`}>
             {lang === 'VN' ? 'Bố cục' : 'Layout'}
           </p>
           <div className="flex gap-1.5 justify-center flex-wrap">
@@ -282,12 +284,12 @@ export default function Certificate() {
                 onClick={() => setLayoutIdx(i)}
                 className={`flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg border transition-all active:scale-90 ${
                   layoutIdx === i
-                    ? 'border-white/30 shadow-lg scale-105 border-2 bg-white/10'
-                    : 'border-transparent bg-white/5 shadow-sm'
+                    ? isLight ? 'border-black/20 shadow-lg scale-105 border-2 bg-black/8' : 'border-white/30 shadow-lg scale-105 border-2 bg-white/10'
+                    : isLight ? 'border-transparent bg-black/4 shadow-sm' : 'border-transparent bg-white/5 shadow-sm'
                 }`}
               >
                 <span className="text-base">{l.emoji}</span>
-                <span className="text-[9px] font-bold text-white/40">{l.label}</span>
+                <span className={`text-[9px] font-bold ${isLight ? 'text-black/40' : 'text-white/40'}`}>{l.label}</span>
               </button>
             ))}
           </div>
@@ -295,7 +297,7 @@ export default function Certificate() {
 
         {/* ─── THEME / COLOR SELECTOR ─── */}
         <div className="space-y-1.5">
-          <p className="text-[10px] font-bold text-center text-white/20">
+          <p className={`text-[10px] font-bold text-center ${isLight ? 'text-black/25' : 'text-white/20'}`}>
             {lang === 'VN' ? 'Màu sắc' : 'Color'}
           </p>
           <div className="flex gap-1.5 justify-center flex-wrap">
@@ -305,19 +307,19 @@ export default function Certificate() {
                 onClick={() => setThemeIdx(i)}
                 className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg border transition-all active:scale-90 ${
                   themeIdx === i
-                    ? 'border-white/30 shadow-lg scale-105 border-2 bg-white/10'
-                    : 'border-transparent bg-white/5 shadow-sm'
+                    ? isLight ? 'border-black/20 shadow-lg scale-105 border-2 bg-black/8' : 'border-white/30 shadow-lg scale-105 border-2 bg-white/10'
+                    : isLight ? 'border-transparent bg-black/4 shadow-sm' : 'border-transparent bg-white/5 shadow-sm'
                 }`}
               >
                 <span className="text-sm">{t.emoji}</span>
-                <span className="text-[8px] font-bold text-white/40">{t.label}</span>
+                <span className={`text-[8px] font-bold ${isLight ? 'text-black/40' : 'text-white/40'}`}>{t.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {isDemo && (
-          <p className="text-center text-[10px] font-bold text-white/20">
+          <p className={`text-center text-[10px] font-bold ${isLight ? 'text-black/20' : 'text-white/20'}`}>
             Demo — tap card to cycle status
           </p>
         )}

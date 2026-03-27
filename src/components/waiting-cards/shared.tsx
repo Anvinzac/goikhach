@@ -239,7 +239,7 @@ export function StatusBadge({
   language,
   className = '',
 }: {
-  status: 'waiting' | 'called' | 'cancelled';
+  status: 'waiting' | 'called' | 'cancelled' | 'expired';
   language: 'VN' | 'EN';
   className?: string;
 }) {
@@ -259,6 +259,11 @@ export function StatusBadge({
       icon: <XCircle className="w-3 h-3" />,
       label: l.cancelled,
       colors: 'text-red-400 bg-red-500/10 border-red-500/30',
+    },
+    expired: {
+      icon: <Clock className="w-3 h-3" />,
+      label: l.expired,
+      colors: 'text-gray-400 bg-gray-500/10 border-gray-500/30',
     },
   };
   const cfg = configs[status];
@@ -292,7 +297,7 @@ export function FooterActions({
   className = '',
   buttonClassName = '',
 }: {
-  status: 'waiting' | 'called' | 'cancelled';
+  status: 'waiting' | 'called' | 'cancelled' | 'expired';
   language: 'VN' | 'EN';
   onToggleLanguage?: () => void;
   onPersonalize?: () => void;

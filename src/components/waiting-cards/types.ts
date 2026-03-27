@@ -10,7 +10,7 @@ export type WaitingCardData = {
   dailySpecial: string;
   peopleAhead: number;
   peopleWaitingTotal: number;
-  status: 'waiting' | 'called' | 'cancelled';
+  status: 'waiting' | 'called' | 'cancelled' | 'expired';
   language: 'VN' | 'EN';
 };
 
@@ -340,6 +340,7 @@ export const labels = {
     waiting: 'Đang chờ',
     called: 'Được gọi',
     cancelled: 'Đã huỷ',
+    expired: 'Hết phiên',
     dailySpecial: 'Hôm nay',
     personalize: 'Cá nhân hóa',
     minutes: 'phút',
@@ -357,6 +358,7 @@ export const labels = {
     waiting: 'Waiting',
     called: 'Called',
     cancelled: 'Cancelled',
+    expired: 'Session ended',
     dailySpecial: 'Today',
     personalize: 'Personalize',
     minutes: 'min',

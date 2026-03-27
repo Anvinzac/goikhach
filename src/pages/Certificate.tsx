@@ -141,7 +141,7 @@ export default function Certificate() {
   }, [activeCert]);
 
   const cycleStatus = () => {
-    const statuses = ['waiting', 'called', 'cancelled'];
+    const statuses = ['waiting', 'called', 'cancelled', 'expired'];
     setDemoStatus(s => statuses[(statuses.indexOf(s) + 1) % statuses.length]);
   };
 
@@ -183,6 +183,7 @@ export default function Certificate() {
 
   const orderStatus = isDemo ? demoStatus : (waitingStats.orderStatus as string);
   const isDone = orderStatus === 'done' || orderStatus === 'called';
+  const isExpired = orderStatus === 'expired';
 
   // Build shared data model
   const cardData: WaitingCardData = {
@@ -192,12 +193,12 @@ export default function Certificate() {
     partySize: activeCert.group_size,
     checkInTime: timeLabel,
     checkInDate: dayLabel,
-    waitingDuration: `${waitingStats.currentWaitMinutes}'`,
-    estimatedWait: isDone ? '—' : `${waitingStats.estimatedMinutes}'`,
-    dailySpecial: sessionInfo.daily_notice || '',
-    peopleAhead: waitingStats.groupsBefore,
-    peopleWaitingTotal: waitingStats.totalPeopleWaiting,
-    status: orderStatus === 'done' ? 'called' : (orderStatus as 'waiting' | 'called' | 'cancelled'),
+    waitingDuration: isExpired ? '—' : `${waitingStats.currentWaitMinutes}'`,
+    estimatedWait: isDone || isExpired ? '—' : `${waitingStats.estimatedMinutes}'`,
+    dailySpecial: isExpired ? '' : (sessionInfo.daily_notice || ''),
+    peopleAhead: isExpired ? 0 : waitingStats.groupsBefore,
+    peopleWaitingTotal: isExpired ? 0 : waitingStats.totalPeopleWaiting,
+    status: isExpired ? 'expired' : orderStatus === 'done' ? 'called' : (orderStatus as 'waiting' | 'called' | 'cancelled'),
     language: lang,
   };
 

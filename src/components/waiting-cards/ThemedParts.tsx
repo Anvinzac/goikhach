@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Sparkles, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Globe, Sparkles, Loader2, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { type ThemeColors, labels } from './types';
 
 // ─── Themed Status Badge ─────────────────────────────────
@@ -8,7 +8,7 @@ export function ThemedStatusBadge({
   language,
   theme,
 }: {
-  status: 'waiting' | 'called' | 'cancelled';
+  status: 'waiting' | 'called' | 'cancelled' | 'expired';
   language: 'VN' | 'EN';
   theme: ThemeColors;
 }) {
@@ -17,6 +17,7 @@ export function ThemedStatusBadge({
     waiting: { icon: <Loader2 className="w-3 h-3 animate-spin" />, label: l.waiting, color: '#fbbf24' },
     called: { icon: <CheckCircle2 className="w-3 h-3" />, label: l.called, color: theme.primary },
     cancelled: { icon: <XCircle className="w-3 h-3" />, label: l.cancelled, color: '#ef4444' },
+    expired: { icon: <Clock className="w-3 h-3" />, label: l.expired, color: '#9ca3af' },
   };
   const c = configs[status];
   return (
@@ -56,7 +57,7 @@ export function ThemedActions({
   onToggleLanguage,
   onPersonalize,
 }: {
-  status: 'waiting' | 'called' | 'cancelled';
+  status: 'waiting' | 'called' | 'cancelled' | 'expired';
   language: 'VN' | 'EN';
   theme: ThemeColors;
   onToggleLanguage?: () => void;

@@ -39,7 +39,11 @@ export function useCertificate(secretCode: string | undefined) {
       .eq('id', cert.order_id)
       .single();
 
-    if (!order) return;
+    // Order was deleted (session reset) — mark as expired
+    if (!order) {
+      setWaitingStats(prev => ({ ...prev, orderStatus: 'expired' }));
+      return;
+    }
 
     // Get waiting groups before this order
     const { data: waitingOrders } = await supabase

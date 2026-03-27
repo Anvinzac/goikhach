@@ -82,6 +82,7 @@ export const statusPulse = {
     transition: { duration: 1, repeat: Infinity },
   },
   cancelled: {},
+  expired: {},
 };
 
 // Neon flicker

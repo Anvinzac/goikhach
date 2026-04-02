@@ -13,7 +13,15 @@ function getBaseUrl() {
 }
 
 export default function Kiosk() {
-  const { currentOrderNumber, secretCode, sessionType, loading, noSession, allUsed } = useKiosk();
+  return (
+    <PinGate>
+      <KioskContent />
+    </PinGate>
+  );
+}
+
+function KioskContent() {
+  const { currentOrderNumber, secretCode, sessionType, loading, noSession, allUsed, claimed } = useKiosk();
 
   const qrUrl = secretCode ? `${getBaseUrl()}/join/${secretCode}` : null;
 

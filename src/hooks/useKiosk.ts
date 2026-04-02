@@ -190,13 +190,25 @@ export function useKiosk() {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'queue_certificates', filter: `session_id=eq.${state.sessionId}` },
         (payload) => {
-          // When our current placeholder gets claimed (group_size changed from 0)
           const updated = payload.new as any;
-          if (
-            updated.id === currentCertIdRef.current &&
-            updated.group_size > 0
-          ) {
+          if (updated.id !== currentCertIdRef.current) return;
+
+          // Customer completed registration (group_size changed from 0)
+          if (updated.group_size > 0) {
             advance();
+            return;
+          }
+
+          // Customer scanned QR (claimed_at set) → hide QR
+          if (updated.claimed_at && updated.group_size === 0 && !updated.is_used) {
+            setState(prev => ({ ...prev, claimed: true }));
+            return;
+          }
+
+          // Customer cancelled (claimed_at cleared) → show QR again
+          if (!updated.claimed_at && updated.group_size === 0 && !updated.is_used) {
+            setState(prev => ({ ...prev, claimed: false }));
+            return;
           }
         }
       )

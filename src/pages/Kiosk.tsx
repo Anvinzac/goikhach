@@ -3,7 +3,7 @@ import { PinGate } from '@/components/PinGate';
 import { QRCodeSVG } from 'qrcode.react';
 import { Loader2, WifiOff, CheckCircle2, Clock } from 'lucide-react';
 
-const PUBLISHED_APP_URL = 'https://goikhach.lovable.app';
+const PUBLISHED_APP_URL = 'https://khach.quanchay.la';
 
 function getBaseUrl() {
   if (typeof window === 'undefined') return PUBLISHED_APP_URL;

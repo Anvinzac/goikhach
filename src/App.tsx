@@ -24,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/kiosk" element={<Kiosk />} />
+          <Route path="/ipadair" element={<IpadAir />} />
           <Route path="/join/demo" element={<JoinDemo />} />
           <Route path="/join/:secret" element={<JoinQueue />} />
           <Route path="/c/demo" element={<Certificate />} />

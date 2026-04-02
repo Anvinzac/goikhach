@@ -144,6 +144,7 @@ export function useKiosk() {
       loading: false,
       noSession: false,
       allUsed: false,
+      claimed: false,
     });
   }, [findNextAvailable, createKioskCert]);
 

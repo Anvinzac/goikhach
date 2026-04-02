@@ -9,6 +9,7 @@ export interface KioskState {
   loading: boolean;
   noSession: boolean;
   allUsed: boolean;
+  claimed: boolean;
 }
 
 function generateSecretCode(): string {

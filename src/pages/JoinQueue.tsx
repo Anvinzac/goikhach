@@ -153,7 +153,27 @@ export default function JoinQueue() {
     return () => { supabase.removeChannel(channel); };
   }, [certId, state]);
 
-  const handleSubmit = useCallback(async () => {
+  // Continuous heart emission while size 2 is selected
+  useEffect(() => {
+    if (selectedSize !== 2) {
+      setHearts([]);
+      return;
+    }
+    const emit = () => {
+      const batch = Array.from({ length: 3 }, () => ({
+        id: ++heartIdRef.current,
+        x: Math.random() * 50 - 25,
+        y: -(Math.random() * 40 + 15),
+        scale: 0.4 + Math.random() * 0.6,
+        rotation: Math.random() * 50 - 25,
+      }));
+      setHearts(prev => [...prev.slice(-15), ...batch]); // cap at ~18
+    };
+    emit(); // first burst immediately
+    const interval = setInterval(emit, 800);
+    return () => clearInterval(interval);
+  }, [selectedSize]);
+
     if (!selectedSize || !certId || !sessionId || !orderNumber || !secret) return;
     setState('submitting');
 

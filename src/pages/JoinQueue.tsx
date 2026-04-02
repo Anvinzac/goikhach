@@ -80,10 +80,53 @@ export default function JoinQueue() {
       setOrderNumber(cert.order_number);
       setSessionType(session.session_type);
       setState('ready');
+
+      // Mark as claimed so kiosk hides the QR
+      await supabase
+        .from('queue_certificates')
+        .update({ claimed_at: new Date().toISOString() })
+        .eq('id', cert.id)
+        .eq('group_size', 0)
+        .eq('is_used', false);
     };
 
     init();
   }, [secret, navigate]);
+
+  // Clear claimed_at when user leaves (cancel/close tab)
+  useEffect(() => {
+    if (!certId || state !== 'ready') return;
+
+    const clearClaim = () => {
+      // Use sendBeacon for reliability on tab close
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/queue_certificates?id=eq.${certId}&group_size=eq.0&is_used=eq.false`;
+      const body = JSON.stringify({ claimed_at: null });
+      const headers = {
+        'Content-Type': 'application/json',
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        'Prefer': 'return=minimal',
+      };
+      
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' });
+        // sendBeacon only supports POST, so fall back to fetch
+        fetch(url, { method: 'PATCH', headers, body, keepalive: true }).catch(() => {});
+      } else {
+        fetch(url, { method: 'PATCH', headers, body, keepalive: true }).catch(() => {});
+      }
+    };
+
+    window.addEventListener('beforeunload', clearClaim);
+    window.addEventListener('pagehide', clearClaim);
+
+    return () => {
+      window.removeEventListener('beforeunload', clearClaim);
+      window.removeEventListener('pagehide', clearClaim);
+      // Also clear when component unmounts (e.g., navigating away)
+      clearClaim();
+    };
+  }, [certId, state]);
 
   // Watch for cert invalidation while form is open (race condition protection)
   useEffect(() => {

@@ -1,0 +1,1 @@
+ALTER TABLE public.queue_certificates ADD COLUMN claimed_at timestamptz DEFAULT NULL;

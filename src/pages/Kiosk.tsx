@@ -1,6 +1,7 @@
 import { useKiosk } from '@/hooks/useKiosk';
+import { PinGate } from '@/components/PinGate';
 import { QRCodeSVG } from 'qrcode.react';
-import { Loader2, WifiOff, CheckCircle2 } from 'lucide-react';
+import { Loader2, WifiOff, CheckCircle2, Clock } from 'lucide-react';
 
 const PUBLISHED_APP_URL = 'https://goikhach.lovable.app';
 
@@ -12,7 +13,15 @@ function getBaseUrl() {
 }
 
 export default function Kiosk() {
-  const { currentOrderNumber, secretCode, sessionType, loading, noSession, allUsed } = useKiosk();
+  return (
+    <PinGate>
+      <KioskContent />
+    </PinGate>
+  );
+}
+
+function KioskContent() {
+  const { currentOrderNumber, secretCode, sessionType, loading, noSession, allUsed, claimed } = useKiosk();
 
   const qrUrl = secretCode ? `${getBaseUrl()}/join/${secretCode}` : null;
 
@@ -65,8 +74,14 @@ export default function Kiosk() {
         Scan to get your queue number
       </p>
 
-      {/* QR Code */}
-      {qrUrl && (
+      {/* QR Code or Claimed state */}
+      {claimed ? (
+        <div className="bg-white/5 backdrop-blur-sm border border-fuchsia-500/20 p-8 rounded-2xl mb-8 text-center space-y-3 transition-all duration-500">
+          <Clock className="w-12 h-12 text-amber-400/70 mx-auto animate-pulse" />
+          <p className="text-white/80 font-semibold text-lg">Đang chờ xác nhận</p>
+          <p className="text-fuchsia-300/50 text-sm">A customer is selecting their group size…</p>
+        </div>
+      ) : qrUrl ? (
         <div className="bg-white p-5 rounded-2xl shadow-2xl shadow-fuchsia-500/20 mb-8 transition-all duration-500">
           <QRCodeSVG
             value={qrUrl}
@@ -75,7 +90,7 @@ export default function Kiosk() {
             includeMargin={false}
           />
         </div>
-      )}
+      ) : null}
 
       {/* Current number */}
       <div className="text-center space-y-2">

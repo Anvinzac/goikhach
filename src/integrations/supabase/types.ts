@@ -89,6 +89,7 @@ export type Database = {
       queue_certificates: {
         Row: {
           browser_token: string | null
+          claimed_at: string | null
           created_at: string
           customer_name: string | null
           group_size: number
@@ -101,6 +102,7 @@ export type Database = {
         }
         Insert: {
           browser_token?: string | null
+          claimed_at?: string | null
           created_at?: string
           customer_name?: string | null
           group_size: number
@@ -113,6 +115,7 @@ export type Database = {
         }
         Update: {
           browser_token?: string | null
+          claimed_at?: string | null
           created_at?: string
           customer_name?: string | null
           group_size?: number

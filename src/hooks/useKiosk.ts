@@ -9,6 +9,7 @@ export interface KioskState {
   loading: boolean;
   noSession: boolean;
   allUsed: boolean;
+  claimed: boolean;
 }
 
 function generateSecretCode(): string {
@@ -33,6 +34,7 @@ export function useKiosk() {
     loading: true,
     noSession: false,
     allUsed: false,
+    claimed: false,
   });
   const advancingRef = useRef(false);
   const currentCertIdRef = useRef<string | null>(null);
@@ -142,6 +144,7 @@ export function useKiosk() {
       loading: false,
       noSession: false,
       allUsed: false,
+      claimed: false,
     });
   }, [findNextAvailable, createKioskCert]);
 
@@ -166,6 +169,7 @@ export function useKiosk() {
         currentOrderNumber: next.orderNumber,
         secretCode: result?.secretCode ?? null,
         allUsed: false,
+        claimed: false,
       }));
     } finally {
       advancingRef.current = false;
@@ -175,6 +179,24 @@ export function useKiosk() {
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // Timeout fallback: if claimed for >2 min, auto-unclaim
+  useEffect(() => {
+    if (!state.claimed || !currentCertIdRef.current) return;
+
+    const CLAIM_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+    const timer = setTimeout(async () => {
+      await supabase
+        .from('queue_certificates')
+        .update({ claimed_at: null })
+        .eq('id', currentCertIdRef.current!)
+        .eq('group_size', 0)
+        .eq('is_used', false);
+      // Realtime will pick up the change and set claimed=false
+    }, CLAIM_TIMEOUT);
+
+    return () => clearTimeout(timer);
+  }, [state.claimed]);
 
   // Listen for certificate changes (customer claimed) and queue_orders changes (staff assigned)
   useEffect(() => {
@@ -186,13 +208,25 @@ export function useKiosk() {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'queue_certificates', filter: `session_id=eq.${state.sessionId}` },
         (payload) => {
-          // When our current placeholder gets claimed (group_size changed from 0)
           const updated = payload.new as any;
-          if (
-            updated.id === currentCertIdRef.current &&
-            updated.group_size > 0
-          ) {
+          if (updated.id !== currentCertIdRef.current) return;
+
+          // Customer completed registration (group_size changed from 0)
+          if (updated.group_size > 0) {
             advance();
+            return;
+          }
+
+          // Customer scanned QR (claimed_at set) → hide QR
+          if (updated.claimed_at && updated.group_size === 0 && !updated.is_used) {
+            setState(prev => ({ ...prev, claimed: true }));
+            return;
+          }
+
+          // Customer cancelled (claimed_at cleared) → show QR again
+          if (!updated.claimed_at && updated.group_size === 0 && !updated.is_used) {
+            setState(prev => ({ ...prev, claimed: false }));
+            return;
           }
         }
       )

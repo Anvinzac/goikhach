@@ -80,6 +80,14 @@ export default function JoinQueue() {
       setOrderNumber(cert.order_number);
       setSessionType(session.session_type);
       setState('ready');
+
+      // Mark as claimed so kiosk hides the QR
+      await supabase
+        .from('queue_certificates')
+        .update({ claimed_at: new Date().toISOString() })
+        .eq('id', cert.id)
+        .eq('group_size', 0)
+        .eq('is_used', false);
     };
 
     init();

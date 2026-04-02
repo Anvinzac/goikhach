@@ -74,8 +74,14 @@ function KioskContent() {
         Scan to get your queue number
       </p>
 
-      {/* QR Code */}
-      {qrUrl && (
+      {/* QR Code or Claimed state */}
+      {claimed ? (
+        <div className="bg-white/5 backdrop-blur-sm border border-fuchsia-500/20 p-8 rounded-2xl mb-8 text-center space-y-3 transition-all duration-500">
+          <Clock className="w-12 h-12 text-amber-400/70 mx-auto animate-pulse" />
+          <p className="text-white/80 font-semibold text-lg">Đang chờ xác nhận</p>
+          <p className="text-fuchsia-300/50 text-sm">A customer is selecting their group size…</p>
+        </div>
+      ) : qrUrl ? (
         <div className="bg-white p-5 rounded-2xl shadow-2xl shadow-fuchsia-500/20 mb-8 transition-all duration-500">
           <QRCodeSVG
             value={qrUrl}
@@ -84,7 +90,7 @@ function KioskContent() {
             includeMargin={false}
           />
         </div>
-      )}
+      ) : null}
 
       {/* Current number */}
       <div className="text-center space-y-2">

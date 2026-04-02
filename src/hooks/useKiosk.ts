@@ -34,6 +34,7 @@ export function useKiosk() {
     loading: true,
     noSession: false,
     allUsed: false,
+    claimed: false,
   });
   const advancingRef = useRef(false);
   const currentCertIdRef = useRef<string | null>(null);

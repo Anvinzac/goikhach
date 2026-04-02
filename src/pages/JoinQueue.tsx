@@ -307,19 +307,6 @@ export default function JoinQueue() {
                 key={n}
                 onClick={() => {
                   setSelectedSize(n);
-                  if (n === 2) {
-                    const newHearts = Array.from({ length: 5 }, () => ({
-                      id: ++heartIdRef.current,
-                      x: Math.random() * 40 - 20,
-                      y: -(Math.random() * 30 + 20),
-                      scale: 0.5 + Math.random() * 0.5,
-                      rotation: Math.random() * 40 - 20,
-                    }));
-                    setHearts(prev => [...prev, ...newHearts]);
-                    setTimeout(() => {
-                      setHearts(prev => prev.filter(h => !newHearts.includes(h)));
-                    }, 1200);
-                  }
                 }}
                 className={`aspect-square rounded-xl font-bold text-2xl transition-all active:scale-90 relative overflow-visible
                   ${selectedSize === n

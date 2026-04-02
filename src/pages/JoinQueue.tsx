@@ -158,12 +158,14 @@ export default function JoinQueue() {
     try {
       // 1. Update queue_order FIRST (idempotent — only if not already assigned by staff)
       const now = new Date().toISOString();
+      const notesForDb = selectedNotes.length > 0 ? selectedNotes : [];
       await supabase
         .from('queue_orders')
         .update({
           group_size: selectedSize,
           registered_at: now,
           updated_at: now,
+          notes: notesForDb,
         })
         .eq('id', orderId)
         .is('group_size', null);

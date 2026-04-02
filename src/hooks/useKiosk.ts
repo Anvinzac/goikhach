@@ -169,6 +169,7 @@ export function useKiosk() {
         currentOrderNumber: next.orderNumber,
         secretCode: result?.secretCode ?? null,
         allUsed: false,
+        claimed: false,
       }));
     } finally {
       advancingRef.current = false;

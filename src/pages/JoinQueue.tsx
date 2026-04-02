@@ -412,10 +412,10 @@ export default function JoinQueue() {
               <p className="text-fuchsia-300/60 text-xs font-medium">Ghi chú / Notes</p>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { key: 'dedicated', label: 'Bàn riêng', labelEn: 'Private table', icon: Star },
-                  { key: 'prefer_downstairs', label: 'Tầng dưới', labelEn: 'Downstairs', icon: ArrowDown },
                   { key: 'prefer_upstairs', label: 'Tầng trên', labelEn: 'Upstairs', icon: ArrowUp },
                   { key: 'will_return', label: 'Quay lại sau', labelEn: 'Will return', icon: Clock },
+                  { key: 'dedicated', label: 'Bàn riêng', labelEn: 'Private table', icon: Star },
+                  { key: 'prefer_downstairs', label: 'Tầng dưới', labelEn: 'Downstairs', icon: ArrowDown },
                 ].map(({ key, label, labelEn, icon: Icon }) => {
                   const isActive = selectedNotes.includes(key);
                   return (

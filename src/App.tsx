@@ -8,6 +8,7 @@ import Certificate from "./pages/Certificate";
 import Admin from "./pages/Admin";
 import Kiosk from "./pages/Kiosk";
 import JoinQueue from "./pages/JoinQueue";
+import JoinDemo from "./pages/JoinDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

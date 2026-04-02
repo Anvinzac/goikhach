@@ -181,6 +181,7 @@ export default function JoinQueue() {
     }
   }, [selectedSize]);
 
+  const handleSubmit = useCallback(async () => {
     if (!selectedSize || !certId || !sessionId || !orderNumber || !secret) return;
     setState('submitting');
 

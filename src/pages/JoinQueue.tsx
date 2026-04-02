@@ -153,6 +153,27 @@ export default function JoinQueue() {
     return () => { supabase.removeChannel(channel); };
   }, [certId, state]);
 
+  // Continuous heart emission while size 2 is selected
+  useEffect(() => {
+    if (selectedSize !== 2) {
+      setHearts([]);
+      return;
+    }
+    const emit = () => {
+      const batch = Array.from({ length: 3 }, () => ({
+        id: ++heartIdRef.current,
+        x: Math.random() * 50 - 25,
+        y: -(Math.random() * 40 + 15),
+        scale: 0.4 + Math.random() * 0.6,
+        rotation: Math.random() * 50 - 25,
+      }));
+      setHearts(prev => [...prev.slice(-15), ...batch]); // cap at ~18
+    };
+    emit(); // first burst immediately
+    const interval = setInterval(emit, 800);
+    return () => clearInterval(interval);
+  }, [selectedSize]);
+
   const handleSubmit = useCallback(async () => {
     if (!selectedSize || !certId || !sessionId || !orderNumber || !secret) return;
     setState('submitting');
@@ -307,19 +328,6 @@ export default function JoinQueue() {
                 key={n}
                 onClick={() => {
                   setSelectedSize(n);
-                  if (n === 2) {
-                    const newHearts = Array.from({ length: 5 }, () => ({
-                      id: ++heartIdRef.current,
-                      x: Math.random() * 40 - 20,
-                      y: -(Math.random() * 30 + 20),
-                      scale: 0.5 + Math.random() * 0.5,
-                      rotation: Math.random() * 40 - 20,
-                    }));
-                    setHearts(prev => [...prev, ...newHearts]);
-                    setTimeout(() => {
-                      setHearts(prev => prev.filter(h => !newHearts.includes(h)));
-                    }, 1200);
-                  }
                 }}
                 className={`aspect-square rounded-xl font-bold text-2xl transition-all active:scale-90 relative overflow-visible
                   ${selectedSize === n

@@ -22,6 +22,8 @@ export default function JoinQueue() {
   const [sessionType, setSessionType] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
+  const [hearts, setHearts] = useState<{ id: number; x: number; y: number; scale: number; rotation: number }[]>([]);
+  const heartIdRef = useRef(0);
   const [certId, setCertId] = useState<string>('');
   const [orderId, setOrderId] = useState<string>('');
   const [sessionId, setSessionId] = useState<string>('');

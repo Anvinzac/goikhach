@@ -8,6 +8,7 @@ import Certificate from "./pages/Certificate";
 import Admin from "./pages/Admin";
 import Kiosk from "./pages/Kiosk";
 import JoinQueue from "./pages/JoinQueue";
+import JoinDemo from "./pages/JoinDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/kiosk" element={<Kiosk />} />
+          <Route path="/join/demo" element={<JoinDemo />} />
           <Route path="/join/:secret" element={<JoinQueue />} />
           <Route path="/c/demo" element={<Certificate />} />
           <Route path="/c/:code" element={<Certificate />} />

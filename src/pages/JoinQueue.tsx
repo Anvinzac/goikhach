@@ -174,7 +174,13 @@ export default function JoinQueue() {
     return () => clearInterval(interval);
   }, [selectedSize]);
 
-  const handleSubmit = useCallback(async () => {
+  // Clear dedicated note if group size > 2
+  useEffect(() => {
+    if (selectedSize !== null && selectedSize > 2) {
+      setSelectedNotes(prev => prev.filter(n => n !== 'dedicated'));
+    }
+  }, [selectedSize]);
+
     if (!selectedSize || !certId || !sessionId || !orderNumber || !secret) return;
     setState('submitting');
 

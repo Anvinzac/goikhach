@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Loader2, ShieldX, XCircle } from 'lucide-react';
+import { Users, Loader2, ShieldX, XCircle, ArrowDown, ArrowUp, Clock, Star } from 'lucide-react';
 
 type JoinState = 'loading' | 'ready' | 'submitting' | 'expired' | 'not_found' | 'error';
 
@@ -21,6 +21,7 @@ export default function JoinQueue() {
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
   const [sessionType, setSessionType] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
+  const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
   const [certId, setCertId] = useState<string>('');
   const [orderId, setOrderId] = useState<string>('');
   const [sessionId, setSessionId] = useState<string>('');
@@ -157,12 +158,14 @@ export default function JoinQueue() {
     try {
       // 1. Update queue_order FIRST (idempotent — only if not already assigned by staff)
       const now = new Date().toISOString();
+      const notesForDb = selectedNotes.length > 0 ? selectedNotes : [];
       await supabase
         .from('queue_orders')
         .update({
           group_size: selectedSize,
           registered_at: now,
           updated_at: now,
+          notes: notesForDb,
         })
         .eq('id', orderId)
         .is('group_size', null);
@@ -295,13 +298,13 @@ export default function JoinQueue() {
             <span className="font-semibold">Số người / Group size</span>
           </div>
 
-          {/* Size buttons 1-4 */}
+          {/* Size buttons 1-4 (tall square) */}
           <div className="grid grid-cols-4 gap-3">
             {[1, 2, 3, 4].map(n => (
               <button
                 key={n}
                 onClick={() => setSelectedSize(n)}
-                className={`h-14 rounded-xl font-bold text-xl transition-all active:scale-90
+                className={`aspect-square rounded-xl font-bold text-2xl transition-all active:scale-90
                   ${selectedSize === n
                     ? 'bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white shadow-lg shadow-fuchsia-500/30 scale-105'
                     : 'bg-white/10 text-white/70 hover:bg-white/15 border border-white/10'
@@ -312,13 +315,13 @@ export default function JoinQueue() {
             ))}
           </div>
 
-          {/* Size buttons 5-8 */}
+          {/* Size buttons 5-8 (shorter) */}
           <div className="grid grid-cols-4 gap-3">
             {[5, 6, 7, 8].map(n => (
               <button
                 key={n}
                 onClick={() => setSelectedSize(n)}
-                className={`h-14 rounded-xl font-bold text-xl transition-all active:scale-90
+                className={`h-11 rounded-xl font-bold text-lg transition-all active:scale-90
                   ${selectedSize === n
                     ? 'bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white shadow-lg shadow-fuchsia-500/30 scale-105'
                     : 'bg-white/10 text-white/70 hover:bg-white/15 border border-white/10'
@@ -329,13 +332,13 @@ export default function JoinQueue() {
             ))}
           </div>
 
-          {/* Size buttons 9-10 */}
+          {/* Size buttons 9-10, 11, 12+ (shorter) */}
           <div className="grid grid-cols-4 gap-3">
-            {[9, 10].map(n => (
+            {[9, 10, 11].map(n => (
               <button
                 key={n}
                 onClick={() => setSelectedSize(n)}
-                className={`h-14 rounded-xl font-bold text-xl transition-all active:scale-90
+                className={`h-11 rounded-xl font-bold text-lg transition-all active:scale-90
                   ${selectedSize === n
                     ? 'bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white shadow-lg shadow-fuchsia-500/30 scale-105'
                     : 'bg-white/10 text-white/70 hover:bg-white/15 border border-white/10'
@@ -344,7 +347,50 @@ export default function JoinQueue() {
                 {n}
               </button>
             ))}
+            <button
+              onClick={() => setSelectedSize(12)}
+              className={`h-11 rounded-xl font-bold text-lg transition-all active:scale-90
+                ${selectedSize !== null && selectedSize >= 12
+                  ? 'bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white shadow-lg shadow-fuchsia-500/30 scale-105'
+                  : 'bg-white/10 text-white/70 hover:bg-white/15 border border-white/10'
+                }`}
+            >
+              12+
+            </button>
           </div>
+
+          {/* Special notes */}
+          {selectedSize && (
+            <div className="space-y-2 pt-1">
+              <p className="text-fuchsia-300/60 text-xs font-medium">Ghi chú / Notes</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { key: 'dedicated', label: 'Bàn riêng', labelEn: 'Private table', icon: Star },
+                  { key: 'prefer_downstairs', label: 'Tầng dưới', labelEn: 'Downstairs', icon: ArrowDown },
+                  { key: 'prefer_upstairs', label: 'Tầng trên', labelEn: 'Upstairs', icon: ArrowUp },
+                  { key: 'will_return', label: 'Quay lại sau', labelEn: 'Will return', icon: Clock },
+                ].map(({ key, label, labelEn, icon: Icon }) => {
+                  const isActive = selectedNotes.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedNotes(prev =>
+                        isActive ? prev.filter(n => n !== key) : [...prev, key]
+                      )}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-95
+                        ${isActive
+                          ? 'bg-fuchsia-600/30 text-fuchsia-200 border border-fuchsia-400/40'
+                          : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10'
+                        }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Submit button */}
           <button

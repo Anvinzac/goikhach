@@ -21,6 +21,7 @@ export default function JoinQueue() {
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
   const [sessionType, setSessionType] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
+  const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
   const [certId, setCertId] = useState<string>('');
   const [orderId, setOrderId] = useState<string>('');
   const [sessionId, setSessionId] = useState<string>('');

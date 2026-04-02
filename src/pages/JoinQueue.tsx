@@ -407,37 +407,39 @@ export default function JoinQueue() {
           </div>
 
           {/* Special notes */}
-          {selectedSize && (
-            <div className="space-y-2 pt-1">
-              <p className="text-fuchsia-300/60 text-xs font-medium">Ghi chú / Notes</p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { key: 'prefer_upstairs', label: 'Tầng trên', labelEn: 'Upstairs', icon: ArrowUp },
-                  { key: 'will_return', label: 'Quay lại sau', labelEn: 'Will return', icon: Clock },
-                  { key: 'dedicated', label: 'Bàn riêng', labelEn: 'Private table', icon: Star },
-                  { key: 'prefer_downstairs', label: 'Tầng dưới', labelEn: 'Downstairs', icon: ArrowDown },
-                ].map(({ key, label, labelEn, icon: Icon }) => {
-                  const isActive = selectedNotes.includes(key);
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setSelectedNotes(prev =>
-                        isActive ? prev.filter(n => n !== key) : [...prev, key]
-                      )}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-95
-                        ${isActive
+          <div className={`space-y-2 pt-1 transition-opacity ${selectedSize ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+            <p className="text-fuchsia-300/60 text-xs font-medium">Ghi chú / Notes</p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { key: 'dedicated', label: 'Bàn riêng', icon: Star },
+                { key: 'prefer_upstairs', label: 'Tầng trên', icon: ArrowUp },
+                { key: 'prefer_downstairs', label: 'Tầng dưới', icon: ArrowDown },
+                { key: 'will_return', label: 'Quay lại sau', icon: Clock },
+              ].map(({ key, label, icon: Icon }) => {
+                const isActive = selectedNotes.includes(key);
+                const isDedicatedDisabled = key === 'dedicated' && selectedSize !== null && selectedSize > 2;
+                return (
+                  <button
+                    key={key}
+                    disabled={isDedicatedDisabled}
+                    onClick={() => setSelectedNotes(prev =>
+                      isActive ? prev.filter(n => n !== key) : [...prev, key]
+                    )}
+                    className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-95
+                      ${isDedicatedDisabled
+                        ? 'opacity-20 cursor-not-allowed bg-white/5 text-white/30 border border-white/5'
+                        : isActive
                           ? 'bg-fuchsia-600/30 text-fuchsia-200 border border-fuchsia-400/40'
                           : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10'
-                        }`}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                      <span>{label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                      }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </div>
 
           {/* Submit button */}
           <button

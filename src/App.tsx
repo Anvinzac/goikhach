@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Certificate from "./pages/Certificate";
 import Admin from "./pages/Admin";
 import Kiosk from "./pages/Kiosk";
+import IpadAir from "./pages/IpadAir";
 import JoinQueue from "./pages/JoinQueue";
 import JoinDemo from "./pages/JoinDemo";
 import NotFound from "./pages/NotFound";

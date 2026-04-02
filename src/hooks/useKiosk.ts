@@ -42,6 +42,18 @@ export function useKiosk() {
   // Find the next available order number (group_size is null, status waiting, not 13,
   // and no staff-created certificate exists for it)
   const findNextAvailable = useCallback(async (sessionId: string): Promise<{ orderNumber: number; orderId: string } | null> => {
+    // Find the highest order_number that has been assigned (group_size > 0)
+    const { data: maxAssigned } = await supabase
+      .from('queue_orders')
+      .select('order_number')
+      .eq('session_id', sessionId)
+      .not('group_size', 'is', null)
+      .order('order_number', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const minNumber = (maxAssigned?.order_number ?? 0) + 1;
+
     // Get order_ids that already have a staff-created cert (group_size > 0)
     const { data: staffCerts } = await supabase
       .from('queue_certificates')
@@ -58,8 +70,9 @@ export function useKiosk() {
       .eq('status', 'waiting')
       .is('group_size', null)
       .neq('order_number', 13)
+      .gte('order_number', minNumber)
       .order('order_number')
-      .limit(10); // fetch a few to filter client-side
+      .limit(10);
 
     if (!orders || orders.length === 0) return null;
 

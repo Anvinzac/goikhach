@@ -305,14 +305,51 @@ export default function JoinQueue() {
             {[1, 2, 3, 4].map(n => (
               <button
                 key={n}
-                onClick={() => setSelectedSize(n)}
-                className={`aspect-square rounded-xl font-bold text-2xl transition-all active:scale-90
+                onClick={() => {
+                  setSelectedSize(n);
+                  if (n === 2) {
+                    const newHearts = Array.from({ length: 5 }, () => ({
+                      id: ++heartIdRef.current,
+                      x: Math.random() * 40 - 20,
+                      y: -(Math.random() * 30 + 20),
+                      scale: 0.5 + Math.random() * 0.5,
+                      rotation: Math.random() * 40 - 20,
+                    }));
+                    setHearts(prev => [...prev, ...newHearts]);
+                    setTimeout(() => {
+                      setHearts(prev => prev.filter(h => !newHearts.includes(h)));
+                    }, 1200);
+                  }
+                }}
+                className={`aspect-square rounded-xl font-bold text-2xl transition-all active:scale-90 relative overflow-visible
                   ${selectedSize === n
                     ? 'bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white shadow-lg shadow-fuchsia-500/30 scale-105'
                     : 'bg-white/10 text-white/70 hover:bg-white/15 border border-white/10'
                   }`}
               >
                 {n}
+                {n === 2 && (
+                  <AnimatePresence>
+                    {hearts.map(h => (
+                      <motion.span
+                        key={h.id}
+                        initial={{ opacity: 0.9, x: 0, y: 0, scale: 0.3 }}
+                        animate={{
+                          opacity: 0,
+                          x: h.x,
+                          y: h.y,
+                          scale: h.scale,
+                          rotate: h.rotation,
+                        }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                      >
+                        <Heart className="w-3.5 h-3.5 fill-pink-300 text-pink-300" />
+                      </motion.span>
+                    ))}
+                  </AnimatePresence>
+                )}
               </button>
             ))}
           </div>

@@ -429,9 +429,13 @@ export default function JoinQueue() {
                   <button
                     key={key}
                     disabled={isDedicatedDisabled}
-                    onClick={() => setSelectedNotes(prev =>
-                      isActive ? prev.filter(n => n !== key) : [...prev, key]
-                    )}
+                    onClick={() => setSelectedNotes(prev => {
+                      if (isActive) return prev.filter(n => n !== key);
+                      // Floor preference is mutually exclusive
+                      const opposite = key === 'prefer_upstairs' ? 'prefer_downstairs' : key === 'prefer_downstairs' ? 'prefer_upstairs' : null;
+                      const filtered = opposite ? prev.filter(n => n !== opposite) : prev;
+                      return [...filtered, key];
+                    })}
                     className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-95
                       ${isDedicatedDisabled
                         ? 'opacity-20 cursor-not-allowed bg-white/5 text-white/30 border border-white/5'

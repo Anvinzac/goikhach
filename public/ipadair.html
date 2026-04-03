@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kiosk - Quán Lá</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:#0a0014;color:#fff;min-height:100vh;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+
+/* PIN screen */
+.pin-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pin-lock{font-size:28px;font-weight:bold;margin-bottom:4px}
+.pin-title{font-size:18px;font-weight:bold;margin:12px 0 4px}
+.pin-sub{color:rgba(255,255,255,.4);font-size:13px;margin-bottom:24px}
+.pin-dots{display:flex;margin-bottom:16px}
+.pin-dot{width:48px;height:48px;margin:0 6px;border-radius:12px;border:2px solid #333;background:#1a1a2e;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pin-dot.filled{border-color:#6366f1;background:#6366f1}
+.pin-dot.error{border-color:#e53e3e}
+.pin-dot-inner{width:10px;height:10px;border-radius:50%;background:#fff;display:none}
+.pin-dot.filled .pin-dot-inner{display:block}
+.pin-error{color:#e53e3e;font-size:13px;height:20px;margin-bottom:8px}
+.numpad{display:flex;flex-wrap:wrap;justify-content:center;max-width:260px}
+.numpad button{width:72px;height:52px;margin:4px;border-radius:12px;border:1px solid #333;background:#1a1a2e;color:#fff;font-size:20px;font-weight:bold;cursor:pointer;-webkit-appearance:none;appearance:none}
+.numpad button:active{opacity:.7}
+.numpad .del-btn{border:none;background:transparent;color:#e53e3e;font-size:14px}
+.numpad .spacer{width:72px;height:52px;margin:4px;border:none;background:none}
+
+/* Kiosk screen */
+.kiosk-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.session-badge{padding:6px 16px;border-radius:999px;background:rgba(120,50,160,.3);border:1px solid rgba(180,100,255,.2);color:#d8b4fe;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+.kiosk-title{color:rgba(255,255,255,.9);font-size:22px;font-weight:bold;margin-bottom:4px;text-align:center}
+.kiosk-sub{color:rgba(200,170,255,.4);font-size:15px;margin-bottom:32px;text-align:center}
+.qr-box{background:#fff;padding:20px;border-radius:16px;margin-bottom:32px;box-shadow:0 8px 32px rgba(160,60,255,.2)}
+.qr-box img,.qr-box canvas{display:block}
+.claimed-box{background:rgba(255,255,255,.05);border:1px solid rgba(180,100,255,.2);border-radius:16px;padding:32px;margin-bottom:32px;text-align:center}
+.claimed-icon{font-size:40px;margin-bottom:12px}
+.claimed-title{color:rgba(255,255,255,.8);font-size:18px;font-weight:600;margin-bottom:4px}
+.claimed-sub{color:rgba(200,170,255,.4);font-size:13px}
+.number-label{color:rgba(180,130,255,.4);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;text-align:center}
+.number-value{font-size:96px;font-weight:900;color:#c4b5fd;line-height:1;text-align:center}
+.kiosk-footer{margin-top:48px;color:rgba(160,100,255,.25);font-size:11px;text-align:center;max-width:280px;line-height:1.5}
+
+/* Status screens */
+.status-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px}
+.status-icon{font-size:48px;margin-bottom:16px}
+.status-title{color:rgba(255,255,255,.8);font-size:24px;margin-bottom:8px}
+.status-sub{color:rgba(200,170,255,.5);font-size:16px}
+</style>
+</head>
+<body>
+
+<div id="pin-screen" class="pin-screen">
+  <div class="pin-lock">🔒</div>
+  <h1 class="pin-title">Xác thực truy cập</h1>
+  <p class="pin-sub">Nhập mã PIN 4 chữ số</p>
+  <div class="pin-dots" id="pin-dots"></div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="numpad" id="numpad"></div>
+</div>
+
+<div id="loading-screen" class="status-screen" style="display:none">
+  <div class="status-icon">⏳</div>
+  <div class="status-title">Đang tải…</div>
+</div>
+
+<div id="no-session-screen" class="status-screen" style="display:none">
+  <div class="status-icon">📡</div>
+  <div class="status-title">Chưa có phiên hoạt động</div>
+  <div class="status-sub">No active session</div>
+</div>
+
+<div id="all-used-screen" class="status-screen" style="display:none">
+  <div class="status-icon">✅</div>
+  <div class="status-title">Hết số</div>
+  <div class="status-sub">All numbers have been assigned</div>
+</div>
+
+<div id="kiosk-screen" class="kiosk-screen" style="display:none">
+  <div class="session-badge" id="session-badge"></div>
+  <h1 class="kiosk-title">Quét mã để lấy số</h1>
+  <p class="kiosk-sub">Scan to get your queue number</p>
+
+  <div id="qr-container" class="qr-box"></div>
+  <div id="claimed-container" class="claimed-box" style="display:none">
+    <div class="claimed-icon">⏳</div>
+    <div class="claimed-title">Đang chờ xác nhận</div>
+    <div class="claimed-sub">A customer is selecting their group size…</div>
+  </div>
+
+  <div>
+    <p class="number-label">Số hiện tại / Current number</p>
+    <div class="number-value" id="current-number">—</div>
+  </div>
+
+  <p class="kiosk-footer">
+    Mỗi mã QR chỉ dùng được một lần. Vui lòng không chụp ảnh mã.<br>
+    Each QR code is single-use. Please do not take photos.
+  </p>
+</div>
+
+<script>
+(function(){
+  var SUPABASE_URL = 'https://etsdnquntvuklglibypv.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0c2RucXVudHZ1a2xnbGlieXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzODIxNjAsImV4cCI6MjA4Nzk1ODE2MH0.DoqCb87h4dj-j9xNIIGPnzasL6_D4byKT_UGAwfxQas';
+  var BASE_URL = 'https://khach.quanchay.la';
+  var PIN = '8723';
+  var POLL_MS = 3000;
+  var CLAIM_TIMEOUT_MS = 2 * 60 * 1000;
+
+  // State
+  var sessionId = null;
+  var sessionType = null;
+  var currentOrderNumber = null;
+  var currentCertId = null;
+  var secretCode = null;
+  var claimed = false;
+  var claimTimer = null;
+  var pollTimer = null;
+
+  // ---- Supabase REST helpers ----
+  function sbHeaders() {
+    return {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
+  }
+
+  function sbGet(table, params) {
+    var qs = '';
+    if (params) {
+      var parts = [];
+      for (var k in params) { parts.push(k + '=' + encodeURIComponent(params[k])); }
+      qs = '?' + parts.join('&');
+    }
+    return fetch(SUPABASE_URL + '/rest/v1/' + table + qs, {
+      method: 'GET',
+      headers: sbHeaders()
+    }).then(function(r){ return r.json(); });
+  }
+
+  function sbPost(table, body) {
+    return fetch(SUPABASE_URL + '/rest/v1/' + table, {
+      method: 'POST',
+      headers: sbHeaders(),
+      body: JSON.stringify(body)
+    }).then(function(r){ return r.json(); });
+  }
+
+  function sbPatch(table, params, body) {
+    var qs = '';
+    if (params) {
+      var parts = [];
+      for (var k in params) { parts.push(k + '=' + encodeURIComponent(params[k])); }
+      qs = '?' + parts.join('&');
+    }
+    return fetch(SUPABASE_URL + '/rest/v1/' + table + qs, {
+      method: 'PATCH',
+      headers: sbHeaders(),
+      body: JSON.stringify(body)
+    }).then(function(r){ return r.text(); });
+  }
+
+  // ---- Screens ----
+  function showScreen(id) {
+    var screens = ['pin-screen','loading-screen','no-session-screen','all-used-screen','kiosk-screen'];
+    for (var i = 0; i < screens.length; i++) {
+      document.getElementById(screens[i]).style.display = screens[i] === id ? '' : 'none';
+    }
+  }
+
+  // ---- PIN ----
+  var pinInput = '';
+  var pinError = false;
+
+  function buildPin() {
+    var dotsEl = document.getElementById('pin-dots');
+    dotsEl.innerHTML = '';
+    for (var i = 0; i < 4; i++) {
+      var d = document.createElement('div');
+      d.className = 'pin-dot' + (pinInput[i] ? ' filled' : '') + (pinError ? ' error' : '');
+      var inner = document.createElement('div');
+      inner.className = 'pin-dot-inner';
+      d.appendChild(inner);
+      dotsEl.appendChild(d);
+    }
+  }
+
+  function buildNumpad() {
+    var pad = document.getElementById('numpad');
+    var keys = [1,2,3,4,5,6,7,8,9,null,0,'del'];
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (k === null) {
+        var sp = document.createElement('div');
+        sp.className = 'spacer';
+        pad.appendChild(sp);
+      } else {
+        var btn = document.createElement('button');
+        if (k === 'del') {
+          btn.className = 'del-btn';
+          btn.textContent = '⌫';
+        } else {
+          btn.textContent = String(k);
+        }
+        (function(key){
+          btn.onclick = function(){ handlePinKey(key); };
+        })(k);
+        pad.appendChild(btn);
+      }
+    }
+  }
+
+  function handlePinKey(key) {
+    if (key === 'del') {
+      pinInput = pinInput.slice(0, -1);
+      buildPin();
+      return;
+    }
+    if (pinInput.length >= 4) return;
+    pinInput += String(key);
+    buildPin();
+    if (pinInput.length === 4) {
+      setTimeout(function(){
+        if (pinInput === PIN) {
+          try { sessionStorage.setItem('queue-pin-verified','true'); } catch(e){}
+          startKiosk();
+        } else {
+          pinError = true;
+          buildPin();
+          document.getElementById('pin-error').textContent = 'Mã PIN không đúng';
+          pinInput = '';
+          setTimeout(function(){
+            pinError = false;
+            buildPin();
+            document.getElementById('pin-error').textContent = '';
+          }, 800);
+        }
+      }, 150);
+    }
+  }
+
+  // ---- Secret code generator ----
+  function generateSecret() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    var code = '';
+    for (var i = 0; i < 16; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  // ---- QR Code ----
+  function renderQR(url) {
+    var container = document.getElementById('qr-container');
+    container.innerHTML = '';
+    if (!url) return;
+    var qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    var img = qr.createImgTag(5, 0);
+    container.innerHTML = img;
+    var imgEl = container.querySelector('img');
+    if (imgEl) {
+      imgEl.style.display = 'block';
+      imgEl.style.width = '260px';
+      imgEl.style.height = '260px';
+    }
+  }
+
+  // ---- Kiosk Logic ----
+  function findNextAvailable(sid, callback) {
+    // Find highest assigned order_number
+    sbGet('queue_orders', {
+      'select': 'order_number',
+      'session_id': 'eq.' + sid,
+      'group_size': 'not.is.null',
+      'order': 'order_number.desc',
+      'limit': '1'
+    }).then(function(maxArr) {
+      var minNum = ((maxArr && maxArr[0]) ? maxArr[0].order_number : 0) + 1;
+
+      // Get staff certs
+      sbGet('queue_certificates', {
+        'select': 'order_id',
+        'session_id': 'eq.' + sid,
+        'group_size': 'gt.0'
+      }).then(function(staffCerts) {
+        var staffIds = {};
+        if (staffCerts) {
+          for (var i = 0; i < staffCerts.length; i++) {
+            staffIds[staffCerts[i].order_id] = true;
+          }
+        }
+
+        sbGet('queue_orders', {
+          'select': 'id,order_number,group_size,status',
+          'session_id': 'eq.' + sid,
+          'status': 'eq.waiting',
+          'group_size': 'is.null',
+          'order_number': 'not.eq.13',
+          'order': 'order_number.asc',
+          'limit': '10'
+        }).then(function(orders) {
+          if (!orders || orders.length === 0) { callback(null); return; }
+          // Filter >= minNum and not staff-assigned
+          for (var j = 0; j < orders.length; j++) {
+            if (orders[j].order_number >= minNum && !staffIds[orders[j].id]) {
+              callback({ orderNumber: orders[j].order_number, orderId: orders[j].id });
+              return;
+            }
+          }
+          callback(null);
+        });
+      });
+    });
+  }
+
+  function createKioskCert(sid, orderId, orderNum, callback) {
+    // Invalidate old placeholders
+    sbPatch('queue_certificates', {
+      'session_id': 'eq.' + sid,
+      'group_size': 'eq.0',
+      'is_used': 'eq.false'
+    }, { is_used: true }).then(function() {
+      var secret = generateSecret();
+      sbPost('queue_certificates', {
+        order_id: orderId,
+        session_id: sid,
+        order_number: orderNum,
+        secret_code: secret,
+        group_size: 0,
+        is_used: false
+      }).then(function(data) {
+        if (data && data[0]) {
+          callback({ secretCode: secret, certId: data[0].id });
+        } else {
+          callback(null);
+        }
+      });
+    });
+  }
+
+  function showKiosk() {
+    showScreen('kiosk-screen');
+    document.getElementById('session-badge').textContent = sessionType === 'lunch' ? 'Trưa / Lunch' : 'Tối / Dinner';
+    document.getElementById('current-number').textContent = currentOrderNumber || '—';
+
+    if (claimed) {
+      document.getElementById('qr-container').style.display = 'none';
+      document.getElementById('claimed-container').style.display = '';
+    } else {
+      document.getElementById('qr-container').style.display = '';
+      document.getElementById('claimed-container').style.display = 'none';
+      if (secretCode) {
+        renderQR(BASE_URL + '/join/' + secretCode);
+      }
+    }
+  }
+
+  function advance() {
+    if (!sessionId) return;
+    findNextAvailable(sessionId, function(next) {
+      if (!next) {
+        showScreen('all-used-screen');
+        currentCertId = null;
+        return;
+      }
+      createKioskCert(sessionId, next.orderId, next.orderNumber, function(result) {
+        currentOrderNumber = next.orderNumber;
+        secretCode = result ? result.secretCode : null;
+        currentCertId = result ? result.certId : null;
+        claimed = false;
+        if (claimTimer) { clearTimeout(claimTimer); claimTimer = null; }
+        showKiosk();
+      });
+    });
+  }
+
+  function pollCertStatus() {
+    if (!currentCertId) return;
+    sbGet('queue_certificates', {
+      'select': 'id,group_size,claimed_at,is_used',
+      'id': 'eq.' + currentCertId
+    }).then(function(rows) {
+      if (!rows || rows.length === 0) return;
+      var cert = rows[0];
+
+      // Customer completed (group_size > 0)
+      if (cert.group_size > 0) {
+        advance();
+        return;
+      }
+
+      // Invalidated
+      if (cert.is_used && cert.group_size === 0) {
+        advance();
+        return;
+      }
+
+      // Claimed (scanning)
+      if (cert.claimed_at && cert.group_size === 0 && !cert.is_used) {
+        if (!claimed) {
+          claimed = true;
+          showKiosk();
+          // Start claim timeout
+          if (claimTimer) clearTimeout(claimTimer);
+          claimTimer = setTimeout(function() {
+            sbPatch('queue_certificates', {
+              'id': 'eq.' + currentCertId,
+              'group_size': 'eq.0',
+              'is_used': 'eq.false'
+            }, { claimed_at: null });
+          }, CLAIM_TIMEOUT_MS);
+        }
+        return;
+      }
+
+      // Unclaimed
+      if (!cert.claimed_at && cert.group_size === 0 && !cert.is_used) {
+        if (claimed) {
+          claimed = false;
+          if (claimTimer) { clearTimeout(claimTimer); claimTimer = null; }
+          showKiosk();
+        }
+      }
+    });
+  }
+
+  // Also poll queue_orders for staff assignment
+  function pollOrderStatus() {
+    if (!sessionId || !currentOrderNumber) return;
+    sbGet('queue_orders', {
+      'select': 'order_number,group_size',
+      'session_id': 'eq.' + sessionId,
+      'order_number': 'eq.' + currentOrderNumber
+    }).then(function(rows) {
+      if (rows && rows[0] && rows[0].group_size !== null) {
+        advance();
+      }
+    });
+  }
+
+  function startPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(function() {
+      pollCertStatus();
+      pollOrderStatus();
+    }, POLL_MS);
+  }
+
+  function startKiosk() {
+    showScreen('loading-screen');
+
+    sbGet('sessions', {
+      'select': '*',
+      'is_active': 'eq.true',
+      'order': 'started_at.desc',
+      'limit': '1'
+    }).then(function(sessions) {
+      if (!sessions || sessions.length === 0) {
+        showScreen('no-session-screen');
+        // Keep polling for session to appear
+        setInterval(function(){
+          sbGet('sessions', {
+            'select': '*',
+            'is_active': 'eq.true',
+            'order': 'started_at.desc',
+            'limit': '1'
+          }).then(function(s){
+            if (s && s.length > 0) { location.reload(); }
+          });
+        }, 10000);
+        return;
+      }
+
+      sessionId = sessions[0].id;
+      sessionType = sessions[0].session_type;
+
+      findNextAvailable(sessionId, function(next) {
+        if (!next) {
+          showScreen('all-used-screen');
+          return;
+        }
+        createKioskCert(sessionId, next.orderId, next.orderNumber, function(result) {
+          currentOrderNumber = next.orderNumber;
+          secretCode = result ? result.secretCode : null;
+          currentCertId = result ? result.certId : null;
+          claimed = false;
+          showKiosk();
+          startPolling();
+        });
+      });
+    });
+  }
+
+  // ---- Init ----
+  function init() {
+    buildPin();
+    buildNumpad();
+    try {
+      if (sessionStorage.getItem('queue-pin-verified') === 'true') {
+        startKiosk();
+        return;
+      }
+    } catch(e){}
+    showScreen('pin-screen');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

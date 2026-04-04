@@ -1,0 +1,6 @@
+ALTER TABLE public.queue_orders REPLICA IDENTITY FULL;
+ALTER TABLE public.sessions REPLICA IDENTITY FULL;
+ALTER TABLE public.queue_certificates REPLICA IDENTITY FULL;
+ALTER TABLE public.restaurant_tables REPLICA IDENTITY FULL;
+ALTER TABLE public.chairs REPLICA IDENTITY FULL;
+ALTER TABLE public.floor_return_signals REPLICA IDENTITY FULL;

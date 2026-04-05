@@ -81,7 +81,7 @@ export function useQueueOrders(sessionId: string | undefined) {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Real-time subscription
+  // Real-time subscription — apply payload directly instead of refetching
   useEffect(() => {
     if (!sessionId) return;
 
@@ -89,9 +89,31 @@ export function useQueueOrders(sessionId: string | undefined) {
       .channel('queue-orders-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'queue_orders', filter: `session_id=eq.${sessionId}` },
-        () => {
-          fetchOrders();
+        { event: 'INSERT', schema: 'public', table: 'queue_orders', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const newOrder = payload.new as QueueOrder;
+          setOrders(prev => {
+            if (prev.some(o => o.id === newOrder.id)) return prev;
+            const next = [...prev, newOrder];
+            next.sort((a, b) => a.order_number - b.order_number);
+            return next;
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'queue_orders', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const updated = payload.new as QueueOrder;
+          setOrders(prev => prev.map(o => o.id === updated.id ? updated : o));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'queue_orders', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const old = payload.old as { id: string };
+          setOrders(prev => prev.filter(o => o.id !== old.id));
         }
       )
       .subscribe();
@@ -99,7 +121,7 @@ export function useQueueOrders(sessionId: string | undefined) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [sessionId, fetchOrders]);
+  }, [sessionId]);
 
   return { orders, loading, updateOrder, refetch: fetchOrders };
 }

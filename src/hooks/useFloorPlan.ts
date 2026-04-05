@@ -114,23 +114,45 @@ export function useFloorPlan(sessionId: string | undefined, floor: string) {
     fetchData();
   }, [fetchData]);
 
-  // Real-time
+  // Real-time — apply payload directly for instant updates
   useEffect(() => {
     if (!sessionId) return;
 
     const channel = supabase
       .channel(`floor-${floor}-changes`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'restaurant_tables', filter: `session_id=eq.${sessionId}` }, (payload) => {
-        fetchData();
-        if (payload.eventType === 'UPDATE') {
-          const newRow = payload.new as RestaurantTable;
-          if (newRow.floor === floor && newRow.status === 'available') {
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'restaurant_tables', filter: `session_id=eq.${sessionId}` }, (payload) => {
+        const updated = payload.new as RestaurantTable;
+        if (updated.floor === floor) {
+          setTables(prev => prev.map(t => t.id === updated.id ? updated : t));
+          if (updated.status === 'available') {
             toast.info(`Table returned to available! (${floor === 'ground' ? 'Ground' : '1st'} Floor)`);
           }
         }
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chairs' }, () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'restaurant_tables', filter: `session_id=eq.${sessionId}` }, () => {
         fetchData();
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'restaurant_tables', filter: `session_id=eq.${sessionId}` }, () => {
+        fetchData();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chairs' }, (payload) => {
+        const updated = payload.new as Chair;
+        setChairs(prev => {
+          const exists = prev.some(c => c.id === updated.id);
+          if (!exists) return prev;
+          return prev.map(c => c.id === updated.id ? updated : c);
+        });
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chairs' }, (payload) => {
+        const newChair = payload.new as Chair;
+        setChairs(prev => {
+          if (prev.some(c => c.id === newChair.id)) return prev;
+          return [...prev, newChair].sort((a, b) => a.chair_index - b.chair_index);
+        });
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'chairs' }, (payload) => {
+        const old = payload.old as { id: string };
+        setChairs(prev => prev.filter(c => c.id !== old.id));
       })
       .subscribe();
 

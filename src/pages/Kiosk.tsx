@@ -21,7 +21,7 @@ export default function Kiosk() {
 }
 
 function KioskContent() {
-  const { currentOrderNumber, secretCode, sessionType, loading, noSession, allUsed, claimed } = useKiosk();
+  const { currentOrderNumber, secretCode, sessionType, loading, noSession, allUsed } = useKiosk();
 
   const qrUrl = secretCode ? `${getBaseUrl()}/join/${secretCode}` : null;
 

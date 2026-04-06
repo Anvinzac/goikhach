@@ -185,7 +185,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
                     setCustomInput('');
                   }
                 }}
-                className="w-full h-10 rounded-lg border border-border text-center font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary pr-10"
+                className="w-full h-10 rounded-lg border border-border font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary pr-10 pl-10 text-center"
               />
               <button
                 onClick={() => {

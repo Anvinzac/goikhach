@@ -230,15 +230,9 @@ export function useKiosk() {
             return;
           }
 
-          // Customer scanned QR (claimed_at set) → hide QR
+          // Customer scanned QR (claimed_at set) → advance immediately
           if (updated.claimed_at && updated.group_size === 0 && !updated.is_used) {
-            setState(prev => ({ ...prev, claimed: true }));
-            return;
-          }
-
-          // Customer cancelled (claimed_at cleared) → show QR again
-          if (!updated.claimed_at && updated.group_size === 0 && !updated.is_used) {
-            setState(prev => ({ ...prev, claimed: false }));
+            advance();
             return;
           }
         }

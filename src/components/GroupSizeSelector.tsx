@@ -167,23 +167,40 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
                 {n}
               </button>
             ))}
-            <input
-              type="number"
-              inputMode="numeric"
-              placeholder="##"
-              value={customInput}
-              onChange={e => setCustomInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && customInput) {
-                  const val = parseInt(customInput);
-                  if (val > 0) {
-                    handleSelect(val);
+            <div className="flex gap-1">
+              <input
+                type="number"
+                inputMode="numeric"
+                placeholder="##"
+                value={customInput}
+                onChange={e => setCustomInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && customInput) {
+                    const val = parseInt(customInput);
+                    if (val > 0) {
+                      handleSelect(val);
+                    }
+                    setCustomInput('');
                   }
-                  setCustomInput('');
-                }
-              }}
-              className="w-full h-10 rounded-lg border border-border text-center font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+                }}
+                className="flex-1 h-10 rounded-lg border border-border text-center font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary min-w-0"
+              />
+              <button
+                onClick={() => {
+                  if (customInput) {
+                    const val = parseInt(customInput);
+                    if (val > 0) {
+                      handleSelect(val);
+                    }
+                    setCustomInput('');
+                  }
+                }}
+                disabled={!customInput || parseInt(customInput) <= 0}
+                className="h-10 px-3 rounded-lg bg-queue text-queue-foreground font-bold text-sm transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
+              >
+                OK
+              </button>
+            </div>
           </div>
         </>
       )}

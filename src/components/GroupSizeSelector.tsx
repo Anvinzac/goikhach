@@ -144,31 +144,48 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
       </button>
 
       {showLargeMenu && (
-        <div className={`absolute left-0 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-2 flex flex-col gap-1 min-w-[52px] max-h-[min(340px,calc(100vh-96px))] overflow-y-auto ${openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
-          {[5, 6, 7, 8, 9, 10].map(n => (
-            <button
-              key={n}
-              onClick={() => handleSelect(n)}
-              className={`w-full h-10 rounded-lg font-bold text-lg transition-all active:scale-95
-                ${currentSize === n ? 'bg-queue text-queue-foreground' : 'hover:bg-muted'}`}
-            >
-              {n}
-            </button>
-          ))}
-          <input
-            type="number"
-            placeholder="##"
-            value={customInput}
-            onChange={e => setCustomInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && customInput) {
-                handleSelect(parseInt(customInput));
-                setCustomInput('');
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => {
+            if (customInput) {
+              const val = parseInt(customInput);
+              if (val > 0) {
+                handleSelect(val);
               }
-            }}
-            className="w-full h-10 rounded-lg border border-border text-center font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
+              setCustomInput('');
+            } else {
+              setShowLargeMenu(false);
+            }
+          }} />
+          <div className={`absolute left-0 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-2 flex flex-col gap-1 min-w-[52px] max-h-[min(340px,calc(100vh-96px))] overflow-y-auto ${openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
+            {[5, 6, 7, 8, 9, 10].map(n => (
+              <button
+                key={n}
+                onClick={() => handleSelect(n)}
+                className={`w-full h-10 rounded-lg font-bold text-lg transition-all active:scale-95
+                  ${currentSize === n ? 'bg-queue text-queue-foreground' : 'hover:bg-muted'}`}
+              >
+                {n}
+              </button>
+            ))}
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="##"
+              value={customInput}
+              onChange={e => setCustomInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && customInput) {
+                  const val = parseInt(customInput);
+                  if (val > 0) {
+                    handleSelect(val);
+                  }
+                  setCustomInput('');
+                }
+              }}
+              className="w-full h-10 rounded-lg border border-border text-center font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </>
       )}
     </div>
   );

@@ -401,31 +401,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;ba
         return;
       }
 
-      // Claimed (scanning)
+      // Claimed (scanning) — advance immediately
       if (cert.claimed_at && cert.group_size === 0 && !cert.is_used) {
-        if (!claimed) {
-          claimed = true;
-          showKiosk();
-          // Start claim timeout
-          if (claimTimer) clearTimeout(claimTimer);
-          claimTimer = setTimeout(function() {
-            sbPatch('queue_certificates', {
-              'id': 'eq.' + currentCertId,
-              'group_size': 'eq.0',
-              'is_used': 'eq.false'
-            }, { claimed_at: null });
-          }, CLAIM_TIMEOUT_MS);
-        }
+        advance();
         return;
-      }
-
-      // Unclaimed
-      if (!cert.claimed_at && cert.group_size === 0 && !cert.is_used) {
-        if (claimed) {
-          claimed = false;
-          if (claimTimer) { clearTimeout(claimTimer); claimTimer = null; }
-          showKiosk();
-        }
       }
     });
   }

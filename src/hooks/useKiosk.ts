@@ -193,23 +193,6 @@ export function useKiosk() {
     initialize();
   }, [initialize]);
 
-  // Timeout fallback: if claimed for >2 min, auto-unclaim
-  useEffect(() => {
-    if (!state.claimed || !currentCertIdRef.current) return;
-
-    const CLAIM_TIMEOUT = 2 * 60 * 1000; // 2 minutes
-    const timer = setTimeout(async () => {
-      await supabase
-        .from('queue_certificates')
-        .update({ claimed_at: null })
-        .eq('id', currentCertIdRef.current!)
-        .eq('group_size', 0)
-        .eq('is_used', false);
-      // Realtime will pick up the change and set claimed=false
-    }, CLAIM_TIMEOUT);
-
-    return () => clearTimeout(timer);
-  }, [state.claimed]);
 
   // Listen for certificate changes (customer claimed) and queue_orders changes (staff assigned)
   useEffect(() => {

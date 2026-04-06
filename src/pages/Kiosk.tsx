@@ -1,7 +1,7 @@
 import { useKiosk } from '@/hooks/useKiosk';
 import { PinGate } from '@/components/PinGate';
 import { QRCodeSVG } from 'qrcode.react';
-import { Loader2, WifiOff, CheckCircle2, Clock } from 'lucide-react';
+import { Loader2, WifiOff, CheckCircle2 } from 'lucide-react';
 
 const PUBLISHED_APP_URL = 'https://khach.quanchay.la';
 

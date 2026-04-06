@@ -344,15 +344,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;ba
     document.getElementById('session-badge').textContent = sessionType === 'lunch' ? 'Trưa / Lunch' : 'Tối / Dinner';
     document.getElementById('current-number').textContent = currentOrderNumber || '—';
 
-    if (claimed) {
-      document.getElementById('qr-container').style.display = 'none';
-      document.getElementById('claimed-container').style.display = '';
-    } else {
-      document.getElementById('qr-container').style.display = '';
-      document.getElementById('claimed-container').style.display = 'none';
-      if (secretCode) {
-        renderQR(BASE_URL + '/join/' + secretCode);
-      }
+    document.getElementById('qr-container').style.display = '';
+    if (secretCode) {
+      renderQR(BASE_URL + '/join/' + secretCode);
     }
   }
 

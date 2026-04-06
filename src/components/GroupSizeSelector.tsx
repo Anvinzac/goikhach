@@ -167,34 +167,40 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
                 {n}
               </button>
             ))}
-            <input
-              type="number"
-              inputMode="numeric"
-              placeholder="##"
-              value={customInput}
-              onChange={e => setCustomInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && customInput) {
-                  const val = parseInt(customInput);
-                  if (val > 0) handleSelect(val);
-                  setCustomInput('');
-                }
-              }}
-              className="w-full h-10 rounded-lg border border-border text-center font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <button
-              onClick={() => {
-                if (customInput) {
-                  const val = parseInt(customInput);
-                  if (val > 0) handleSelect(val);
-                  setCustomInput('');
-                }
-              }}
-              disabled={!customInput || parseInt(customInput) <= 0}
-              className="w-full h-10 rounded-lg bg-queue text-queue-foreground font-bold text-sm transition-all active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
-            >
-              OK
-            </button>
+            <div className="relative">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder="##"
+                value={customInput}
+                onChange={e => {
+                  const v = e.target.value.replace(/\D/g, '');
+                  setCustomInput(v);
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && customInput) {
+                    const val = parseInt(customInput);
+                    if (val > 0) handleSelect(val);
+                    setCustomInput('');
+                  }
+                }}
+                className="w-full h-10 rounded-lg border border-border text-center font-bold text-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary pr-10"
+              />
+              <button
+                onClick={() => {
+                  if (customInput) {
+                    const val = parseInt(customInput);
+                    if (val > 0) handleSelect(val);
+                    setCustomInput('');
+                  }
+                }}
+                disabled={!customInput || parseInt(customInput) <= 0}
+                className="absolute right-1 top-1 bottom-1 w-8 rounded-md bg-queue text-queue-foreground font-bold text-xs transition-all active:scale-90 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center"
+              >
+                OK
+              </button>
+            </div>
           </div>
         </>
       )}

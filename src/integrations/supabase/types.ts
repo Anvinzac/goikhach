@@ -262,6 +262,7 @@ export type Database = {
       sessions: {
         Row: {
           daily_notice: string | null
+          expires_at: string | null
           id: string
           is_active: boolean
           session_type: string
@@ -269,6 +270,7 @@ export type Database = {
         }
         Insert: {
           daily_notice?: string | null
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           session_type: string
@@ -276,6 +278,7 @@ export type Database = {
         }
         Update: {
           daily_notice?: string | null
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           session_type?: string

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Sparkles, Loader2, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { Globe, Sparkles, Loader2, CheckCircle2, XCircle, Clock, Share2 } from 'lucide-react';
 import { type ThemeColors, labels } from './types';
 
 // ─── Themed Status Badge ─────────────────────────────────
@@ -56,12 +56,16 @@ export function ThemedActions({
   theme,
   onToggleLanguage,
   onPersonalize,
+  onShare,
+  hasPin,
 }: {
   status: 'waiting' | 'called' | 'cancelled' | 'expired';
   language: 'VN' | 'EN';
   theme: ThemeColors;
   onToggleLanguage?: () => void;
   onPersonalize?: () => void;
+  onShare?: () => void;
+  hasPin?: boolean;
 }) {
   const l = labels[language];
   const btnStyle = {

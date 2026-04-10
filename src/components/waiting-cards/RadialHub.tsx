@@ -118,7 +118,7 @@ export default function RadialHub({ data, theme, onToggleLanguage, onPersonalize
 
         {/* Footer */}
         <motion.div custom={7} variants={fadeUp}>
-          <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} />
+          <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} onShare={onShare} hasPin={hasPin} />
         </motion.div>
       </div>
     </motion.div>

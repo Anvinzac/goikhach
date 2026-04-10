@@ -77,6 +77,18 @@ export function ThemedActions({
     <div className="flex items-center justify-between w-full">
       <ThemedStatusBadge status={status} language={language} theme={theme} />
       <div className="flex items-center gap-3">
+        {onShare && (
+          <motion.button
+            onClick={onShare}
+            className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold"
+            style={btnStyle}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Share2 className="w-3 h-3" />
+            {hasPin ? (language === 'VN' ? 'Đã chia sẻ' : 'Shared') : (language === 'VN' ? 'Chia sẻ' : 'Share')}
+          </motion.button>
+        )}
         {onToggleLanguage && (
           <motion.button
             onClick={onToggleLanguage}

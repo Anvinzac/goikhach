@@ -167,18 +167,12 @@ export default function Certificate() {
     );
   }
 
-  if (accessState === 'denied') {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-center gap-4">
-        <ShieldX className="w-16 h-16 text-red-400/50" />
-        <h1 className="text-2xl font-bold text-white/70">
-          {lang === 'VN' ? 'Phiếu đã được sử dụng' : 'Certificate already claimed'}
-        </h1>
-        <p className="text-white/30 text-sm">
-          {lang === 'VN' ? 'Phiếu này đã được sử dụng trên thiết bị khác.' : 'This certificate has been claimed on another device.'}
-        </p>
-      </div>
-    );
+  if (accessState === 'needs_pin_setup') {
+    return <PinSetupScreen onSetPin={setupPin} />;
+  }
+
+  if (accessState === 'needs_pin') {
+    return <PinEntryScreen onVerify={verifyPin} />;
   }
 
   if (!activeCert || !sessionInfo) return null;

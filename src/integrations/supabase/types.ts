@@ -97,6 +97,7 @@ export type Database = {
           is_used: boolean
           order_id: string
           order_number: number
+          pin_code: string | null
           secret_code: string
           session_id: string
         }
@@ -110,6 +111,7 @@ export type Database = {
           is_used?: boolean
           order_id: string
           order_number: number
+          pin_code?: string | null
           secret_code: string
           session_id: string
         }
@@ -123,6 +125,7 @@ export type Database = {
           is_used?: boolean
           order_id?: string
           order_number?: number
+          pin_code?: string | null
           secret_code?: string
           session_id?: string
         }

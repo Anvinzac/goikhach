@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type ComponentType } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useCertificate } from '@/hooks/useCertificate';
-import { ShieldX, User, Download } from 'lucide-react';
+import { ShieldX, User, Download, Lock, KeyRound } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { AnimatePresence, motion } from 'framer-motion';
 import {

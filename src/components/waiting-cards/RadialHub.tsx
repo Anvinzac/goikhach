@@ -23,7 +23,7 @@ const fadeUp = {
   }),
 };
 
-export default function RadialHub({ data, theme, onToggleLanguage, onPersonalize }: WaitingCardProps) {
+export default function RadialHub({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
   const isDone = data.status === 'called';
 

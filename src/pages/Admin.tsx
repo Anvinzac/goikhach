@@ -23,6 +23,7 @@ export default function Admin() {
       .from('sessions')
       .select('*')
       .eq('is_active', true)
+      .gte('expires_at', new Date().toISOString())
       .order('started_at', { ascending: false })
       .limit(1)
       .maybeSingle();

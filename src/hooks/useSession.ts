@@ -19,6 +19,7 @@ export function useSession() {
       .from('sessions')
       .select('*')
       .eq('is_active', true)
+      .gte('expires_at', new Date().toISOString())
       .order('started_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -97,9 +98,13 @@ export function useSession() {
       }
     }
 
+    // expires at end of today (23:59:59)
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
     const { data, error } = await supabase
       .from('sessions')
-      .insert({ session_type: type, is_active: true, daily_notice: dailyNotice || '' })
+      .insert({ session_type: type, is_active: true, daily_notice: dailyNotice || '', expires_at: endOfDay.toISOString() })
       .select()
       .single();
 

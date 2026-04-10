@@ -71,6 +71,8 @@ export default function Certificate() {
   const waitingStats = isDemo ? DEMO_STATS : hook.waitingStats;
   const accessState = isDemo ? 'granted' : hook.accessState;
   const updateCustomerName = hook.updateCustomerName;
+  const setupPin = hook.setupPin;
+  const verifyPin = hook.verifyPin;
 
   const [layoutIdx, setLayoutIdx] = useState(0);
   const [themeIdx, setThemeIdx] = useState(0);

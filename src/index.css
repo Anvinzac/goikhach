@@ -215,3 +215,9 @@ html, body, #root {
   .border-floor-neutral-sharing { border-color: hsl(var(--floor-neutral-sharing-end)); }
   .border-floor-neutral-occupied { border-color: hsl(var(--floor-neutral-occupied-end)); }
 }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}

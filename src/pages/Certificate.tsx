@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type ComponentType } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useCertificate } from '@/hooks/useCertificate';
-import { ShieldX, User, Download } from 'lucide-react';
+import { ShieldX, User, Download, Lock, KeyRound } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -59,6 +59,118 @@ const DEMO_STATS = {
   reachedTableAt: null,
 };
 
+function PinSetupScreen({ onSetPin }: { onSetPin: (pin: string) => Promise<boolean> }) {
+  const [pin, setPin] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [step, setStep] = useState<'set' | 'confirm'>('set');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (step === 'set') {
+      if (pin.length < 4) { setError('Tối thiểu 4 số / Min 4 digits'); return; }
+      setStep('confirm');
+      setError('');
+      return;
+    }
+    if (confirm !== pin) { setError('Mã PIN không khớp / PIN mismatch'); setConfirm(''); return; }
+    setLoading(true);
+    const ok = await onSetPin(pin);
+    if (!ok) { setError('Lỗi, thử lại / Error, try again'); setLoading(false); }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-center gap-5">
+      <KeyRound className="w-12 h-12 text-fuchsia-400/60" />
+      <div>
+        <h1 className="text-xl font-bold text-white/80 mb-1">
+          {step === 'set' ? 'Đặt mã PIN' : 'Xác nhận mã PIN'}
+        </h1>
+        <p className="text-white/30 text-xs">
+          {step === 'set' ? 'Tạo mã PIN để chia sẻ phiếu / Set a PIN to share this card' : 'Nhập lại mã PIN / Re-enter your PIN'}
+        </p>
+      </div>
+      <input
+        type="password"
+        inputMode="numeric"
+        autoFocus
+        maxLength={8}
+        value={step === 'set' ? pin : confirm}
+        onChange={e => {
+          const v = e.target.value.replace(/\D/g, '');
+          step === 'set' ? setPin(v) : setConfirm(v);
+          setError('');
+        }}
+        onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+        className="w-40 text-center text-2xl tracking-[0.3em] bg-white/10 border border-white/10 rounded-xl py-3 text-white font-mono focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50"
+        placeholder="••••"
+      />
+      {error && <p className="text-red-400 text-xs font-medium">{error}</p>}
+      <button
+        onClick={handleSubmit}
+        disabled={loading || (step === 'set' ? pin.length < 4 : confirm.length < 4)}
+        className="px-6 py-2.5 rounded-xl bg-fuchsia-600 text-white font-bold text-sm disabled:opacity-30 active:scale-95 transition-all"
+      >
+        {loading ? '...' : step === 'set' ? 'Tiếp / Next' : 'Xác nhận / Confirm'}
+      </button>
+      {step === 'confirm' && (
+        <button onClick={() => { setStep('set'); setConfirm(''); setError(''); }} className="text-white/30 text-xs underline">
+          ← Quay lại / Back
+        </button>
+      )}
+    </div>
+  );
+}
+
+function PinEntryScreen({ onVerify }: { onVerify: (pin: string) => Promise<boolean> }) {
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [shake, setShake] = useState(false);
+
+  const handleSubmit = async () => {
+    if (pin.length < 4) return;
+    setLoading(true);
+    const ok = await onVerify(pin);
+    setLoading(false);
+    if (!ok) {
+      setError('Sai mã PIN / Wrong PIN');
+      setPin('');
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-center gap-5">
+      <Lock className="w-12 h-12 text-fuchsia-400/60" />
+      <div>
+        <h1 className="text-xl font-bold text-white/80 mb-1">Nhập mã PIN</h1>
+        <p className="text-white/30 text-xs">Nhập mã PIN để xem phiếu / Enter PIN to view card</p>
+      </div>
+      <input
+        type="password"
+        inputMode="numeric"
+        autoFocus
+        maxLength={8}
+        value={pin}
+        onChange={e => { setPin(e.target.value.replace(/\D/g, '')); setError(''); }}
+        onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+        className={`w-40 text-center text-2xl tracking-[0.3em] bg-white/10 border border-white/10 rounded-xl py-3 text-white font-mono focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50 transition-transform ${shake ? 'animate-[shake_0.3s_ease-in-out]' : ''}`}
+        placeholder="••••"
+      />
+      {error && <p className="text-red-400 text-xs font-medium">{error}</p>}
+      <button
+        onClick={handleSubmit}
+        disabled={loading || pin.length < 4}
+        className="px-6 py-2.5 rounded-xl bg-fuchsia-600 text-white font-bold text-sm disabled:opacity-30 active:scale-95 transition-all"
+      >
+        {loading ? '...' : 'Mở phiếu / Open card'}
+      </button>
+    </div>
+  );
+}
+
 export default function Certificate() {
   const { code } = useParams<{ code: string }>();
   const location = useLocation();
@@ -71,6 +183,8 @@ export default function Certificate() {
   const waitingStats = isDemo ? DEMO_STATS : hook.waitingStats;
   const accessState = isDemo ? 'granted' : hook.accessState;
   const updateCustomerName = hook.updateCustomerName;
+  const setupPin = hook.setupPin;
+  const verifyPin = hook.verifyPin;
 
   const [layoutIdx, setLayoutIdx] = useState(0);
   const [themeIdx, setThemeIdx] = useState(0);
@@ -165,18 +279,12 @@ export default function Certificate() {
     );
   }
 
-  if (accessState === 'denied') {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-center gap-4">
-        <ShieldX className="w-16 h-16 text-red-400/50" />
-        <h1 className="text-2xl font-bold text-white/70">
-          {lang === 'VN' ? 'Phiếu đã được sử dụng' : 'Certificate already claimed'}
-        </h1>
-        <p className="text-white/30 text-sm">
-          {lang === 'VN' ? 'Phiếu này đã được sử dụng trên thiết bị khác.' : 'This certificate has been claimed on another device.'}
-        </p>
-      </div>
-    );
+  if (accessState === 'needs_pin_setup') {
+    return <PinSetupScreen onSetPin={setupPin} />;
+  }
+
+  if (accessState === 'needs_pin') {
+    return <PinEntryScreen onVerify={verifyPin} />;
   }
 
   if (!activeCert || !sessionInfo) return null;

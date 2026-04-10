@@ -12,6 +12,7 @@ export interface CertificateData {
   browser_token: string | null;
   customer_name: string | null;
   created_at: string;
+  pin_code: string | null;
 }
 
 export interface WaitingStats {
@@ -27,25 +28,20 @@ export function useCertificate(secretCode: string | undefined) {
   const [certificate, setCertificate] = useState<CertificateData | null>(null);
   const [sessionInfo, setSessionInfo] = useState<{ session_type: string; daily_notice: string; started_at: string } | null>(null);
   const [waitingStats, setWaitingStats] = useState<WaitingStats>({ groupsBefore: 0, totalPeopleWaiting: 0, estimatedMinutes: 0, currentWaitMinutes: 0, orderStatus: 'waiting', reachedTableAt: null });
-  const [accessState, setAccessState] = useState<'loading' | 'granted' | 'denied' | 'not_found'>('loading');
-
-  const STORAGE_KEY = `cert_token_${secretCode}`;
+  const [accessState, setAccessState] = useState<'loading' | 'needs_pin_setup' | 'needs_pin' | 'granted' | 'not_found'>('loading');
 
   const fetchWaitingStats = useCallback(async (cert: CertificateData) => {
-    // Get the order's current status
     const { data: order } = await supabase
       .from('queue_orders')
       .select('status, reached_table_at, updated_at')
       .eq('id', cert.order_id)
       .single();
 
-    // Order was deleted (session reset) — mark as expired
     if (!order) {
       setWaitingStats(prev => ({ ...prev, orderStatus: 'expired' }));
       return;
     }
 
-    // Get waiting groups before this order
     const { data: waitingOrders } = await supabase
       .from('queue_orders')
       .select('order_number, group_size, status')
@@ -74,7 +70,6 @@ export function useCertificate(secretCode: string | undefined) {
     if (!secretCode) return;
 
     const init = async () => {
-      // Fetch certificate
       const { data: cert, error } = await supabase
         .from('queue_certificates')
         .select('*')
@@ -86,54 +81,71 @@ export function useCertificate(secretCode: string | undefined) {
         return;
       }
 
-      // Kiosk placeholders (group_size=0) should only be claimed via /join/:secret, not /c/:secret
+      // Kiosk placeholders (group_size=0) should only be claimed via /join/:secret
       if (cert.group_size === 0) {
-        setAccessState(cert.is_used ? 'denied' : 'not_found');
+        setAccessState('not_found');
         return;
       }
 
-      const storedToken = localStorage.getItem(STORAGE_KEY);
+      setCertificate(cert as CertificateData);
 
-      if (!cert.is_used) {
-        // First access - claim it
-        const browserToken = crypto.randomUUID();
-        await supabase
-          .from('queue_certificates')
-          .update({ is_used: true, browser_token: browserToken })
-          .eq('id', cert.id);
-
-        localStorage.setItem(STORAGE_KEY, browserToken);
-        cert.is_used = true;
-        cert.browser_token = browserToken;
-        setCertificate(cert as CertificateData);
-        setAccessState('granted');
-      } else if (storedToken && storedToken === cert.browser_token) {
-        // Returning visitor with valid token
-        setCertificate(cert as CertificateData);
-        setAccessState('granted');
+      if (!cert.pin_code) {
+        // No PIN set yet — first visitor sets the PIN
+        setAccessState('needs_pin_setup');
       } else {
-        // Already used by someone else
-        setAccessState('denied');
-        return;
+        // PIN exists — visitor must enter it
+        setAccessState('needs_pin');
       }
-
-      // Fetch session info
-      const { data: sess } = await supabase
-        .from('sessions')
-        .select('session_type, daily_notice, started_at')
-        .eq('id', cert.session_id)
-        .single();
-
-      setSessionInfo(sess as any);
-      fetchWaitingStats(cert as CertificateData);
     };
 
     init();
-  }, [secretCode, STORAGE_KEY, fetchWaitingStats]);
+  }, [secretCode]);
+
+  const setupPin = useCallback(async (pin: string) => {
+    if (!certificate) return false;
+    const { error } = await supabase
+      .from('queue_certificates')
+      .update({ pin_code: pin, is_used: true })
+      .eq('id', certificate.id);
+
+    if (error) return false;
+
+    setCertificate(prev => prev ? { ...prev, pin_code: pin, is_used: true } : null);
+    setAccessState('granted');
+
+    // Fetch session info & stats
+    const { data: sess } = await supabase
+      .from('sessions')
+      .select('session_type, daily_notice, started_at')
+      .eq('id', certificate.session_id)
+      .single();
+    setSessionInfo(sess as any);
+    fetchWaitingStats(certificate);
+
+    return true;
+  }, [certificate, fetchWaitingStats]);
+
+  const verifyPin = useCallback(async (pin: string) => {
+    if (!certificate) return false;
+    if (certificate.pin_code === pin) {
+      setAccessState('granted');
+
+      const { data: sess } = await supabase
+        .from('sessions')
+        .select('session_type, daily_notice, started_at')
+        .eq('id', certificate.session_id)
+        .single();
+      setSessionInfo(sess as any);
+      fetchWaitingStats(certificate);
+
+      return true;
+    }
+    return false;
+  }, [certificate, fetchWaitingStats]);
 
   // Real-time updates
   useEffect(() => {
-    if (!certificate) return;
+    if (!certificate || accessState !== 'granted') return;
 
     const channel = supabase
       .channel(`cert-live-${certificate.id}`)
@@ -147,7 +159,6 @@ export function useCertificate(secretCode: string | undefined) {
       })
       .subscribe();
 
-    // Update current wait time every 30 seconds
     const timer = setInterval(() => {
       fetchWaitingStats(certificate);
     }, 30000);
@@ -156,7 +167,7 @@ export function useCertificate(secretCode: string | undefined) {
       supabase.removeChannel(channel);
       clearInterval(timer);
     };
-  }, [certificate, fetchWaitingStats]);
+  }, [certificate, accessState, fetchWaitingStats]);
 
   const updateCustomerName = useCallback(async (name: string) => {
     if (!certificate) return;
@@ -164,5 +175,5 @@ export function useCertificate(secretCode: string | undefined) {
     setCertificate(prev => prev ? { ...prev, customer_name: name } : null);
   }, [certificate]);
 
-  return { certificate, sessionInfo, waitingStats, accessState, updateCustomerName };
+  return { certificate, sessionInfo, waitingStats, accessState, updateCustomerName, setupPin, verifyPin };
 }

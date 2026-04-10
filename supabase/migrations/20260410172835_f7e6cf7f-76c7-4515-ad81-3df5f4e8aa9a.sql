@@ -1,0 +1,1 @@
+ALTER TABLE public.queue_certificates ADD COLUMN pin_code text DEFAULT NULL;

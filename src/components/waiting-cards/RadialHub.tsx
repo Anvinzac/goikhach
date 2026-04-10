@@ -23,7 +23,7 @@ const fadeUp = {
   }),
 };
 
-export default function RadialHub({ data, theme, onToggleLanguage, onPersonalize }: WaitingCardProps) {
+export default function RadialHub({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
   const isDone = data.status === 'called';
 
@@ -118,7 +118,7 @@ export default function RadialHub({ data, theme, onToggleLanguage, onPersonalize
 
         {/* Footer */}
         <motion.div custom={7} variants={fadeUp}>
-          <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} />
+          <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} onShare={onShare} hasPin={hasPin} />
         </motion.div>
       </div>
     </motion.div>

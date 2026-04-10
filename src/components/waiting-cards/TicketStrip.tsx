@@ -17,7 +17,7 @@ const printReveal = {
   }),
 };
 
-export default function TicketStrip({ data, theme, onToggleLanguage, onPersonalize }: WaitingCardProps) {
+export default function TicketStrip({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
   const isDone = data.status === 'called';
 
@@ -107,7 +107,7 @@ export default function TicketStrip({ data, theme, onToggleLanguage, onPersonali
 
         {/* Footer */}
         <motion.div className="px-4 py-3" custom={5} variants={printReveal}>
-          <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} />
+          <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} onShare={onShare} hasPin={hasPin} />
         </motion.div>
 
         <div className="px-4 pb-3 text-center">

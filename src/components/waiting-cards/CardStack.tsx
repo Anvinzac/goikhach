@@ -11,7 +11,7 @@ const stackReveal = {
   }),
 };
 
-export default function CardStack({ data, theme, onToggleLanguage, onPersonalize }: WaitingCardProps) {
+export default function CardStack({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
   const isDone = data.status === 'called';
 
@@ -111,7 +111,7 @@ export default function CardStack({ data, theme, onToggleLanguage, onPersonalize
           </div>
 
           <div className="px-3 py-2 flex items-center justify-between border-t" style={{ borderColor: theme.surfaceBorder }}>
-            <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} />
+            <ThemedActions status={data.status} language={data.language} theme={theme} onToggleLanguage={onToggleLanguage} onPersonalize={onPersonalize} onShare={onShare} hasPin={hasPin} />
           </div>
         </motion.div>
       </motion.div>

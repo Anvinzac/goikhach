@@ -28,9 +28,19 @@ export function useCertificate(secretCode: string | undefined) {
   const [certificate, setCertificate] = useState<CertificateData | null>(null);
   const [sessionInfo, setSessionInfo] = useState<{ session_type: string; daily_notice: string; started_at: string } | null>(null);
   const [waitingStats, setWaitingStats] = useState<WaitingStats>({ groupsBefore: 0, totalPeopleWaiting: 0, estimatedMinutes: 0, currentWaitMinutes: 0, orderStatus: 'waiting', reachedTableAt: null });
-  const [accessState, setAccessState] = useState<'loading' | 'needs_pin_setup' | 'needs_pin' | 'granted' | 'not_found'>('loading');
+  const [accessState, setAccessState] = useState<'loading' | 'granted' | 'needs_pin' | 'denied' | 'not_found'>('loading');
 
-  const fetchWaitingStats = useCallback(async (cert: CertificateData) => {
+  const STORAGE_KEY = `cert_token_${secretCode}`;
+
+  const fetchSessionAndStats = useCallback(async (cert: CertificateData) => {
+    const { data: sess } = await supabase
+      .from('sessions')
+      .select('session_type, daily_notice, started_at')
+      .eq('id', cert.session_id)
+      .single();
+    setSessionInfo(sess as any);
+
+    // Fetch waiting stats
     const { data: order } = await supabase
       .from('queue_orders')
       .select('status, reached_table_at, updated_at')
@@ -51,7 +61,6 @@ export function useCertificate(secretCode: string | undefined) {
     const groupsBefore = allWaiting.filter(o => o.order_number < cert.order_number).length;
     const totalPeopleWaiting = allWaiting.reduce((sum, o) => sum + (o.group_size || 0), 0);
     const estimatedMinutes = groupsBefore * 3;
-
     const certCreatedAt = new Date(cert.created_at);
     const now = new Date();
     const currentWaitMinutes = Math.floor((now.getTime() - certCreatedAt.getTime()) / 60000);
@@ -81,67 +90,67 @@ export function useCertificate(secretCode: string | undefined) {
         return;
       }
 
-      // Kiosk placeholders (group_size=0) should only be claimed via /join/:secret
       if (cert.group_size === 0) {
-        setAccessState('not_found');
+        setAccessState(cert.is_used ? 'denied' : 'not_found');
         return;
       }
 
-      setCertificate(cert as CertificateData);
+      const storedToken = localStorage.getItem(STORAGE_KEY);
 
-      if (!cert.pin_code) {
-        // No PIN set yet — first visitor sets the PIN
-        setAccessState('needs_pin_setup');
-      } else {
-        // PIN exists — visitor must enter it
+      if (!cert.is_used) {
+        // First access — claim it
+        const browserToken = crypto.randomUUID();
+        await supabase
+          .from('queue_certificates')
+          .update({ is_used: true, browser_token: browserToken })
+          .eq('id', cert.id);
+        localStorage.setItem(STORAGE_KEY, browserToken);
+        cert.is_used = true;
+        cert.browser_token = browserToken;
+        setCertificate(cert as CertificateData);
+        setAccessState('granted');
+      } else if (storedToken && storedToken === cert.browser_token) {
+        // Returning visitor with valid token
+        setCertificate(cert as CertificateData);
+        setAccessState('granted');
+      } else if (cert.pin_code) {
+        // Has PIN set — visitor can enter PIN to view
+        setCertificate(cert as CertificateData);
         setAccessState('needs_pin');
+      } else {
+        // Already used, no PIN — denied
+        setAccessState('denied');
+        return;
+      }
+
+      if (storedToken === cert.browser_token || !cert.is_used) {
+        fetchSessionAndStats(cert as CertificateData);
       }
     };
 
     init();
-  }, [secretCode]);
-
-  const setupPin = useCallback(async (pin: string) => {
-    if (!certificate) return false;
-    const { error } = await supabase
-      .from('queue_certificates')
-      .update({ pin_code: pin, is_used: true })
-      .eq('id', certificate.id);
-
-    if (error) return false;
-
-    setCertificate(prev => prev ? { ...prev, pin_code: pin, is_used: true } : null);
-    setAccessState('granted');
-
-    // Fetch session info & stats
-    const { data: sess } = await supabase
-      .from('sessions')
-      .select('session_type, daily_notice, started_at')
-      .eq('id', certificate.session_id)
-      .single();
-    setSessionInfo(sess as any);
-    fetchWaitingStats(certificate);
-
-    return true;
-  }, [certificate, fetchWaitingStats]);
+  }, [secretCode, STORAGE_KEY, fetchSessionAndStats]);
 
   const verifyPin = useCallback(async (pin: string) => {
     if (!certificate) return false;
     if (certificate.pin_code === pin) {
       setAccessState('granted');
-
-      const { data: sess } = await supabase
-        .from('sessions')
-        .select('session_type, daily_notice, started_at')
-        .eq('id', certificate.session_id)
-        .single();
-      setSessionInfo(sess as any);
-      fetchWaitingStats(certificate);
-
+      fetchSessionAndStats(certificate);
       return true;
     }
     return false;
-  }, [certificate, fetchWaitingStats]);
+  }, [certificate, fetchSessionAndStats]);
+
+  const setupPin = useCallback(async (pin: string) => {
+    if (!certificate) return false;
+    const { error } = await supabase
+      .from('queue_certificates')
+      .update({ pin_code: pin })
+      .eq('id', certificate.id);
+    if (error) return false;
+    setCertificate(prev => prev ? { ...prev, pin_code: pin } : null);
+    return true;
+  }, [certificate]);
 
   // Real-time updates
   useEffect(() => {
@@ -155,19 +164,19 @@ export function useCertificate(secretCode: string | undefined) {
         table: 'queue_orders',
         filter: `session_id=eq.${certificate.session_id}`,
       }, () => {
-        fetchWaitingStats(certificate);
+        fetchSessionAndStats(certificate);
       })
       .subscribe();
 
     const timer = setInterval(() => {
-      fetchWaitingStats(certificate);
+      fetchSessionAndStats(certificate);
     }, 30000);
 
     return () => {
       supabase.removeChannel(channel);
       clearInterval(timer);
     };
-  }, [certificate, accessState, fetchWaitingStats]);
+  }, [certificate, accessState, fetchSessionAndStats]);
 
   const updateCustomerName = useCallback(async (name: string) => {
     if (!certificate) return;

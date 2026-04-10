@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type ComponentType } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useCertificate } from '@/hooks/useCertificate';
-import { ShieldX, User, Download, Lock, KeyRound } from 'lucide-react';
+import { ShieldX, User, Download, Lock, KeyRound, Check, Copy } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -42,6 +42,7 @@ const DEMO_CERTIFICATE = {
   browser_token: 'demo',
   customer_name: null as string | null,
   created_at: new Date().toISOString(),
+  pin_code: null as string | null,
 };
 
 const DEMO_SESSION = {
@@ -59,69 +60,7 @@ const DEMO_STATS = {
   reachedTableAt: null,
 };
 
-function PinSetupScreen({ onSetPin }: { onSetPin: (pin: string) => Promise<boolean> }) {
-  const [pin, setPin] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [step, setStep] = useState<'set' | 'confirm'>('set');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async () => {
-    if (step === 'set') {
-      if (pin.length < 4) { setError('Tối thiểu 4 số / Min 4 digits'); return; }
-      setStep('confirm');
-      setError('');
-      return;
-    }
-    if (confirm !== pin) { setError('Mã PIN không khớp / PIN mismatch'); setConfirm(''); return; }
-    setLoading(true);
-    const ok = await onSetPin(pin);
-    if (!ok) { setError('Lỗi, thử lại / Error, try again'); setLoading(false); }
-  };
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-center gap-5">
-      <KeyRound className="w-12 h-12 text-fuchsia-400/60" />
-      <div>
-        <h1 className="text-xl font-bold text-white/80 mb-1">
-          {step === 'set' ? 'Đặt mã PIN' : 'Xác nhận mã PIN'}
-        </h1>
-        <p className="text-white/30 text-xs">
-          {step === 'set' ? 'Tạo mã PIN để chia sẻ phiếu / Set a PIN to share this card' : 'Nhập lại mã PIN / Re-enter your PIN'}
-        </p>
-      </div>
-      <input
-        type="password"
-        inputMode="numeric"
-        autoFocus
-        maxLength={8}
-        value={step === 'set' ? pin : confirm}
-        onChange={e => {
-          const v = e.target.value.replace(/\D/g, '');
-          step === 'set' ? setPin(v) : setConfirm(v);
-          setError('');
-        }}
-        onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-        className="w-40 text-center text-2xl tracking-[0.3em] bg-white/10 border border-white/10 rounded-xl py-3 text-white font-mono focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50"
-        placeholder="••••"
-      />
-      {error && <p className="text-red-400 text-xs font-medium">{error}</p>}
-      <button
-        onClick={handleSubmit}
-        disabled={loading || (step === 'set' ? pin.length < 4 : confirm.length < 4)}
-        className="px-6 py-2.5 rounded-xl bg-fuchsia-600 text-white font-bold text-sm disabled:opacity-30 active:scale-95 transition-all"
-      >
-        {loading ? '...' : step === 'set' ? 'Tiếp / Next' : 'Xác nhận / Confirm'}
-      </button>
-      {step === 'confirm' && (
-        <button onClick={() => { setStep('set'); setConfirm(''); setError(''); }} className="text-white/30 text-xs underline">
-          ← Quay lại / Back
-        </button>
-      )}
-    </div>
-  );
-}
-
+// ─── PIN Entry Screen (for shared link visitors) ─────────
 function PinEntryScreen({ onVerify }: { onVerify: (pin: string) => Promise<boolean> }) {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
@@ -171,6 +110,155 @@ function PinEntryScreen({ onVerify }: { onVerify: (pin: string) => Promise<boole
   );
 }
 
+// ─── Share Overlay (PIN creation + copy URL) ─────────────
+function ShareOverlay({
+  onSetPin,
+  existingPin,
+  secretCode,
+  lang,
+  onClose,
+}: {
+  onSetPin: (pin: string) => Promise<boolean>;
+  existingPin: string | null;
+  secretCode: string;
+  lang: Lang;
+  onClose: () => void;
+}) {
+  const [pin, setPin] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [step, setStep] = useState<'set' | 'confirm' | 'done'>(existingPin ? 'done' : 'set');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const shareUrl = `${window.location.origin}/c/${secretCode}`;
+
+  const handleSubmit = async () => {
+    if (step === 'set') {
+      if (pin.length < 4) { setError(lang === 'VN' ? 'Tối thiểu 4 số' : 'Min 4 digits'); return; }
+      setStep('confirm');
+      setError('');
+      return;
+    }
+    if (step === 'confirm') {
+      if (confirm !== pin) { setError(lang === 'VN' ? 'Mã PIN không khớp' : 'PIN mismatch'); setConfirm(''); return; }
+      setLoading(true);
+      const ok = await onSetPin(pin);
+      setLoading(false);
+      if (!ok) { setError(lang === 'VN' ? 'Lỗi, thử lại' : 'Error, try again'); return; }
+      setStep('done');
+      // Auto-copy URL
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+      } catch { /* fallback below */ }
+    }
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0 }}
+      className="overflow-hidden"
+    >
+      <div className="backdrop-blur-sm rounded-2xl border bg-white/5 border-white/10 p-5 space-y-4">
+        {step !== 'done' ? (
+          <>
+            <div className="text-center space-y-1.5">
+              <KeyRound className="w-8 h-8 text-fuchsia-400/60 mx-auto" />
+              <h3 className="text-sm font-bold text-white/80">
+                {step === 'set'
+                  ? (lang === 'VN' ? 'Đặt mã PIN để chia sẻ' : 'Set a PIN to share')
+                  : (lang === 'VN' ? 'Xác nhận mã PIN' : 'Confirm your PIN')}
+              </h3>
+              <p className="text-[11px] text-white/30 leading-relaxed max-w-xs mx-auto">
+                {lang === 'VN'
+                  ? 'Bạn bè cần nhập đúng PIN mới xem được phiếu này. Điều này giúp tránh người khác nhận số của bạn.'
+                  : 'Friends must enter the correct PIN to view this card. This prevents others from claiming your number.'}
+              </p>
+            </div>
+            <input
+              type="password"
+              inputMode="numeric"
+              autoFocus
+              maxLength={8}
+              value={step === 'set' ? pin : confirm}
+              onChange={e => {
+                const v = e.target.value.replace(/\D/g, '');
+                step === 'set' ? setPin(v) : setConfirm(v);
+                setError('');
+              }}
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              className="w-full text-center text-xl tracking-[0.3em] bg-white/10 border border-white/10 rounded-xl py-2.5 text-white font-mono focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50"
+              placeholder="••••"
+            />
+            {error && <p className="text-red-400 text-xs font-medium text-center">{error}</p>}
+            <div className="flex gap-2">
+              <button onClick={onClose} className="flex-1 px-3 py-2 rounded-xl text-white/30 text-xs font-bold active:scale-95 transition-all">
+                {lang === 'VN' ? 'Huỷ' : 'Cancel'}
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={loading || (step === 'set' ? pin.length < 4 : confirm.length < 4)}
+                className="flex-1 px-3 py-2 rounded-xl bg-fuchsia-600 text-white font-bold text-xs disabled:opacity-30 active:scale-95 transition-all"
+              >
+                {loading ? '...' : step === 'set' ? (lang === 'VN' ? 'Tiếp' : 'Next') : (lang === 'VN' ? 'Xác nhận' : 'Confirm')}
+              </button>
+            </div>
+            {step === 'confirm' && (
+              <button onClick={() => { setStep('set'); setConfirm(''); setError(''); }} className="w-full text-white/20 text-[10px] underline text-center">
+                ← {lang === 'VN' ? 'Quay lại' : 'Back'}
+              </button>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="text-center space-y-1.5">
+              <Check className="w-8 h-8 text-emerald-400 mx-auto" />
+              <h3 className="text-sm font-bold text-white/80">
+                {lang === 'VN' ? 'Đã tạo mã PIN!' : 'PIN set!'}
+              </h3>
+              <p className="text-[11px] text-white/30">
+                {lang === 'VN'
+                  ? 'Gửi link bên dưới cho bạn bè kèm mã PIN'
+                  : 'Share the link below with your PIN'}
+              </p>
+            </div>
+            <div
+              className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 cursor-pointer active:scale-95 transition-all"
+              onClick={handleCopy}
+            >
+              <p className="flex-1 text-[10px] text-white/60 font-mono truncate">{shareUrl}</p>
+              {copied ? (
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+              ) : (
+                <Copy className="w-4 h-4 text-white/30 shrink-0" />
+              )}
+            </div>
+            {copied && (
+              <p className="text-emerald-400 text-[10px] font-bold text-center">
+                {lang === 'VN' ? '✓ Đã sao chép link!' : '✓ Link copied!'}
+              </p>
+            )}
+            <button onClick={onClose} className="w-full px-3 py-2 rounded-xl bg-white/10 text-white/50 text-xs font-bold active:scale-95 transition-all">
+              {lang === 'VN' ? 'Đóng' : 'Close'}
+            </button>
+          </>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Certificate() {
   const { code } = useParams<{ code: string }>();
   const location = useLocation();
@@ -190,6 +278,7 @@ export default function Certificate() {
   const [themeIdx, setThemeIdx] = useState(0);
   const [lang, setLang] = useState<Lang>('VN');
   const [showPersonalize, setShowPersonalize] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [demoCertificate, setDemoCertificate] = useState(DEMO_CERTIFICATE);
   const [demoStatus, setDemoStatus] = useState<string>('waiting');
@@ -279,8 +368,18 @@ export default function Certificate() {
     );
   }
 
-  if (accessState === 'needs_pin_setup') {
-    return <PinSetupScreen onSetPin={setupPin} />;
+  if (accessState === 'denied') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black p-8 text-center gap-4">
+        <ShieldX className="w-16 h-16 text-red-400/50" />
+        <h1 className="text-2xl font-bold text-white/70">
+          {lang === 'VN' ? 'Phiếu đã được sử dụng' : 'Certificate already claimed'}
+        </h1>
+        <p className="text-white/30 text-sm">
+          {lang === 'VN' ? 'Phiếu này đã được sử dụng trên thiết bị khác.' : 'This certificate has been claimed on another device.'}
+        </p>
+      </div>
+    );
   }
 
   if (accessState === 'needs_pin') {
@@ -330,11 +429,26 @@ export default function Certificate() {
                 data={cardData}
                 theme={theme}
                 onToggleLanguage={toggleLang}
-                onPersonalize={() => setShowPersonalize(!showPersonalize)}
+                onPersonalize={() => { setShowPersonalize(!showPersonalize); setShowShare(false); }}
+                onShare={() => { setShowShare(!showShare); setShowPersonalize(false); }}
+                hasPin={!!activeCert.pin_code}
               />
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* Share overlay */}
+        <AnimatePresence>
+          {showShare && !isDemo && (
+            <ShareOverlay
+              onSetPin={setupPin}
+              existingPin={activeCert.pin_code}
+              secretCode={activeCert.secret_code}
+              lang={lang}
+              onClose={() => setShowShare(false)}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Personalization panel */}
         <AnimatePresence>
@@ -362,7 +476,7 @@ export default function Certificate() {
                     onClick={handleNameSubmit}
                     disabled={!customerName.trim()}
                     className="px-3 py-2 rounded-xl font-bold text-sm disabled:opacity-30 active:scale-95 transition-all"
-                    style={{ background: theme.primary, color: isLight ? '#fff' : '#fff' }}
+                    style={{ background: theme.primary, color: '#fff' }}
                   >
                     OK
                   </button>

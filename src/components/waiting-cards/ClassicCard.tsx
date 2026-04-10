@@ -4,7 +4,7 @@ import { type WaitingCardProps, labels } from './types';
 import { ThemedNumber, ThemedActions } from './ThemedParts';
 import { fadeInUp, staggerContainer, shimmer, gradientShift } from './animations';
 
-export default function ClassicCard({ data, theme, onToggleLanguage, onPersonalize }: WaitingCardProps) {
+export default function ClassicCard({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
   const isDone = data.status === 'called';
 
@@ -122,6 +122,8 @@ export default function ClassicCard({ data, theme, onToggleLanguage, onPersonali
           theme={theme}
           onToggleLanguage={onToggleLanguage}
           onPersonalize={onPersonalize}
+          onShare={onShare}
+          hasPin={hasPin}
         />
       </div>
     </motion.div>

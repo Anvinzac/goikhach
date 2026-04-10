@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Clock, Globe, Sparkles, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Users, Clock, Globe, Sparkles, Loader2, CheckCircle2, XCircle, Share2 } from 'lucide-react';
 import { fadeInUp, staggerContainer, hoverScale, tapPress, statusPulse } from './animations';
 import { labels, type WaitingCardData } from './types';
 import { type ReactNode } from 'react';
@@ -294,6 +294,8 @@ export function FooterActions({
   language,
   onToggleLanguage,
   onPersonalize,
+  onShare,
+  hasPin,
   className = '',
   buttonClassName = '',
 }: {
@@ -301,6 +303,8 @@ export function FooterActions({
   language: 'VN' | 'EN';
   onToggleLanguage?: () => void;
   onPersonalize?: () => void;
+  onShare?: () => void;
+  hasPin?: boolean;
   className?: string;
   buttonClassName?: string;
 }) {
@@ -309,6 +313,17 @@ export function FooterActions({
     <motion.div className={`flex items-center justify-between ${className}`} variants={fadeInUp}>
       <StatusBadge status={status} language={language} />
       <div className="flex items-center gap-1.5">
+        {onShare && (
+          <motion.button
+            onClick={onShare}
+            className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold ${buttonClassName}`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Share2 className="w-3 h-3" />
+            {hasPin ? (language === 'VN' ? 'Đã chia sẻ' : 'Shared') : (language === 'VN' ? 'Chia sẻ' : 'Share')}
+          </motion.button>
+        )}
         {onToggleLanguage && (
           <motion.button
             onClick={onToggleLanguage}

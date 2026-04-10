@@ -326,6 +326,8 @@ export type WaitingCardProps = {
   theme: ThemeColors;
   onToggleLanguage?: () => void;
   onPersonalize?: () => void;
+  onShare?: () => void;
+  hasPin?: boolean;
 };
 
 export const labels = {

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Users, Globe, Sparkles, Clock, MapPin, Bell } from 'lucide-react';
+import { Users, Globe, Sparkles, Clock, MapPin, Bell, Share2 } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedStatusBadge } from './ThemedParts';
 
@@ -29,7 +29,7 @@ const contentSlide = {
 
 type NodeStatus = 'done' | 'active' | 'pending';
 
-export default function TimelineJourney({ data, theme, onToggleLanguage, onPersonalize }: WaitingCardProps) {
+export default function TimelineJourney({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
   const isDone = data.status === 'called';
   const isCancelled = data.status === 'cancelled';
@@ -149,6 +149,11 @@ export default function TimelineJourney({ data, theme, onToggleLanguage, onPerso
       <motion.div className="px-5 py-3 flex items-center justify-between border-t" style={{ borderColor: theme.surfaceBorder }} custom={6} variants={contentSlide}>
         <ThemedStatusBadge status={data.status} language={data.language} theme={theme} />
         <div className="flex items-center gap-1.5">
+          {onShare && (
+            <motion.button onClick={onShare} className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold" style={btnStyle} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Share2 className="w-3 h-3" />{hasPin ? (data.language === 'VN' ? 'Đã chia sẻ' : 'Shared') : (data.language === 'VN' ? 'Chia sẻ' : 'Share')}
+            </motion.button>
+          )}
           {onToggleLanguage && (
             <motion.button onClick={onToggleLanguage} className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold" style={btnStyle} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Globe className="w-3 h-3" />{data.language === 'VN' ? 'EN' : 'VI'}

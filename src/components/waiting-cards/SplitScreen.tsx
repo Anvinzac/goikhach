@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Users, Clock, Globe, Sparkles } from 'lucide-react';
+import { Users, Clock, Globe, Sparkles, Share2 } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedNumber, ThemedStatusBadge } from './ThemedParts';
 
@@ -16,7 +16,7 @@ const slideInRight = {
   }),
 };
 
-export default function SplitScreen({ data, theme, onToggleLanguage, onPersonalize }: WaitingCardProps) {
+export default function SplitScreen({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
   const isDone = data.status === 'called';
   const btnStyle = { color: theme.primaryDim, background: theme.primaryFaint, border: `1px solid ${theme.surfaceBorder}` };
@@ -84,6 +84,11 @@ export default function SplitScreen({ data, theme, onToggleLanguage, onPersonali
           )}
 
           <motion.div className="flex items-center gap-1.5 mt-3" custom={5} variants={slideInRight}>
+            {onShare && (
+              <motion.button onClick={onShare} className="flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold" style={btnStyle} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Share2 className="w-2.5 h-2.5" />{hasPin ? (data.language === 'VN' ? 'Đã chia sẻ' : 'Shared') : (data.language === 'VN' ? 'Chia sẻ' : 'Share')}
+              </motion.button>
+            )}
             {onToggleLanguage && (
               <motion.button onClick={onToggleLanguage} className="flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold" style={btnStyle} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Globe className="w-2.5 h-2.5" />{data.language === 'VN' ? 'EN' : 'VI'}

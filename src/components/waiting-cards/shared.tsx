@@ -160,11 +160,54 @@ export function DailySpecialBanner({
   style?: React.CSSProperties;
 }) {
   if (!text) return null;
+
+  const isUrgentReminder = text.includes('📢') || text.includes('sắp được gọi');
+
   return (
-    <motion.div className={`rounded-2xl px-4 py-2.5 relative overflow-hidden ${className}`} variants={fadeInUp} style={style}>
-      {deco && <span className="absolute top-1 right-2 text-2xl opacity-20">{deco}</span>}
-      <p className={`text-xs font-bold ${textClassName}`}>{text}</p>
-    </motion.div>
+    <AnimatePresence>
+      <motion.div
+        className={`rounded-2xl px-4 py-2.5 relative overflow-hidden ${className}`}
+        variants={fadeInUp}
+        style={style}
+        initial={{ opacity: 0, y: 8 }}
+        animate={
+          isUrgentReminder
+            ? {
+                opacity: 1,
+                y: 0,
+                boxShadow: [
+                  '0 0 0 0 rgba(251, 191, 36, 0)',
+                  '0 0 16px 4px rgba(251, 191, 36, 0.3)',
+                  '0 0 0 0 rgba(251, 191, 36, 0)',
+                ],
+                transition: {
+                  opacity: { duration: 0.3 },
+                  y: { duration: 0.3 },
+                  boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+                },
+              }
+            : { opacity: 1, y: 0 }
+        }
+      >
+        {isUrgentReminder ? (
+          <div className="flex items-start gap-2">
+            <motion.div
+              animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
+              transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
+              className="flex-shrink-0 mt-0.5"
+            >
+              <BellRing className="w-4 h-4" style={{ color: 'inherit' }} />
+            </motion.div>
+            <p className={`text-xs font-bold ${textClassName}`}>{text}</p>
+          </div>
+        ) : (
+          <>
+            {deco && <span className="absolute top-1 right-2 text-2xl opacity-20">{deco}</span>}
+            <p className={`text-xs font-bold ${textClassName}`}>{text}</p>
+          </>
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 }
 

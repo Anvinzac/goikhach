@@ -152,7 +152,7 @@ export function useCertificate(secretCode: string | undefined) {
     return true;
   }, [certificate]);
 
-  // Real-time updates
+  // Real-time updates for queue orders AND session notice
   useEffect(() => {
     if (!certificate || accessState !== 'granted') return;
 
@@ -165,6 +165,15 @@ export function useCertificate(secretCode: string | undefined) {
         filter: `session_id=eq.${certificate.session_id}`,
       }, () => {
         fetchSessionAndStats(certificate);
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'sessions',
+        filter: `id=eq.${certificate.session_id}`,
+      }, (payload) => {
+        const updated = payload.new as any;
+        setSessionInfo(prev => prev ? { ...prev, daily_notice: updated.daily_notice ?? '' } : prev);
       })
       .subscribe();
 

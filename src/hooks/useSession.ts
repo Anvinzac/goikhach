@@ -15,18 +15,24 @@ function getSessionWindow(): { type: 'lunch' | 'dinner'; expiresAt: Date } | nul
   const h = now.getHours();
 
   if (h >= 10 && h < 15) {
-    // Lunch: 10AM–3PM
     const expires = new Date(now);
     expires.setHours(15, 0, 0, 0);
     return { type: 'lunch', expiresAt: expires };
   }
-  if (h >= 15 && h < 24) {
-    // Dinner: 3PM–midnight
+  if (h >= 15) {
+    // Dinner expires at 10AM next day
     const expires = new Date(now);
-    expires.setHours(23, 59, 59, 999);
+    expires.setDate(expires.getDate() + 1);
+    expires.setHours(10, 0, 0, 0);
     return { type: 'dinner', expiresAt: expires };
   }
-  // Outside operating hours (midnight–10AM): no session
+  if (h < 10) {
+    // Before 10AM — check if there's a dinner session still valid from last night
+    // (its expiry would be today at 10AM, so it's still within window)
+    const expires = new Date(now);
+    expires.setHours(10, 0, 0, 0);
+    return { type: 'dinner', expiresAt: expires };
+  }
   return null;
 }
 

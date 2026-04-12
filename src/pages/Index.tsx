@@ -92,9 +92,8 @@ const Index = () => {
 
   if (!session) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 text-center">
-        <p className="text-2xl font-black text-muted-foreground">Ngoài giờ phục vụ</p>
-        <p className="text-sm text-muted-foreground">Ca trưa: 10:00–15:00 · Ca tối: 15:00–24:00</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-queue border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }

@@ -92,7 +92,11 @@ const Index = () => {
   }
 
   if (!session) {
-    return <SessionStarter onStart={(type, notice) => startNewSession(type, notice)} loading={false} />;
+    return (
+      <PinGate>
+        <SessionStarter onStart={(type, notice) => startNewSession(type, notice)} loading={false} />
+      </PinGate>
+    );
   }
 
   const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [

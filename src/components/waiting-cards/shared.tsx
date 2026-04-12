@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Clock, Globe, Sparkles, Loader2, CheckCircle2, XCircle, Share2 } from 'lucide-react';
+import { Users, Clock, Globe, Sparkles, Loader2, CheckCircle2, XCircle, Share2, BellRing } from 'lucide-react';
 import { fadeInUp, staggerContainer, hoverScale, tapPress, statusPulse } from './animations';
 import { labels, type WaitingCardData } from './types';
 import { type ReactNode } from 'react';

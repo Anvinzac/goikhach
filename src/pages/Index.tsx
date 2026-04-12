@@ -3,7 +3,6 @@ import { useSession } from '@/hooks/useSession';
 import { useQueueOrders } from '@/hooks/useQueueOrders';
 import { QueueManager } from '@/components/QueueManager';
 import { FloorPlanView } from '@/components/FloorPlanView';
-import { SessionStarter } from '@/components/SessionStarter';
 import { PinGate } from '@/components/PinGate';
 import { MapPin } from 'lucide-react';
 import { toast } from 'sonner';
@@ -93,9 +92,10 @@ const Index = () => {
 
   if (!session) {
     return (
-      <PinGate>
-        <SessionStarter onStart={(type, notice) => startNewSession(type, notice)} loading={false} />
-      </PinGate>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 text-center">
+        <p className="text-2xl font-black text-muted-foreground">Ngoài giờ phục vụ</p>
+        <p className="text-sm text-muted-foreground">Ca trưa: 10:00–15:00 · Ca tối: 15:00–24:00</p>
+      </div>
     );
   }
 

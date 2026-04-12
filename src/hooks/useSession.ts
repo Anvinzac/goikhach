@@ -10,108 +10,69 @@ export interface Session {
   daily_notice: string;
 }
 
+function getSessionWindow(): { type: 'lunch' | 'dinner'; expiresAt: Date } | null {
+  const now = new Date();
+  const h = now.getHours();
+
+  if (h >= 10 && h < 15) {
+    // Lunch: 10AM–3PM
+    const expires = new Date(now);
+    expires.setHours(15, 0, 0, 0);
+    return { type: 'lunch', expiresAt: expires };
+  }
+  if (h >= 15 && h < 24) {
+    // Dinner: 3PM–midnight
+    const expires = new Date(now);
+    expires.setHours(23, 59, 59, 999);
+    return { type: 'dinner', expiresAt: expires };
+  }
+  // Outside operating hours (midnight–10AM): no session
+  return null;
+}
+
 export function useSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchActiveSession = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('sessions')
-      .select('*')
-      .eq('is_active', true)
-      .gte('expires_at', new Date().toISOString())
-      .order('started_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching session:', error);
-    }
-    setSession(data);
-    setLoading(false);
-  }, []);
-
-  const startNewSession = useCallback(async (type: 'lunch' | 'dinner', dailyNotice?: string) => {
-    setLoading(true);
-
-    const { data: existingSessions, error: existingSessionsError } = await supabase
+  const createSession = useCallback(async (type: 'lunch' | 'dinner', expiresAt: Date, dailyNotice?: string) => {
+    // Clean up all old sessions and their data
+    const { data: existingSessions } = await supabase
       .from('sessions')
       .select('id');
 
-    if (existingSessionsError) {
-      toast.error('Failed to reset previous session data');
-      setLoading(false);
-      return;
-    }
-
-    const sessionIds = (existingSessions || []).map((item) => item.id);
+    const sessionIds = (existingSessions || []).map((s) => s.id);
 
     if (sessionIds.length > 0) {
-      const { data: existingTables, error: existingTablesFetchError } = await supabase
+      const { data: existingTables } = await supabase
         .from('restaurant_tables')
         .select('id')
         .in('session_id', sessionIds);
 
-      if (existingTablesFetchError) {
-        toast.error('Failed to reset previous floor data');
-        setLoading(false);
-        return;
-      }
-
-      const tableIds = (existingTables || []).map((item) => item.id);
+      const tableIds = (existingTables || []).map((t) => t.id);
 
       if (tableIds.length > 0) {
-        const { error: chairsError } = await supabase
-          .from('chairs')
-          .delete()
-          .in('table_id', tableIds);
-
-        if (chairsError) {
-          toast.error('Failed to clear previous chair data');
-          setLoading(false);
-          return;
-        }
+        await supabase.from('chairs').delete().in('table_id', tableIds);
       }
 
-      const [{ error: certificatesError }, { error: ordersError }, { error: signalsError }, { error: tablesError }] = await Promise.all([
+      await Promise.all([
         supabase.from('queue_certificates').delete().in('session_id', sessionIds),
         supabase.from('queue_orders').delete().in('session_id', sessionIds),
         supabase.from('floor_return_signals').delete().in('session_id', sessionIds),
         supabase.from('restaurant_tables').delete().in('session_id', sessionIds),
       ]);
 
-      if (certificatesError || ordersError || signalsError || tablesError) {
-        toast.error('Failed to clear previous queue data');
-        setLoading(false);
-        return;
-      }
-
-      const { error: sessionsError } = await supabase
-        .from('sessions')
-        .delete()
-        .in('id', sessionIds);
-
-      if (sessionsError) {
-        toast.error('Failed to clear previous sessions');
-        setLoading(false);
-        return;
-      }
+      await supabase.from('sessions').delete().in('id', sessionIds);
     }
-
-    // expires at end of today (23:59:59)
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
 
     const { data, error } = await supabase
       .from('sessions')
-      .insert({ session_type: type, is_active: true, daily_notice: dailyNotice || '', expires_at: endOfDay.toISOString() })
+      .insert({ session_type: type, is_active: true, daily_notice: dailyNotice || '', expires_at: expiresAt.toISOString() })
       .select()
       .single();
 
-    if (error) {
+    if (error || !data) {
       toast.error('Failed to start session');
-      setLoading(false);
-      return;
+      return null;
     }
 
     // Initialize 120 queue orders
@@ -121,12 +82,10 @@ export function useSession() {
       status: 'waiting' as const,
       notes: [],
     }));
-
     await supabase.from('queue_orders').insert(orders);
 
     // Initialize restaurant tables and chairs
     const tableConfigs = [
-      // Ground floor
       ...Array.from({ length: 5 }, (_, i) => ({
         session_id: data.id, floor: 'ground', column_position: 0, table_index: i,
         table_type: 'big', is_expandable: i >= 3, chair_count: 4,
@@ -139,7 +98,6 @@ export function useSession() {
         session_id: data.id, floor: 'ground', column_position: 2, table_index: i,
         table_type: 'small', is_expandable: false, chair_count: 2,
       })),
-      // First floor
       ...Array.from({ length: 3 }, (_, i) => ({
         session_id: data.id, floor: 'first', column_position: 0, table_index: i,
         table_type: 'small', is_expandable: false, chair_count: 2,
@@ -172,14 +130,66 @@ export function useSession() {
       }
     }
 
-    setSession(data);
-    setLoading(false);
-    toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} session started!`);
+    return data;
   }, []);
 
-  useEffect(() => {
-    fetchActiveSession();
-  }, [fetchActiveSession]);
+  const fetchOrCreateSession = useCallback(async () => {
+    const window = getSessionWindow();
 
-  return { session, loading, startNewSession, refreshSession: fetchActiveSession };
+    if (!window) {
+      // Outside operating hours
+      setSession(null);
+      setLoading(false);
+      return;
+    }
+
+    // Check for existing active session of the right type that hasn't expired
+    const { data, error } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('is_active', true)
+      .eq('session_type', window.type)
+      .gte('expires_at', new Date().toISOString())
+      .order('started_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching session:', error);
+      setLoading(false);
+      return;
+    }
+
+    if (data) {
+      setSession(data);
+      setLoading(false);
+      return;
+    }
+
+    // No matching session — auto-create one
+    const newSession = await createSession(window.type, window.expiresAt);
+    if (newSession) {
+      setSession(newSession);
+      toast.success(`Phiên ${window.type === 'lunch' ? 'Ca trưa' : 'Ca tối'} đã tự động bắt đầu`);
+    }
+    setLoading(false);
+  }, [createSession]);
+
+  const startNewSession = useCallback(async (type: 'lunch' | 'dinner', dailyNotice?: string) => {
+    setLoading(true);
+    const window = getSessionWindow();
+    const expiresAt = window?.expiresAt || (() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; })();
+    const newSession = await createSession(type, expiresAt, dailyNotice);
+    if (newSession) {
+      setSession(newSession);
+      toast.success(`${type === 'lunch' ? 'Ca trưa' : 'Ca tối'} đã bắt đầu!`);
+    }
+    setLoading(false);
+  }, [createSession]);
+
+  useEffect(() => {
+    fetchOrCreateSession();
+  }, [fetchOrCreateSession]);
+
+  return { session, loading, startNewSession, refreshSession: fetchOrCreateSession };
 }

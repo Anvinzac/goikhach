@@ -19,6 +19,23 @@ const Index = () => {
   const [floorBadges, setFloorBadges] = useState<{ ground: number; first: number }>({ ground: 0, first: 0 });
   const resetTimerRef = useRef<number | null>(null);
   const resetTriggeredRef = useRef(false);
+  const autoStartAttemptedRef = useRef(false);
+
+  // Auto-start session ONLY if no session exists in database (first time setup)
+  useEffect(() => {
+    // Only attempt auto-start once, when loading is complete and there's no session
+    if (!loading && !session && !autoStartAttemptedRef.current) {
+      autoStartAttemptedRef.current = true;
+      
+      // Determine session type based on current time
+      const now = new Date();
+      const hour = now.getHours();
+      // Lunch: 11:00 - 14:59, Dinner: 15:00 - 22:59, otherwise lunch
+      const sessionType = (hour >= 15 && hour < 23) ? 'dinner' : 'lunch';
+      
+      startNewSession(sessionType);
+    }
+  }, [loading, session, startNewSession]);
 
   const waitingCount = orders
     .filter(o => o.status === 'waiting' && o.group_size != null)
@@ -90,6 +107,7 @@ const Index = () => {
     );
   }
 
+  // Session will auto-start, so we don't show SessionStarter anymore
   if (!session) {
     return (
       <div className="flex items-center justify-center min-h-screen">

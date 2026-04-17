@@ -197,5 +197,37 @@ export function useSession() {
     fetchOrCreateSession();
   }, [fetchOrCreateSession]);
 
+  // Listen for session table changes globally so other devices pick up
+  // newly created sessions (e.g. after a reset on another device) and
+  // drop sessions that have been deleted.
+  useEffect(() => {
+    const channel = supabase
+      .channel('sessions-global-changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'sessions' },
+        () => { fetchOrCreateSession(); }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'sessions' },
+        (payload) => {
+          const old = payload.old as { id?: string };
+          // If the session this device is currently using was deleted, refetch
+          setSession(prev => {
+            if (prev && old?.id && prev.id === old.id) {
+              // Trigger a refetch to find/create the new active session
+              fetchOrCreateSession();
+              return null;
+            }
+            return prev;
+          });
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchOrCreateSession]);
+
   return { session, loading, startNewSession, refreshSession: fetchOrCreateSession };
 }

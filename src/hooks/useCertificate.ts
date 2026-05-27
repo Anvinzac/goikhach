@@ -204,7 +204,7 @@ export function useCertificate(secretCode: string | undefined) {
       supabase.removeChannel(channel);
       clearInterval(timer);
     };
-  }, [certificate, accessState, fetchSessionAndStats]);
+  }, [certificate, accessState, fetchSessionAndStats, filterNoticeForCert]);
 
   const updateCustomerName = useCallback(async (name: string) => {
     if (!certificate) return;

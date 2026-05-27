@@ -92,7 +92,7 @@ export function useCertificate(secretCode: string | undefined) {
       orderStatus: order.status,
       reachedTableAt: order.reached_table_at,
     });
-  }, []);
+  }, [filterNoticeForCert]);
 
   useEffect(() => {
     if (!secretCode) return;

@@ -192,7 +192,7 @@ export function useCertificate(secretCode: string | undefined) {
         filter: `id=eq.${certificate.session_id}`,
       }, (payload) => {
         const updated = payload.new as any;
-        setSessionInfo(prev => prev ? { ...prev, daily_notice: updated.daily_notice ?? '' } : prev);
+        setSessionInfo(prev => prev ? { ...prev, daily_notice: filterNoticeForCert(updated.daily_notice, certificate.order_number) } : prev);
       })
       .subscribe();
 

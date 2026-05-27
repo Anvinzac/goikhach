@@ -32,13 +32,32 @@ export function useCertificate(secretCode: string | undefined) {
 
   const STORAGE_KEY = `cert_token_${secretCode}`;
 
+  // Filter the daily notice so a customer never sees their own number (or higher)
+  // referenced as "about to be called". Max displayed value is cert.order_number - 2.
+  const filterNoticeForCert = useCallback((notice: string | null | undefined, customerNumber: number): string => {
+    if (!notice) return '';
+    const numbers = Array.from(notice.matchAll(/\d+/g)).map(m => parseInt(m[0], 10));
+    if (numbers.length === 0) return notice;
+    const maxAllowed = customerNumber - 2;
+    const visible = numbers.filter(n => n <= maxAllowed);
+    if (visible.length === 0) return '';
+    if (visible.length === numbers.length) return notice;
+    // Rebuild: keep prefix/suffix wrapper, replace number list with the filtered set
+    return notice.replace(/(\d+)(\s*,\s*\d+)*/, visible.join(', '));
+  }, []);
+
   const fetchSessionAndStats = useCallback(async (cert: CertificateData) => {
     const { data: sess } = await supabase
       .from('sessions')
       .select('session_type, daily_notice, started_at')
       .eq('id', cert.session_id)
       .single();
-    setSessionInfo(sess as any);
+    if (sess) {
+      setSessionInfo({
+        ...(sess as any),
+        daily_notice: filterNoticeForCert((sess as any).daily_notice, cert.order_number),
+      });
+    }
 
     // Fetch waiting stats
     const { data: order } = await supabase

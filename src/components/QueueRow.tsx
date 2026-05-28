@@ -196,7 +196,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
                   notes={visibleNotes}
                   customNote={order.custom_note}
                   onUpdate={(notes, customNote) => onUpdate(order.id, { notes: [...hiddenNotes, ...notes], custom_note: customNote })}
-                  onShowQR={qrEnabled ? () => setShowQR(true) : undefined}
+                  onShowQR={() => setShowQR(true)}
                 />
               ) : null}
             </div>

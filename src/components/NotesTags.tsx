@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare, ChevronDown } from 'lucide-react';
+import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare, ChevronDown, QrCode } from 'lucide-react';
 
 const TAG_OPTIONS = [
   { value: 'foreigners', icon: Globe, label: 'Khách NN' },
@@ -15,9 +15,10 @@ interface NotesTagsProps {
   onUpdate: (notes: string[], customNote: string | null) => void;
   compact?: boolean;
   dropUp?: boolean;
+  onShowQR?: () => void;
 }
 
-export function NotesTags({ notes, customNote, onUpdate, compact, dropUp }: NotesTagsProps) {
+export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShowQR }: NotesTagsProps) {
   const [open, setOpen] = useState(false);
   const [tempNote, setTempNote] = useState(customNote || '');
 

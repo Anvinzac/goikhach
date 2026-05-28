@@ -11,12 +11,16 @@ html, body, #root {
 }
 
 /* Allow scrolling on certificate page */
-.certificate-page {
+html.certificate-page,
+body.certificate-page,
+#root.certificate-page {
   height: auto !important;
   min-height: 100dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  background-color: #000;
 }
+
 
 /* Keep main app locked */
 .app-locked {

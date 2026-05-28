@@ -142,7 +142,8 @@ export function useCertificate(secretCode: string | undefined) {
         return;
       }
 
-      if (storedToken === cert.browser_token || !cert.is_used) {
+      // Fetch session + stats whenever access is granted (first claim or returning visitor)
+      if (accessState !== 'needs_pin') {
         fetchSessionAndStats(cert as CertificateData);
       }
     };

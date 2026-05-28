@@ -412,8 +412,10 @@ export default function Certificate() {
   const LayoutComponent = layout.component;
 
   return (
-    <div className={`min-h-screen ${theme.pageBg} transition-colors duration-500`} style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-      <div className="p-3 pb-6 max-w-md mx-auto space-y-3">
+    <div className="min-h-dvh relative" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+      <div className={`fixed inset-0 -z-10 ${theme.pageBg} transition-colors duration-500`} aria-hidden />
+      <div className="p-3 pb-6 max-w-md mx-auto space-y-3 relative">
+
 
         {/* The card */}
         <div ref={cardRef} onClick={isDemo ? cycleStatus : undefined} className={isDemo ? 'cursor-pointer' : ''}>

@@ -11,7 +11,7 @@ interface QRCodePopupProps {
   onClose: () => void;
 }
 
-const PUBLISHED_APP_URL = 'https://goikhach.lovable.app';
+const PUBLISHED_APP_URL = 'https://khach.quanchay.la';
 
 function getCertificateBaseUrl() {
   if (typeof window === 'undefined') return PUBLISHED_APP_URL;

@@ -115,6 +115,7 @@ export function useCertificate(secretCode: string | undefined) {
       }
 
       const storedToken = localStorage.getItem(STORAGE_KEY);
+      let granted = false;
 
       if (!cert.is_used) {
         // First access — claim it
@@ -128,10 +129,12 @@ export function useCertificate(secretCode: string | undefined) {
         cert.browser_token = browserToken;
         setCertificate(cert as CertificateData);
         setAccessState('granted');
+        granted = true;
       } else if (storedToken && storedToken === cert.browser_token) {
         // Returning visitor with valid token
         setCertificate(cert as CertificateData);
         setAccessState('granted');
+        granted = true;
       } else if (cert.pin_code) {
         // Has PIN set — visitor can enter PIN to view
         setCertificate(cert as CertificateData);
@@ -142,7 +145,7 @@ export function useCertificate(secretCode: string | undefined) {
         return;
       }
 
-      if (storedToken === cert.browser_token || !cert.is_used) {
+      if (granted) {
         fetchSessionAndStats(cert as CertificateData);
       }
     };

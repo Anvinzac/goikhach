@@ -92,6 +92,19 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShow
                   </button>
                 );
               })}
+              {onShowQR && (
+                <button
+                  onClick={() => {
+                    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(20);
+                    setOpen(false);
+                    onShowQR();
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold text-sm transition-all active:scale-95 bg-sharing text-sharing-foreground shadow-md [font-family:'Be_Vietnam_Pro',sans-serif]"
+                >
+                  <QrCode className="w-4 h-4" />
+                  <span className="text-xs leading-tight">QR</span>
+                </button>
+              )}
             </div>
             <input
               type="text"

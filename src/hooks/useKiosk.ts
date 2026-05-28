@@ -87,14 +87,18 @@ export function useKiosk() {
     orderId: string,
     orderNumber: number,
   ): Promise<{ secretCode: string; certId: string } | null> => {
-    // Invalidate any existing unclaimed kiosk placeholders for this session
-    // (group_size=0 means kiosk pending, is_used=false means unclaimed)
+    // Invalidate any existing unscanned kiosk placeholders for this session
+    // (group_size=0 means kiosk pending, is_used=false means unclaimed).
+    // IMPORTANT: do NOT invalidate placeholders a customer has already scanned
+    // (claimed_at IS NOT NULL) — those belong to a customer mid-registration
+    // and must remain valid until they finish or abandon.
     await supabase
       .from('queue_certificates')
       .update({ is_used: true })
       .eq('session_id', sessionId)
       .eq('group_size', 0)
-      .eq('is_used', false);
+      .eq('is_used', false)
+      .is('claimed_at', null);
 
     const secret = generateSecretCode();
     const { data, error } = await supabase

@@ -89,9 +89,6 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
 
   const handleGroupSizeSelect = (size: number | null, prev: number | null) => {
     onUpdate(order.id, { group_size: size, previous_group_size: prev });
-    if (size !== null && qrEnabled) {
-      setShowQR(true);
-    }
   };
 
   const statusBg = {
@@ -199,6 +196,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
                   notes={visibleNotes}
                   customNote={order.custom_note}
                   onUpdate={(notes, customNote) => onUpdate(order.id, { notes: [...hiddenNotes, ...notes], custom_note: customNote })}
+                  onShowQR={qrEnabled ? () => setShowQR(true) : undefined}
                 />
               ) : null}
             </div>
@@ -268,6 +266,7 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
               customNote={order.custom_note}
               onUpdate={(notes, customNote) => onUpdate(order.id, { notes: [...hiddenNotes, ...notes], custom_note: customNote })}
               dropUp={isNearBottom}
+              onShowQR={qrEnabled ? () => setShowQR(true) : undefined}
             />
           </div>
         )

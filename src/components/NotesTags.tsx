@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare, ChevronDown } from 'lucide-react';
+import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare, ChevronDown, QrCode } from 'lucide-react';
 
 const TAG_OPTIONS = [
   { value: 'foreigners', icon: Globe, label: 'Khách NN' },
@@ -15,9 +15,10 @@ interface NotesTagsProps {
   onUpdate: (notes: string[], customNote: string | null) => void;
   compact?: boolean;
   dropUp?: boolean;
+  onShowQR?: () => void;
 }
 
-export function NotesTags({ notes, customNote, onUpdate, compact, dropUp }: NotesTagsProps) {
+export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShowQR }: NotesTagsProps) {
   const [open, setOpen] = useState(false);
   const [tempNote, setTempNote] = useState(customNote || '');
 
@@ -91,6 +92,19 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp }: Note
                   </button>
                 );
               })}
+              {onShowQR && (
+                <button
+                  onClick={() => {
+                    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(20);
+                    setOpen(false);
+                    onShowQR();
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold text-sm transition-all active:scale-95 bg-sharing text-sharing-foreground shadow-md [font-family:'Be_Vietnam_Pro',sans-serif]"
+                >
+                  <QrCode className="w-4 h-4" />
+                  <span className="text-xs leading-tight">QR</span>
+                </button>
+              )}
             </div>
             <input
               type="text"

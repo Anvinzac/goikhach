@@ -86,7 +86,7 @@ export function useQueueOrders(sessionId: string | undefined) {
     if (!sessionId) return;
 
     const channel = supabase
-      .channel('queue-orders-changes')
+      .channel(`queue-orders-${sessionId}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'queue_orders', filter: `session_id=eq.${sessionId}` },
@@ -105,7 +105,7 @@ export function useQueueOrders(sessionId: string | undefined) {
         { event: 'UPDATE', schema: 'public', table: 'queue_orders', filter: `session_id=eq.${sessionId}` },
         (payload) => {
           const updated = payload.new as QueueOrder;
-          setOrders(prev => prev.map(o => o.id === updated.id ? updated : o));
+          setOrders(prev => prev.map(o => o.id === updated.id ? { ...o, ...updated } : o));
         }
       )
       .on(
@@ -116,12 +116,17 @@ export function useQueueOrders(sessionId: string | undefined) {
           setOrders(prev => prev.filter(o => o.id !== old.id));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        // On (re)subscribe, refetch to catch anything missed while disconnected
+        if (status === 'SUBSCRIBED') {
+          fetchOrders();
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [sessionId]);
+  }, [sessionId, fetchOrders]);
 
   return { orders, loading, updateOrder, refetch: fetchOrders };
 }

@@ -27,13 +27,13 @@ export function ThemedStatusBadge({
       animate={
         status === 'waiting'
           ? {
-              boxShadow: [`0 0 0 0 ${c.color}00`, `0 0 0 8px ${c.color}15`, `0 0 0 0 ${c.color}00`],
+              boxShadow: [`0 0 0 0 ${c.color}00`, `0 0 0 8px ${c.color}15`],
             }
           : {}
       }
       transition={
         status === 'waiting'
-          ? { duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut', times: [0, 0.5, 1] }
+          ? { duration: 1.5, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }
           : { duration: 0 }
       }
     >

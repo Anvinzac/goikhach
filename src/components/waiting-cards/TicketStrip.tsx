@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Users, Clock } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedActions } from './ThemedParts';
-import { staggerContainer } from './animations';
+import { staggerContainer, noticePulse } from './animations';
 
 const thermalFlicker = {
   opacity: [1, 0.92, 1, 0.96, 1, 0.94, 1],
@@ -87,7 +87,7 @@ export default function TicketStrip({ data, theme, onToggleLanguage, onPersonali
 
         {/* Stats */}
         <motion.div className="px-4 py-2 space-y-1.5" custom={3} variants={printReveal}>
-          <Row label={l.ahead} value={isDone ? '✓' : String(data.peopleAhead)} theme={theme} highlight />
+          <Row label={l.ahead} value={isDone ? '✓' : String(data.peopleAhead)} theme={theme} highlight urgent={!isDone && data.peopleAhead > 0 && data.peopleAhead < 3} />
           <Row label={l.estimated} value={isDone ? '—' : data.estimatedWait} theme={theme} highlight />
           <Row label={l.waited} value={data.waitingDuration} theme={theme} />
           <Row label={l.totalWaiting} value={`${data.peopleWaitingTotal} ${l.people}`} theme={theme} />
@@ -97,7 +97,7 @@ export default function TicketStrip({ data, theme, onToggleLanguage, onPersonali
 
         {/* Daily special */}
         {data.dailySpecial && (
-          <motion.div className="px-4 py-2" custom={4} variants={printReveal}>
+          <motion.div className="px-4 py-2" custom={4} variants={printReveal} animate={noticePulse(theme.primary)}>
             <p className="text-[9px] uppercase tracking-widest font-bold mb-1" style={{ color: theme.primaryDim }}>{l.dailySpecial}</p>
             <p className="text-xs font-semibold" style={{ color: theme.primaryLight }}>{data.dailySpecial}</p>
           </motion.div>
@@ -120,16 +120,16 @@ export default function TicketStrip({ data, theme, onToggleLanguage, onPersonali
   );
 }
 
-function Row({ label, value, icon, theme, highlight }: {
+function Row({ label, value, icon, theme, highlight, urgent }: {
   label: string; value: string; icon?: React.ReactNode;
-  theme: WaitingCardProps['theme']; highlight?: boolean;
+  theme: WaitingCardProps['theme']; highlight?: boolean; urgent?: boolean;
 }) {
   return (
     <div className="flex items-center justify-between">
       <span className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: theme.primaryDim }}>
         {icon}{label}
       </span>
-      <span className="text-sm font-bold" style={{ color: highlight ? theme.primary : theme.primaryLight }}>{value}</span>
+      <span className="text-sm font-bold" style={{ color: urgent ? '#ef4444' : (highlight ? theme.primary : theme.primaryLight) }}>{value}</span>
     </div>
   );
 }

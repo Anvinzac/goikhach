@@ -47,7 +47,7 @@ const DEMO_CERTIFICATE = {
 
 const DEMO_SESSION = {
   session_type: 'lunch',
-  daily_notice: 'Hôm nay quán có món đặc biệt: Bún riêu chay',
+  daily_notice: 'Mời quý khách quay lại nhà hàng sớm nhất có thể!',
   started_at: new Date().toISOString(),
 };
 

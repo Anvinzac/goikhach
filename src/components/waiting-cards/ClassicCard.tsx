@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Users, Clock } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedNumber, ThemedActions } from './ThemedParts';
-import { fadeInUp, staggerContainer, shimmer, gradientShift } from './animations';
+import { fadeInUp, staggerContainer, shimmer, gradientShift, noticePulse } from './animations';
 
 export default function ClassicCard({ data, theme, onToggleLanguage, onPersonalize, onShare, hasPin }: WaitingCardProps) {
   const l = labels[data.language];
@@ -80,6 +80,7 @@ export default function ClassicCard({ data, theme, onToggleLanguage, onPersonali
             className="rounded-2xl px-4 py-2.5 relative overflow-hidden border"
             style={{ background: theme.surface, borderColor: theme.surfaceBorder }}
             variants={fadeInUp}
+            animate={noticePulse(theme.primary)}
           >
             <p className="text-xs font-bold" style={{ color: theme.primaryLight }}>{data.dailySpecial}</p>
           </motion.div>
@@ -88,7 +89,7 @@ export default function ClassicCard({ data, theme, onToggleLanguage, onPersonali
         {/* Stats grid */}
         <motion.div className="grid grid-cols-3 gap-2" variants={fadeInUp}>
           {[
-            { label: l.ahead, value: isDone ? '✓' : String(data.peopleAhead) },
+            { label: l.ahead, value: isDone ? '✓' : String(data.peopleAhead), urgent: !isDone && data.peopleAhead > 0 && data.peopleAhead < 3 },
             { label: l.estimated, value: isDone ? '—' : data.estimatedWait },
             { label: l.waited, value: data.waitingDuration },
           ].map((s, i) => (
@@ -100,7 +101,7 @@ export default function ClassicCard({ data, theme, onToggleLanguage, onPersonali
               whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
             >
               <p className="text-[8px] uppercase tracking-wider font-bold" style={{ color: theme.primaryDim }}>{s.label}</p>
-              <p className="text-3xl font-black mt-1" style={{ color: theme.primaryLight }}>{s.value}</p>
+              <p className="text-3xl font-black mt-1" style={{ color: s.urgent ? '#ef4444' : theme.primaryLight }}>{s.value}</p>
             </motion.div>
           ))}
         </motion.div>

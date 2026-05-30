@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Users, Clock } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedNumber, ThemedActions } from './ThemedParts';
-import { glowPulse } from './animations';
+import { glowPulse, noticePulse } from './animations';
 
 const orbitSpin = {
   rotate: 360,
@@ -97,20 +97,20 @@ export default function RadialHub({ data, theme, onToggleLanguage, onPersonalize
         {/* Stats */}
         <motion.div className="grid grid-cols-3 gap-2 mb-3" custom={5} variants={fadeUp}>
           {[
-            { label: l.ahead, value: isDone ? '✓' : String(data.peopleAhead) },
+            { label: l.ahead, value: isDone ? '✓' : String(data.peopleAhead), urgent: !isDone && data.peopleAhead > 0 && data.peopleAhead < 3 },
             { label: l.waited, value: data.waitingDuration },
             { label: l.totalWaiting, value: `${data.peopleWaitingTotal}` },
           ].map((s, i) => (
             <div key={i} className="rounded-2xl px-2 py-2.5 text-center border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }}>
               <p className="text-[7px] uppercase tracking-wider font-bold" style={{ color: theme.primaryDim }}>{s.label}</p>
-              <p className="text-xl font-black mt-0.5" style={{ color: theme.primaryLight }}>{s.value}</p>
+              <p className="text-xl font-black mt-0.5" style={{ color: s.urgent ? '#ef4444' : theme.primaryLight }}>{s.value}</p>
             </div>
           ))}
         </motion.div>
 
         {/* Daily special */}
         {data.dailySpecial && (
-          <motion.div className="rounded-2xl px-3 py-2 mb-3 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={6} variants={fadeUp}>
+          <motion.div className="rounded-2xl px-3 py-2 mb-3 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={6} variants={fadeUp} animate={noticePulse(theme.primary)}>
             <p className="text-[9px] uppercase tracking-wider font-bold mb-0.5" style={{ color: theme.primaryDim }}>{l.dailySpecial}</p>
             <p className="text-xs font-semibold" style={{ color: theme.primaryLight }}>{data.dailySpecial}</p>
           </motion.div>

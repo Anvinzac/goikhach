@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Users, Globe, Sparkles, Clock, MapPin, Bell, Share2 } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedStatusBadge } from './ThemedParts';
+import { noticePulse } from './animations';
 
 const nodeReveal = {
   hidden: { opacity: 0, scale: 0.5 },
@@ -35,10 +36,10 @@ export default function TimelineJourney({ data, theme, onToggleLanguage, onPerso
   const isCancelled = data.status === 'cancelled';
   const btnStyle = { color: theme.primaryDim, background: theme.primaryFaint, border: `1px solid ${theme.surfaceBorder}` };
 
-  const stages: { icon: React.ReactNode; label: string; detail: string; status: NodeStatus }[] = [
+  const stages: { icon: React.ReactNode; label: string; detail: string; status: NodeStatus; urgent?: boolean }[] = [
     { icon: <MapPin className="w-3.5 h-3.5" />, label: l.checkIn, detail: `${data.checkInTime} · ${data.checkInDate}`, status: 'done' },
     { icon: <Clock className="w-3.5 h-3.5" />, label: l.waiting, detail: `${data.partySize} ${l.partySize} · ${l.waited} ${data.waitingDuration}`, status: isDone ? 'done' : isCancelled ? 'done' : 'active' },
-    { icon: <Users className="w-3.5 h-3.5" />, label: data.language === 'VN' ? 'Vị trí hiện tại' : 'Current position', detail: isDone ? '✓' : `${data.peopleAhead} ${data.language === 'VN' ? 'nhóm trước bạn' : 'groups ahead'}`, status: isDone ? 'done' : isCancelled ? 'pending' : 'active' },
+    { icon: <Users className="w-3.5 h-3.5" />, label: data.language === 'VN' ? 'Vị trí hiện tại' : 'Current position', detail: isDone ? '✓' : `${data.peopleAhead} ${data.language === 'VN' ? 'nhóm trước bạn' : 'groups ahead'}`, status: isDone ? 'done' : isCancelled ? 'pending' : 'active', urgent: !isDone && data.peopleAhead > 0 && data.peopleAhead < 3 },
     { icon: <Bell className="w-3.5 h-3.5" />, label: data.language === 'VN' ? 'Được gọi' : 'Called', detail: isDone ? l.called : `${l.estimated} ${data.estimatedWait}`, status: isDone ? 'active' : 'pending' },
   ];
 
@@ -107,7 +108,7 @@ export default function TimelineJourney({ data, theme, onToggleLanguage, onPerso
 
               <motion.div className={`flex-1 ${isLast ? 'pb-0' : 'pb-4'}`} custom={i} variants={contentSlide}>
                 <p className="text-xs font-bold leading-none mt-1" style={{ color: colors.text }}>{stage.label}</p>
-                <p className="text-[10px] font-medium mt-1" style={{ color: stage.status === 'pending' ? theme.primaryFaint : theme.primaryDim }}>{stage.detail}</p>
+                <p className="text-[10px] font-medium mt-1" style={{ color: stage.urgent ? '#ef4444' : (stage.status === 'pending' ? theme.primaryFaint : theme.primaryDim) }}>{stage.detail}</p>
 
                 {stage.status === 'active' && i === 2 && !isDone && (
                   <motion.div
@@ -139,7 +140,7 @@ export default function TimelineJourney({ data, theme, onToggleLanguage, onPerso
 
       {/* Daily special */}
       {data.dailySpecial && (
-        <motion.div className="mx-5 mb-3 rounded-xl px-3 py-2 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={5} variants={contentSlide}>
+        <motion.div className="mx-5 mb-3 rounded-xl px-3 py-2 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={5} variants={contentSlide} animate={noticePulse(theme.primary)}>
           <p className="text-[8px] uppercase tracking-wider font-bold" style={{ color: theme.primaryDim }}>{l.dailySpecial}</p>
           <p className="text-[11px] font-semibold mt-0.5" style={{ color: theme.primaryLight }}>{data.dailySpecial}</p>
         </motion.div>

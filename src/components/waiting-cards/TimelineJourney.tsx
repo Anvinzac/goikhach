@@ -36,10 +36,10 @@ export default function TimelineJourney({ data, theme, onToggleLanguage, onPerso
   const isCancelled = data.status === 'cancelled';
   const btnStyle = { color: theme.primaryDim, background: theme.primaryFaint, border: `1px solid ${theme.surfaceBorder}` };
 
-  const stages: { icon: React.ReactNode; label: string; detail: string; status: NodeStatus }[] = [
+  const stages: { icon: React.ReactNode; label: string; detail: string; status: NodeStatus; urgent?: boolean }[] = [
     { icon: <MapPin className="w-3.5 h-3.5" />, label: l.checkIn, detail: `${data.checkInTime} · ${data.checkInDate}`, status: 'done' },
     { icon: <Clock className="w-3.5 h-3.5" />, label: l.waiting, detail: `${data.partySize} ${l.partySize} · ${l.waited} ${data.waitingDuration}`, status: isDone ? 'done' : isCancelled ? 'done' : 'active' },
-    { icon: <Users className="w-3.5 h-3.5" />, label: data.language === 'VN' ? 'Vị trí hiện tại' : 'Current position', detail: isDone ? '✓' : `${data.peopleAhead} ${data.language === 'VN' ? 'nhóm trước bạn' : 'groups ahead'}`, status: isDone ? 'done' : isCancelled ? 'pending' : 'active' },
+    { icon: <Users className="w-3.5 h-3.5" />, label: data.language === 'VN' ? 'Vị trí hiện tại' : 'Current position', detail: isDone ? '✓' : `${data.peopleAhead} ${data.language === 'VN' ? 'nhóm trước bạn' : 'groups ahead'}`, status: isDone ? 'done' : isCancelled ? 'pending' : 'active', urgent: !isDone && data.peopleAhead > 0 && data.peopleAhead < 3 },
     { icon: <Bell className="w-3.5 h-3.5" />, label: data.language === 'VN' ? 'Được gọi' : 'Called', detail: isDone ? l.called : `${l.estimated} ${data.estimatedWait}`, status: isDone ? 'active' : 'pending' },
   ];
 

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Users, Clock, Globe, Sparkles, Share2 } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedNumber, ThemedStatusBadge } from './ThemedParts';
+import { noticePulse } from './animations';
 
 const slideInLeft = {
   hidden: { opacity: 0, x: -30 },
@@ -69,7 +70,7 @@ export default function SplitScreen({ data, theme, onToggleLanguage, onPersonali
             </motion.div>
             <motion.div className="h-px mx-1" style={{ background: theme.surfaceBorder }} custom={2} variants={slideInRight} />
             <motion.div className="space-y-2" custom={3} variants={slideInRight}>
-              <DataBlock label={l.ahead} value={isDone ? '✓' : String(data.peopleAhead)} theme={theme} highlight />
+              <DataBlock label={l.ahead} value={isDone ? '✓' : String(data.peopleAhead)} theme={theme} highlight urgent={!isDone && data.peopleAhead > 0 && data.peopleAhead < 3} />
               <DataBlock label={l.estimated} value={isDone ? '—' : data.estimatedWait} theme={theme} highlight />
               <DataBlock label={l.waited} value={data.waitingDuration} theme={theme} />
               <DataBlock label={l.totalWaiting} value={`${data.peopleWaitingTotal} ${l.people}`} theme={theme} />
@@ -77,7 +78,7 @@ export default function SplitScreen({ data, theme, onToggleLanguage, onPersonali
           </div>
 
           {data.dailySpecial && (
-            <motion.div className="mt-3 rounded-xl px-2.5 py-2 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={4} variants={slideInRight}>
+            <motion.div className="mt-3 rounded-xl px-2.5 py-2 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={4} variants={slideInRight} animate={noticePulse(theme.primary)}>
               <p className="text-[8px] uppercase tracking-wider font-bold" style={{ color: theme.primaryDim }}>{l.dailySpecial}</p>
               <p className="text-[11px] font-semibold mt-0.5" style={{ color: theme.primaryLight }}>{data.dailySpecial}</p>
             </motion.div>
@@ -106,9 +107,9 @@ export default function SplitScreen({ data, theme, onToggleLanguage, onPersonali
   );
 }
 
-function DataBlock({ icon, label, value, sub, large, highlight, theme }: {
+function DataBlock({ icon, label, value, sub, large, highlight, urgent, theme }: {
   icon?: React.ReactNode; label: string; value: string; sub?: string;
-  large?: boolean; highlight?: boolean; theme: WaitingCardProps['theme'];
+  large?: boolean; highlight?: boolean; urgent?: boolean; theme: WaitingCardProps['theme'];
 }) {
   return (
     <div>
@@ -116,7 +117,7 @@ function DataBlock({ icon, label, value, sub, large, highlight, theme }: {
         {icon && <span style={{ color: theme.primaryDim }}>{icon}</span>}
         <span className="text-[9px] uppercase tracking-wider font-bold" style={{ color: theme.primaryDim }}>{label}</span>
       </div>
-      <p className={`font-black leading-none ${large ? 'text-2xl' : 'text-base'}`} style={{ color: highlight ? theme.primary : theme.primaryLight }}>{value}</p>
+      <p className={`font-black leading-none ${large ? 'text-2xl' : 'text-base'}`} style={{ color: urgent ? '#ef4444' : (highlight ? theme.primary : theme.primaryLight) }}>{value}</p>
       {sub && <p className="text-[9px] mt-0.5" style={{ color: theme.primaryFaint }}>{sub}</p>}
     </div>
   );

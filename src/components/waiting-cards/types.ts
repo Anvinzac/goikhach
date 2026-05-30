@@ -523,7 +523,7 @@ export const labels = {
     called: 'Được gọi',
     cancelled: 'Đã huỷ',
     expired: 'Hết phiên',
-    dailySpecial: 'Hôm nay',
+    dailySpecial: 'Thông báo',
     personalize: 'Cá nhân hóa',
     minutes: 'phút',
     groups: 'nhóm',

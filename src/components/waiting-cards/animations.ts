@@ -103,3 +103,18 @@ export const counterSpring = {
   stiffness: 100,
   damping: 20,
 };
+
+// Notice highlight pulse
+export const noticePulse = (color: string) => ({
+  boxShadow: [
+    `0 0 0 0 ${color}00`,
+    `0 0 0 6px ${color}18`,
+    `0 0 0 0 ${color}00`,
+  ],
+  borderColor: [
+    `${color}20`,
+    `${color}55`,
+    `${color}20`,
+  ],
+  transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' as const },
+});

@@ -22,7 +22,7 @@ export function ThemedStatusBadge({
   const c = configs[status];
   return (
     <motion.div
-      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold"
+      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold"
       style={{ color: c.color, background: `${c.color}10`, border: `1px solid ${c.color}30` }}
       animate={
         status === 'waiting'

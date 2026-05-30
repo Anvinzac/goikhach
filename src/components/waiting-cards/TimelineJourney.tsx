@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Users, Globe, Sparkles, Clock, MapPin, Bell, Share2 } from 'lucide-react';
 import { type WaitingCardProps, labels } from './types';
 import { ThemedStatusBadge } from './ThemedParts';
+import { noticePulse } from './animations';
 
 const nodeReveal = {
   hidden: { opacity: 0, scale: 0.5 },

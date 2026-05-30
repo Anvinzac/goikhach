@@ -108,7 +108,7 @@ export default function TimelineJourney({ data, theme, onToggleLanguage, onPerso
 
               <motion.div className={`flex-1 ${isLast ? 'pb-0' : 'pb-4'}`} custom={i} variants={contentSlide}>
                 <p className="text-xs font-bold leading-none mt-1" style={{ color: colors.text }}>{stage.label}</p>
-                <p className="text-[10px] font-medium mt-1" style={{ color: stage.status === 'pending' ? theme.primaryFaint : theme.primaryDim }}>{stage.detail}</p>
+                <p className="text-[10px] font-medium mt-1" style={{ color: stage.urgent ? '#ef4444' : (stage.status === 'pending' ? theme.primaryFaint : theme.primaryDim) }}>{stage.detail}</p>
 
                 {stage.status === 'active' && i === 2 && !isDone && (
                   <motion.div

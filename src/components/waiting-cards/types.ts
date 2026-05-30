@@ -541,7 +541,7 @@ export const labels = {
     called: 'Called',
     cancelled: 'Cancelled',
     expired: 'Session ended',
-    dailySpecial: 'Today',
+    dailySpecial: 'Notice',
     personalize: 'Personalize',
     minutes: 'min',
     groups: 'groups',

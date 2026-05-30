@@ -140,7 +140,7 @@ export default function TimelineJourney({ data, theme, onToggleLanguage, onPerso
 
       {/* Daily special */}
       {data.dailySpecial && (
-        <motion.div className="mx-5 mb-3 rounded-xl px-3 py-2 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={5} variants={contentSlide}>
+        <motion.div className="mx-5 mb-3 rounded-xl px-3 py-2 border" style={{ background: theme.surface, borderColor: theme.surfaceBorder }} custom={5} variants={contentSlide} animate={noticePulse(theme.primary)}>
           <p className="text-[8px] uppercase tracking-wider font-bold" style={{ color: theme.primaryDim }}>{l.dailySpecial}</p>
           <p className="text-[11px] font-semibold mt-0.5" style={{ color: theme.primaryLight }}>{data.dailySpecial}</p>
         </motion.div>

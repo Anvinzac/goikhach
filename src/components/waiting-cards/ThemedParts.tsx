@@ -28,9 +28,13 @@ export function ThemedStatusBadge({
         status === 'waiting'
           ? {
               boxShadow: [`0 0 0 0 ${c.color}00`, `0 0 0 8px ${c.color}15`, `0 0 0 0 ${c.color}00`],
-              transition: { duration: 2, repeat: Infinity },
             }
           : {}
+      }
+      transition={
+        status === 'waiting'
+          ? { duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut', times: [0, 0.5, 1] }
+          : { duration: 0 }
       }
     >
       {c.icon}

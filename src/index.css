@@ -86,7 +86,9 @@ body.certificate-page,
     --waiting: 215 16% 47%;
     --done: 160 84% 39%;
     --cancelled: 350 89% 60%;
-    --notfound: 220 9% 46%;
+    --notfound: 48 100% 55%;
+    --notfound-end: 28 95% 50%;
+    --notfound-foreground: 0 0% 10%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -162,6 +164,10 @@ body.certificate-page,
   .bg-floor-neutral-occupied {
     background: linear-gradient(135deg, hsl(var(--floor-neutral-occupied)), hsl(var(--floor-neutral-occupied-end)));
     color: hsl(var(--card));
+  }
+  .bg-notfound {
+    background: linear-gradient(135deg, hsl(var(--notfound)), hsl(var(--notfound-end)));
+    color: hsl(var(--notfound-foreground));
   }
 
   @keyframes pulse-available {

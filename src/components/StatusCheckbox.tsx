@@ -55,7 +55,7 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
     waiting: { icon: null, bg: 'border-2 border-muted-foreground/30', text: '' },
     done: { icon: <Check className="w-5 h-5" />, bg: 'bg-available text-available-foreground', text: '' },
     cancelled: { icon: <X className="w-5 h-5" />, bg: 'bg-occupied text-occupied-foreground', text: '' },
-    not_found: { icon: <HelpCircle className="w-5 h-5" />, bg: 'bg-notfound', text: '' },
+    not_found: { icon: <HelpCircle className="w-5 h-5 text-orange-500" />, bg: 'bg-notfound', text: '' },
   };
 
   const current = statusConfig[status];

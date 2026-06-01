@@ -86,8 +86,8 @@ body.certificate-page,
     --waiting: 215 16% 47%;
     --done: 160 84% 39%;
     --cancelled: 350 89% 60%;
-    --notfound: 48 100% 55%;
-    --notfound-end: 28 95% 50%;
+    --notfound: 84 92% 48%;
+    --notfound-end: 52 100% 56%;
     --notfound-foreground: 0 0% 10%;
 
     --sidebar-background: 0 0% 98%;

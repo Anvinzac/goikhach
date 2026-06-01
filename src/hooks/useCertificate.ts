@@ -114,11 +114,9 @@ export function useCertificate(secretCode: string | undefined) {
         return;
       }
 
-      const storedToken = localStorage.getItem(STORAGE_KEY);
-      let granted = false;
-
+      // Always grant access to a valid queue number — the link is shareable.
+      // Mark as used on first view for analytics, but never deny subsequent views.
       if (!cert.is_used) {
-        // First access — claim it
         const browserToken = crypto.randomUUID();
         await supabase
           .from('queue_certificates')
@@ -127,27 +125,10 @@ export function useCertificate(secretCode: string | undefined) {
         localStorage.setItem(STORAGE_KEY, browserToken);
         cert.is_used = true;
         cert.browser_token = browserToken;
-        setCertificate(cert as CertificateData);
-        setAccessState('granted');
-        granted = true;
-      } else if (storedToken && storedToken === cert.browser_token) {
-        // Returning visitor with valid token
-        setCertificate(cert as CertificateData);
-        setAccessState('granted');
-        granted = true;
-      } else if (cert.pin_code) {
-        // Has PIN set — visitor can enter PIN to view
-        setCertificate(cert as CertificateData);
-        setAccessState('needs_pin');
-      } else {
-        // Already used, no PIN — denied
-        setAccessState('denied');
-        return;
       }
-
-      if (granted) {
-        fetchSessionAndStats(cert as CertificateData);
-      }
+      setCertificate(cert as CertificateData);
+      setAccessState('granted');
+      fetchSessionAndStats(cert as CertificateData);
     };
 
     init();

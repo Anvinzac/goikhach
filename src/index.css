@@ -132,6 +132,9 @@ body.certificate-page,
   .status-done {
     color: hsl(var(--done));
   }
+  .text-done {
+    color: hsl(var(--done));
+  }
   .status-cancelled {
     color: hsl(var(--cancelled));
   }

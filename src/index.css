@@ -86,6 +86,7 @@ body.certificate-page,
     --waiting: 215 16% 47%;
     --done: 150 100% 45%;
     --done-end: 175 100% 55%;
+    --done-foreground: 0 0% 100%;
     --cancelled: 350 89% 60%;
     --notfound: 84 92% 48%;
     --notfound-end: 52 100% 56%;
@@ -141,6 +142,10 @@ body.certificate-page,
   .bg-available {
     background: linear-gradient(135deg, hsl(var(--available)), hsl(var(--available-end)));
     color: hsl(var(--available-foreground));
+  }
+  .bg-done {
+    background: linear-gradient(135deg, hsl(var(--done)), hsl(var(--done-end)));
+    color: hsl(var(--done-foreground));
   }
   .bg-occupied {
     background: linear-gradient(135deg, hsl(var(--occupied)), hsl(var(--occupied-end)));

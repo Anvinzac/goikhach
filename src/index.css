@@ -84,7 +84,9 @@ body.certificate-page,
      --floor-neutral-occupied-end: 220 10% 48%;
      --floor-neutral-foreground: 220 20% 18%;
     --waiting: 215 16% 47%;
-    --done: 160 84% 39%;
+    --done: 150 100% 45%;
+    --done-end: 175 100% 55%;
+    --done-foreground: 0 0% 100%;
     --cancelled: 350 89% 60%;
     --notfound: 84 92% 48%;
     --notfound-end: 52 100% 56%;
@@ -130,6 +132,9 @@ body.certificate-page,
   .status-done {
     color: hsl(var(--done));
   }
+  .text-done {
+    color: hsl(var(--done));
+  }
   .status-cancelled {
     color: hsl(var(--cancelled));
   }
@@ -140,6 +145,10 @@ body.certificate-page,
   .bg-available {
     background: linear-gradient(135deg, hsl(var(--available)), hsl(var(--available-end)));
     color: hsl(var(--available-foreground));
+  }
+  .bg-done {
+    background: linear-gradient(135deg, hsl(var(--done)), hsl(var(--done-end)));
+    color: hsl(var(--done-foreground));
   }
   .bg-occupied {
     background: linear-gradient(135deg, hsl(var(--occupied)), hsl(var(--occupied-end)));

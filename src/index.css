@@ -84,13 +84,13 @@ body.certificate-page,
      --floor-neutral-occupied-end: 220 10% 48%;
      --floor-neutral-foreground: 220 20% 18%;
     --waiting: 215 16% 47%;
-    --done: 150 100% 45%;
-    --done-end: 175 100% 55%;
+    --done: 160 84% 39%;
+    --done-end: 172 95% 55%;
     --done-foreground: 0 0% 100%;
     --cancelled: 350 89% 60%;
-    --notfound: 84 92% 48%;
-    --notfound-end: 52 100% 56%;
-    --notfound-foreground: 0 0% 10%;
+    --notfound: 48 100% 55%;
+    --notfound-end: 30 55% 35%;
+    --notfound-foreground: 0 0% 100%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

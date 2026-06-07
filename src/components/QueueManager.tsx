@@ -21,6 +21,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
   const [showWaitTime, setShowWaitTime] = useState(false);
+  const [hideDone, setHideDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isLunchSession = (() => {
     const h = new Date().getHours();

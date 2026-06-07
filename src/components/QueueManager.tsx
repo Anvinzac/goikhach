@@ -44,13 +44,14 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
     };
   }, []);
 
+  const visibleOrders = hideDone ? orders.filter(o => o.status !== 'done') : orders;
   const pageSize = viewMode === 'full' ? 10 : 20;
-  const totalPages = Math.ceil(orders.length / pageSize);
-  const pageOrders = orders.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+  const totalPages = Math.ceil(visibleOrders.length / pageSize);
+  const pageOrders = visibleOrders.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
   const pageStates = Array.from({ length: totalPages }, (_, i) => {
     const start = i * pageSize;
-    const end = Math.min((i + 1) * pageSize, orders.length);
-    const hasAssignedNumbers = orders.slice(start, end).some(order => order.group_size !== null);
+    const end = Math.min((i + 1) * pageSize, visibleOrders.length);
+    const hasAssignedNumbers = visibleOrders.slice(start, end).some(order => order.group_size !== null);
 
     return {
       index: i,

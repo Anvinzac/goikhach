@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
 import { LayoutGrid, List, RotateCcw, QrCode, Timer } from 'lucide-react';
@@ -28,6 +28,20 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
     return (h > 10 || (h === 10 && m >= 30)) && h < 15;
   })();
   const sessionLabel = isLunchSession ? 'Ca trưa' : 'Ca tối';
+
+  const [isLandscape, setIsLandscape] = useState(() =>
+    typeof window !== 'undefined' && window.innerHeight < 500 && window.innerWidth > window.innerHeight
+  );
+  useEffect(() => {
+    const check = () => setIsLandscape(window.innerHeight < 500 && window.innerWidth > window.innerHeight);
+    check();
+    window.addEventListener('resize', check);
+    window.addEventListener('orientationchange', check);
+    return () => {
+      window.removeEventListener('resize', check);
+      window.removeEventListener('orientationchange', check);
+    };
+  }, []);
 
   const pageSize = viewMode === 'full' ? 10 : 20;
   const totalPages = Math.ceil(orders.length / pageSize);
@@ -157,26 +171,57 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
           }`}
         >
         {viewMode === 'full' ? (
-          <div className="flex flex-col h-full" style={{ gap: '0', paddingTop: '0', paddingBottom: '0' }}>
-            {pageOrders.map((order, i) => (
-              <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))', marginTop: '-1px' }}>
-                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
-              </div>
-            ))}
-          </div>
+          isLandscape ? (
+            <div className="grid grid-cols-2 grid-rows-5 grid-flow-col auto-rows-fr h-full">
+              {pageOrders.map((order, i) => {
+                const rowIndex = i % 5;
+                const isBottom = rowIndex >= 3;
+                const isRightCol = i >= 5;
+                return (
+                  <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
+                    <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col h-full" style={{ gap: '0', paddingTop: '0', paddingBottom: '0' }}>
+              {pageOrders.map((order, i) => (
+                <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))', marginTop: '-1px' }}>
+                  <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                </div>
+              ))}
+            </div>
+          )
         ) : (
-          <div className="grid grid-cols-2 grid-rows-10 grid-flow-col auto-rows-fr h-full">
-            {pageOrders.map((order, i) => {
-              const rowIndex = i % 10;
-              const isBottom = rowIndex >= 6;
-              const isRightCol = i >= 10;
-              return (
-              <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
-                <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
-              </div>
-              );
-            })}
-          </div>
+          isLandscape ? (
+            <div className="grid grid-cols-4 grid-rows-5 grid-flow-col auto-rows-fr h-full">
+              {pageOrders.map((order, i) => {
+                const rowIndex = i % 5;
+                const isBottom = rowIndex >= 3;
+                const colIndex = Math.floor(i / 5);
+                const isRightCol = colIndex >= 2;
+                return (
+                  <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
+                    <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 grid-rows-10 grid-flow-col auto-rows-fr h-full">
+              {pageOrders.map((order, i) => {
+                const rowIndex = i % 10;
+                const isBottom = rowIndex >= 6;
+                const isRightCol = i >= 10;
+                return (
+                <div key={order.id} className={`${i % 2 === 1 ? 'bg-muted/30' : ''}`} style={{ borderBottom: '1px solid', borderColor: i % 2 === 0 ? 'hsl(var(--border))' : 'hsl(var(--muted))' }}>
+                  <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                </div>
+                );
+              })}
+            </div>
+          )
         )}
         </div>
       </div>

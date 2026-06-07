@@ -137,7 +137,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
           <button
             onClick={() => setHideDone(v => !v)}
             className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
-              hideDone ? 'bg-done text-done-foreground' : 'bg-muted'
+              hideDone ? 'bg-queue text-queue-foreground' : 'bg-muted'
             }`}
             title={hideDone ? 'Showing only uncalled' : 'Hide called (Done)'}
           >

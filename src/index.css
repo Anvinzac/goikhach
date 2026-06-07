@@ -88,8 +88,8 @@ body.certificate-page,
     --done-end: 172 95% 55%;
     --done-foreground: 0 0% 100%;
     --cancelled: 350 89% 60%;
-    --notfound: 48 100% 55%;
-    --notfound-end: 30 55% 35%;
+    --notfound: var(--sharing);
+    --notfound-end: var(--sharing-end);
     --notfound-foreground: 0 0% 100%;
 
     --sidebar-background: 0 0% 98%;

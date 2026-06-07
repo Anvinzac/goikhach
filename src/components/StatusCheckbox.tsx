@@ -10,7 +10,6 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTapTime = useRef<number>(0);
   const longPressFiredAt = useRef<number>(0);
-  const lastActionAt = useRef<number>(0);
 
   const handleTouchStart = useCallback(() => {
     longPressTimer.current = setTimeout(() => {
@@ -18,7 +17,6 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
         navigator.vibrate(50);
       }
       longPressFiredAt.current = Date.now();
-      lastActionAt.current = Date.now();
       onChange('not_found');
     }, 400);
   }, [onChange]);
@@ -32,19 +30,17 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
 
   const handleQuickTap = useCallback(() => {
     const now = Date.now();
-    // Cooldown: ignore taps that arrive right after any action (e.g. ghost tap after long-press release)
-    if (now - lastActionAt.current < 500) {
+    // Ignore ghost tap that fires right after a long-press release
+    if (now - longPressFiredAt.current < 500) {
       return;
     }
     const timeSinceLastTap = now - lastTapTime.current;
     lastTapTime.current = now;
 
     if (timeSinceLastTap < 300) {
-      // Double tap → cancelled
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate(50);
       }
-      lastActionAt.current = now;
       onChange('cancelled');
       return;
     }
@@ -52,8 +48,6 @@ export function StatusCheckbox({ status, onChange }: StatusCheckboxProps) {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(20);
     }
-    lastActionAt.current = now;
-    // If not waiting, toggle back to waiting; otherwise mark done
     if (status !== 'waiting') {
       onChange('waiting');
       return;

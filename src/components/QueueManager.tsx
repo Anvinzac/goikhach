@@ -29,6 +29,20 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
   })();
   const sessionLabel = isLunchSession ? 'Ca trưa' : 'Ca tối';
 
+  const [isLandscape, setIsLandscape] = useState(() =>
+    typeof window !== 'undefined' && window.innerHeight < 500 && window.innerWidth > window.innerHeight
+  );
+  useEffect(() => {
+    const check = () => setIsLandscape(window.innerHeight < 500 && window.innerWidth > window.innerHeight);
+    check();
+    window.addEventListener('resize', check);
+    window.addEventListener('orientationchange', check);
+    return () => {
+      window.removeEventListener('resize', check);
+      window.removeEventListener('orientationchange', check);
+    };
+  }, []);
+
   const pageSize = viewMode === 'full' ? 10 : 20;
   const totalPages = Math.ceil(orders.length / pageSize);
   const pageOrders = orders.slice(currentPage * pageSize, (currentPage + 1) * pageSize);

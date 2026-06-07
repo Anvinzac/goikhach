@@ -135,6 +135,15 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             <Timer className="w-3.5 h-3.5" />
           </button>
           <button
+            onClick={() => setHideDone(v => !v)}
+            className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
+              hideDone ? 'bg-done text-done-foreground' : 'bg-muted'
+            }`}
+            title={hideDone ? 'Showing only uncalled' : 'Hide called (Done)'}
+          >
+            <Filter className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={onRefresh}
             onMouseDown={onResetPressStart}
             onMouseUp={onResetPressEnd}

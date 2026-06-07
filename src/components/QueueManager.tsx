@@ -44,6 +44,9 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
     };
   }, []);
 
+  useEffect(() => { setCurrentPage(0); }, [hideDone]);
+
+
   const visibleOrders = hideDone ? orders.filter(o => o.status !== 'done') : orders;
   const pageSize = viewMode === 'full' ? 10 : 20;
   const totalPages = Math.ceil(visibleOrders.length / pageSize);

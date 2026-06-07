@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, RotateCcw, QrCode, Timer } from 'lucide-react';
+import { LayoutGrid, List, RotateCcw, QrCode, Timer, Filter } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
@@ -21,6 +21,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
   const [showWaitTime, setShowWaitTime] = useState(false);
+  const [hideDone, setHideDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isLunchSession = (() => {
     const h = new Date().getHours();
@@ -43,13 +44,17 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
     };
   }, []);
 
+  useEffect(() => { setCurrentPage(0); }, [hideDone]);
+
+
+  const visibleOrders = hideDone ? orders.filter(o => o.status !== 'done') : orders;
   const pageSize = viewMode === 'full' ? 10 : 20;
-  const totalPages = Math.ceil(orders.length / pageSize);
-  const pageOrders = orders.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+  const totalPages = Math.ceil(visibleOrders.length / pageSize);
+  const pageOrders = visibleOrders.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
   const pageStates = Array.from({ length: totalPages }, (_, i) => {
     const start = i * pageSize;
-    const end = Math.min((i + 1) * pageSize, orders.length);
-    const hasAssignedNumbers = orders.slice(start, end).some(order => order.group_size !== null);
+    const end = Math.min((i + 1) * pageSize, visibleOrders.length);
+    const hasAssignedNumbers = visibleOrders.slice(start, end).some(order => order.group_size !== null);
 
     return {
       index: i,
@@ -128,6 +133,15 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             title={showWaitTime ? 'Hide wait times' : 'Show wait times'}
           >
             <Timer className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => setHideDone(v => !v)}
+            className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
+              hideDone ? 'bg-queue text-queue-foreground' : 'bg-muted'
+            }`}
+            title={hideDone ? 'Showing only uncalled' : 'Hide called (Done)'}
+          >
+            <Filter className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onRefresh}

@@ -110,24 +110,24 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
           </button>
         </div>
 
-        <div className="flex items-center gap-0.5">
-          <div className="flex bg-muted rounded p-0.5 gap-0.5">
+        <div className="flex items-center gap-1.5">
+          <div className="flex bg-muted rounded p-1 gap-1">
             <button
               onClick={() => { setViewMode('full'); setCurrentPage(0); }}
-              className={`px-2 py-1 rounded transition-all ${viewMode === 'full' ? 'bg-card shadow-sm' : ''}`}
+              className={`px-2.5 py-1 rounded transition-all ${viewMode === 'full' ? 'bg-card shadow-sm' : ''}`}
             >
               <List className="w-4 h-4" />
             </button>
             <button
               onClick={() => { setViewMode('compact'); setCurrentPage(0); }}
-              className={`px-2 py-1 rounded transition-all ${viewMode === 'compact' ? 'bg-card shadow-sm' : ''}`}
+              className={`px-2.5 py-1 rounded transition-all ${viewMode === 'compact' ? 'bg-card shadow-sm' : ''}`}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
           </div>
           <button
             onClick={() => setShowWaitTime(v => !v)}
-            className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
+            className={`w-9 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
               showWaitTime ? 'bg-queue text-queue-foreground' : 'bg-muted'
             }`}
             title={showWaitTime ? 'Hide wait times' : 'Show wait times'}
@@ -142,7 +142,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             onTouchStart={onResetPressStart}
             onTouchEnd={onResetPressEnd}
             onTouchCancel={onResetPressEnd}
-            className="w-8 h-8 rounded flex items-center justify-center bg-occupied/15 text-occupied active:bg-occupied active:text-occupied-foreground transition-all"
+            className="w-9 h-8 rounded flex items-center justify-center bg-occupied/15 text-occupied active:bg-occupied active:text-occupied-foreground transition-all"
             title="Chạm để tải lại, giữ để reset"
           >
             <RotateCcw className="w-3.5 h-3.5" />

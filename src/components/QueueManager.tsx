@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, RotateCcw, QrCode, Timer, Filter } from 'lucide-react';
+import { LayoutGrid, List, RotateCcw, Timer, Filter } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
@@ -134,15 +134,6 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             title={showWaitTime ? 'Hide wait times' : 'Show wait times'}
           >
             <Timer className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setHideDone(v => !v)}
-            className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
-              hideDone ? 'bg-queue text-queue-foreground' : 'bg-muted'
-            }`}
-            title={hideDone ? 'Showing only uncalled' : 'Hide called (Done)'}
-          >
-            <Filter className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onRefresh}

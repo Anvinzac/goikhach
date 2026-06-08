@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { QueueOrder } from '@/hooks/useQueueOrders';
 import { QueueRow } from './QueueRow';
-import { LayoutGrid, List, RotateCcw, QrCode, Timer, Filter } from 'lucide-react';
+import { LayoutGrid, List, RotateCcw, Timer, Filter } from 'lucide-react';
 
 interface QueueManagerProps {
   sessionId: string;
@@ -13,10 +13,9 @@ interface QueueManagerProps {
   orders: QueueOrder[];
   updateOrder: (id: string, updates: Partial<QueueOrder>) => void;
   qrEnabled: boolean;
-  onToggleQr: () => void;
 }
 
-export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled, onToggleQr }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled }: QueueManagerProps) {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);
@@ -100,13 +99,14 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums leading-none">~{estimatedMinutes} phút</span>
           )}
           <button
-            onClick={onToggleQr}
-            className={`w-7 h-7 rounded flex items-center justify-center transition-all active:scale-90 ${
-              qrEnabled ? 'bg-queue text-queue-foreground' : 'bg-muted text-muted-foreground opacity-40'
+            onClick={() => setHideDone(v => !v)}
+            className={`min-w-[3.5rem] h-7 px-2 rounded flex items-center justify-center gap-1 transition-all active:scale-90 text-xs font-bold ${
+              hideDone ? 'bg-queue text-queue-foreground' : 'bg-muted text-muted-foreground'
             }`}
-            title={qrEnabled ? 'QR enabled' : 'QR disabled'}
+            title={hideDone ? 'Showing only uncalled' : 'Hide called (Done)'}
           >
-            <QrCode className="w-3.5 h-3.5" />
+            <Filter className="w-3.5 h-3.5" />
+            <span className="hidden @[380px]:inline">{hideDone ? 'Bật' : 'Tắt'}</span>
           </button>
         </div>
 
@@ -133,15 +133,6 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             title={showWaitTime ? 'Hide wait times' : 'Show wait times'}
           >
             <Timer className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setHideDone(v => !v)}
-            className={`w-8 h-8 rounded flex items-center justify-center transition-all active:scale-90 ${
-              hideDone ? 'bg-queue text-queue-foreground' : 'bg-muted'
-            }`}
-            title={hideDone ? 'Showing only uncalled' : 'Hide called (Done)'}
-          >
-            <Filter className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onRefresh}

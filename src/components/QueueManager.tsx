@@ -15,7 +15,7 @@ interface QueueManagerProps {
   qrEnabled: boolean;
 }
 
-export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled, onToggleQr }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled }: QueueManagerProps) {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);

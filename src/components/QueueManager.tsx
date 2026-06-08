@@ -100,13 +100,14 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums leading-none">~{estimatedMinutes} phút</span>
           )}
           <button
-            onClick={onToggleQr}
-            className={`w-7 h-7 rounded flex items-center justify-center transition-all active:scale-90 ${
-              qrEnabled ? 'bg-queue text-queue-foreground' : 'bg-muted text-muted-foreground opacity-40'
+            onClick={() => setHideDone(v => !v)}
+            className={`min-w-[3.5rem] h-7 px-2 rounded flex items-center justify-center gap-1 transition-all active:scale-90 text-xs font-bold ${
+              hideDone ? 'bg-queue text-queue-foreground' : 'bg-muted text-muted-foreground'
             }`}
-            title={qrEnabled ? 'QR enabled' : 'QR disabled'}
+            title={hideDone ? 'Showing only uncalled' : 'Hide called (Done)'}
           >
-            <QrCode className="w-3.5 h-3.5" />
+            <Filter className="w-3.5 h-3.5" />
+            <span className="hidden @[380px]:inline">{hideDone ? 'Bật' : 'Tắt'}</span>
           </button>
         </div>
 

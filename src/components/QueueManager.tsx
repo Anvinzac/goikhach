@@ -13,7 +13,6 @@ interface QueueManagerProps {
   orders: QueueOrder[];
   updateOrder: (id: string, updates: Partial<QueueOrder>) => void;
   qrEnabled: boolean;
-  onToggleQr: () => void;
 }
 
 export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled, onToggleQr }: QueueManagerProps) {

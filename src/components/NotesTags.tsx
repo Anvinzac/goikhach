@@ -45,7 +45,7 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShow
   }
 
   return (
-    <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0" {...(open ? { 'data-popup-open': '' } : {})}>
       {/* Tags display */}
       <button
         onClick={() => setOpen(!open)}

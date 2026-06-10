@@ -183,7 +183,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
                 const isBottom = rowIndex >= 3;
                 const isRightCol = i >= 5;
                 return (
-                  <div key={order.id} className={i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
+                  <div key={order.id} className={(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
                     <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                   </div>
                 );
@@ -192,7 +192,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
           ) : (
             <div className="flex flex-col h-full" style={{ gap: '0', paddingTop: '0', paddingBottom: '0' }}>
               {pageOrders.map((order, i) => (
-                <div key={order.id} className={`flex-1 min-h-0 ${i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a'}`} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)', marginTop: '-1px' }}>
+                <div key={order.id} className={`flex-1 min-h-0 ${(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'}`} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)', marginTop: '-1px' }}>
                   <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                 </div>
               ))}
@@ -207,7 +207,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
                 const colIndex = Math.floor(i / 5);
                 const isRightCol = colIndex >= 2;
                 return (
-                  <div key={order.id} className={i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
+                  <div key={order.id} className={(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
                     <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                   </div>
                 );
@@ -220,7 +220,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
                 const isBottom = rowIndex >= 6;
                 const isRightCol = i >= 10;
                 return (
-                <div key={order.id} className={i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
+                <div key={order.id} className={(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
                   <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                 </div>
                 );

@@ -114,12 +114,22 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
       >
       {/* Order number - tap to toggle dashed circle */}
       <span
-        className={`text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all ${numberCellClass} ${numberBadgeClass} ${
+        className={`relative overflow-hidden text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all ${numberCellClass} ${numberBadgeClass} ${
           isCircled ? 'border border-dashed border-muted-foreground' : ''
         }`}
         onClick={(e) => { e.stopPropagation(); toggleCircled(); }}
       >
-        {order.order_number}
+        {isCircled && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
+            style={{
+              background: 'linear-gradient(180deg, #93c5fd 0%, #3b82f6 60%, #1d4ed8 100%)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)',
+            }}
+          />
+        )}
+        <span className="relative">{order.order_number}</span>
       </span>
 
         {/* Group size */}

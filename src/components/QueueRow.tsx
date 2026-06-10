@@ -120,14 +120,38 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         onClick={(e) => { e.stopPropagation(); toggleCircled(); }}
       >
         {isCircled && (
-          <span
+          <svg
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
-            style={{
-              background: 'linear-gradient(180deg, #93c5fd 0%, #3b82f6 60%, #1d4ed8 100%)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)',
-            }}
-          />
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-0 w-full h-full animate-splash"
+          >
+            <defs>
+              <linearGradient id="splash-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#bfdbfe" />
+                <stop offset="40%" stopColor="#3b82f6" />
+                <stop offset="100%" stopColor="#1d4ed8" />
+              </linearGradient>
+            </defs>
+            {/* Main splash body with energetic peaks */}
+            <path
+              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60 L 100 100 L 0 100 Z"
+              fill="url(#splash-fill)"
+            />
+            {/* Highlight on water surface */}
+            <path
+              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60"
+              fill="none"
+              stroke="rgba(255,255,255,0.7)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            {/* Flying droplets */}
+            <circle cx="36" cy="10" r="3" fill="#60a5fa" />
+            <circle cx="72" cy="4" r="2.5" fill="#93c5fd" />
+            <circle cx="90" cy="16" r="2" fill="#60a5fa" />
+            <ellipse cx="14" cy="22" rx="1.6" ry="2.4" fill="#93c5fd" />
+          </svg>
         )}
         <span className="relative">{order.order_number}</span>
       </span>
@@ -237,14 +261,35 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
         onClick={toggleCircled}
       >
         {isCircled && (
-          <span
+          <svg
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
-            style={{
-              background: 'linear-gradient(180deg, #93c5fd 0%, #3b82f6 60%, #1d4ed8 100%)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)',
-            }}
-          />
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-0 w-full h-full animate-splash"
+          >
+            <defs>
+              <linearGradient id="splash-fill-2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#bfdbfe" />
+                <stop offset="40%" stopColor="#3b82f6" />
+                <stop offset="100%" stopColor="#1d4ed8" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60 L 100 100 L 0 100 Z"
+              fill="url(#splash-fill-2)"
+            />
+            <path
+              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60"
+              fill="none"
+              stroke="rgba(255,255,255,0.7)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <circle cx="36" cy="10" r="3" fill="#60a5fa" />
+            <circle cx="72" cy="4" r="2.5" fill="#93c5fd" />
+            <circle cx="90" cy="16" r="2" fill="#60a5fa" />
+            <ellipse cx="14" cy="22" rx="1.6" ry="2.4" fill="#93c5fd" />
+          </svg>
         )}
         <span className="relative">{order.order_number}</span>
       </span>

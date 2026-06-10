@@ -111,7 +111,7 @@ const Index = () => {
 
   return (
     <PinGate>
-    <div className="flex flex-col h-[100dvh] bg-background">
+    <div className="flex flex-col h-[100dvh] tally-watercolor">
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {activeTab === 'queue' && (
@@ -132,7 +132,7 @@ const Index = () => {
       </div>
 
       {/* Bottom tabs */}
-      <div className="flex border-t border-border bg-card safe-area-bottom flex-shrink-0">
+      <div className="flex border-t border-border frosted-bar safe-area-bottom flex-shrink-0">
         {tabs.map(tab => {
           const active = activeTab === tab.id;
           return (

@@ -211,14 +211,6 @@ body.certificate-page,
     transform-origin: top center;
   }
 
-  @keyframes splash-bob {
-    0%, 100% { transform: translateY(0) scaleY(1); }
-    50% { transform: translateY(-1px) scaleY(1.05); }
-  }
-  .animate-splash {
-    animation: splash-bob 1.8s ease-in-out infinite;
-    transform-origin: bottom center;
-  }
 
   .return-signal-emphasis {
     animation: return-signal-pulse 1.3s ease-in-out infinite;

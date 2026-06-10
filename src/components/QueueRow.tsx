@@ -114,46 +114,12 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
       >
       {/* Order number - tap to toggle dashed circle */}
       <span
-        className={`relative overflow-hidden text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all ${numberCellClass} ${numberBadgeClass} ${
+        className={`text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all ${numberCellClass} ${numberBadgeClass} ${
           isCircled ? 'border border-dashed border-muted-foreground' : ''
         }`}
         onClick={(e) => { e.stopPropagation(); toggleCircled(); }}
       >
-        {isCircled && (
-          <svg
-            aria-hidden
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            className="pointer-events-none absolute inset-0 w-full h-full animate-splash"
-          >
-            <defs>
-              <linearGradient id="splash-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#bfdbfe" />
-                <stop offset="40%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#1d4ed8" />
-              </linearGradient>
-            </defs>
-            {/* Main splash body with energetic peaks */}
-            <path
-              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60 L 100 100 L 0 100 Z"
-              fill="url(#splash-fill)"
-            />
-            {/* Highlight on water surface */}
-            <path
-              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60"
-              fill="none"
-              stroke="rgba(255,255,255,0.7)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            {/* Flying droplets */}
-            <circle cx="36" cy="10" r="3" fill="#60a5fa" />
-            <circle cx="72" cy="4" r="2.5" fill="#93c5fd" />
-            <circle cx="90" cy="16" r="2" fill="#60a5fa" />
-            <ellipse cx="14" cy="22" rx="1.6" ry="2.4" fill="#93c5fd" />
-          </svg>
-        )}
-        <span className="relative">{order.order_number}</span>
+        {order.order_number}
       </span>
 
         {/* Group size */}
@@ -255,43 +221,12 @@ export function QueueRow({ order, sessionId, onUpdate, compact, isNearBottom, is
     <div className={`flex items-center gap-1 px-1 py-px ${statusBg} transition-all overflow-visible h-full min-h-0`}>
       {/* Order number - tap to toggle dashed circle */}
       <span
-        className={`relative overflow-hidden text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all cursor-pointer ${numberCellClass} ${numberBadgeClass} ${
+        className={`text-queue flex-shrink-0 inline-flex items-center justify-center rounded-full text-center font-semibold active:scale-90 transition-all cursor-pointer ${numberCellClass} ${numberBadgeClass} ${
           isCircled ? 'border border-dashed border-muted-foreground' : ''
         }`}
         onClick={toggleCircled}
       >
-        {isCircled && (
-          <svg
-            aria-hidden
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            className="pointer-events-none absolute inset-0 w-full h-full animate-splash"
-          >
-            <defs>
-              <linearGradient id="splash-fill-2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#bfdbfe" />
-                <stop offset="40%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#1d4ed8" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60 L 100 100 L 0 100 Z"
-              fill="url(#splash-fill-2)"
-            />
-            <path
-              d="M 0 70 C 6 66, 10 40, 20 46 C 26 50, 30 18, 42 26 C 50 31, 54 6, 64 18 C 70 26, 78 14, 86 32 C 92 44, 96 56, 100 60"
-              fill="none"
-              stroke="rgba(255,255,255,0.7)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <circle cx="36" cy="10" r="3" fill="#60a5fa" />
-            <circle cx="72" cy="4" r="2.5" fill="#93c5fd" />
-            <circle cx="90" cy="16" r="2" fill="#60a5fa" />
-            <ellipse cx="14" cy="22" rx="1.6" ry="2.4" fill="#93c5fd" />
-          </svg>
-        )}
-        <span className="relative">{order.order_number}</span>
+        {order.order_number}
       </span>
 
       {/* Group size */}

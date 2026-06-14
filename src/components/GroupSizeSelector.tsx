@@ -93,7 +93,7 @@ export function GroupSizeSelector({ currentSize, previousSize, onSelect, compact
   }
 
   return (
-    <div ref={containerRef} className="relative flex items-center gap-1">
+    <div ref={containerRef} className="relative flex items-center gap-1" {...(showLargeMenu ? { 'data-popup-open': 'true' } : {})}>
       {[1, 2, 3, 4].map(n => {
         const isSelected = currentSize === n;
         const isFilled = currentSize !== null && n < currentSize;

@@ -123,6 +123,7 @@ const Index = () => {
         updateOrder={updateOrder}
         qrEnabled={qrEnabled}
         waitingCount={waitingCount}
+        waitingGroups={waitingGroups}
         floorBadges={floorBadges}
         setFloorBadges={setFloorBadges}
       />

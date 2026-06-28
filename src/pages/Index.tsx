@@ -236,69 +236,6 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
     </div>
   );
 }
-    <div className="flex flex-col h-[100dvh] tally-watercolor">
-      {/* Content */}
-      <div className="flex-1 overflow-hidden">
-        {activeTab === 'queue' && (
-          <QueueManager
-            sessionId={session.id}
-            sessionType={session.session_type}
-            onResetPressStart={handleResetPressStart}
-            onResetPressEnd={handleResetPressEnd}
-            onRefresh={handleRefresh}
-            estimatedMinutes={estimatedMinutes}
-            orders={orders}
-            updateOrder={updateOrder}
-            qrEnabled={qrEnabled}
-          />
-        )}
-        {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}
-        {activeTab === 'first' && <FloorPlanView sessionId={session.id} floor="first" />}
-      </div>
 
-      {/* Bottom tabs */}
-      <div className="flex border-t border-border frosted-bar safe-area-bottom flex-shrink-0">
-        {tabs.map(tab => {
-          const active = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                if (tab.badgeKey) {
-                  setFloorBadges(prev => ({ ...prev, [tab.badgeKey!]: 0 }));
-                }
-                if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-                  navigator.vibrate(15);
-                }
-              }}
-              className={`flex-1 flex flex-col items-center py-1 transition-all active:scale-95
-                ${active ? 'text-queue' : 'text-muted-foreground'}`}
-            >
-              {tab.id === 'queue' ? (
-                <span className="text-xl font-black tabular-nums leading-none">{waitingCount}</span>
-              ) : (
-                <span className="relative">
-                  {tab.icon && (
-                    <tab.icon
-                      className={`w-5 h-5 transition-all ${tab.badgeKey && floorBadges[tab.badgeKey] > 0 ? 'text-signal animate-bell-nudge' : ''}`}
-                    />
-                  )}
-                  {tab.badgeKey && floorBadges[tab.badgeKey] > 0 && (
-                    <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 rounded-full bg-available text-[10px] font-black flex items-center justify-center px-0.5 animate-bounce">
-                      {floorBadges[tab.badgeKey]}
-                    </span>
-                  )}
-                </span>
-              )}
-              <span className="text-[10px] font-bold leading-tight">{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-    </PinGate>
-  );
-};
 
 export default Index;

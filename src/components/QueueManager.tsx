@@ -13,9 +13,10 @@ interface QueueManagerProps {
   orders: QueueOrder[];
   updateOrder: (id: string, updates: Partial<QueueOrder>) => void;
   qrEnabled: boolean;
+  isReadOnly?: boolean;
 }
 
-export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled }: QueueManagerProps) {
+export function QueueManager({ sessionId, sessionType, onResetPressStart, onResetPressEnd, onRefresh, estimatedMinutes = 0, orders, updateOrder, qrEnabled, isReadOnly = false }: QueueManagerProps) {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
   const [currentPage, setCurrentPage] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null);

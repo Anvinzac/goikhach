@@ -157,6 +157,13 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
   const guardedResetEnd = isGuest ? () => {} : handleResetPressEnd;
   const guardedRefresh = isGuest ? () => {} : handleRefresh;
 
+  // Guest mode shows a padded estimate: total groups x 4, rounded to nearest 5
+  const totalGroups = orders.filter(o => o.group_size != null && o.group_size > 0).length;
+  const guestEstimatedMinutes = Math.round((totalGroups * 4) / 5) * 5;
+  const displayedEstimatedMinutes = isGuest ? guestEstimatedMinutes : estimatedMinutes;
+
+
+
   const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [
     { id: 'queue', label: 'Queue' },
     { id: 'ground', label: 'Ground', icon: MapPin, badgeKey: 'ground' },
@@ -179,7 +186,7 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
             onResetPressStart={guardedResetStart}
             onResetPressEnd={guardedResetEnd}
             onRefresh={guardedRefresh}
-            estimatedMinutes={estimatedMinutes}
+            estimatedMinutes={displayedEstimatedMinutes}
             orders={orders}
             updateOrder={guardedUpdateOrder}
             qrEnabled={qrEnabled}

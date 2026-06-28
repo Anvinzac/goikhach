@@ -111,6 +111,131 @@ const Index = () => {
 
   return (
     <PinGate>
+      <IndexInner
+        session={session}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        handleResetPressStart={handleResetPressStart}
+        handleResetPressEnd={handleResetPressEnd}
+        handleRefresh={handleRefresh}
+        estimatedMinutes={estimatedMinutes}
+        orders={orders}
+        updateOrder={updateOrder}
+        qrEnabled={qrEnabled}
+        waitingCount={waitingCount}
+        floorBadges={floorBadges}
+        setFloorBadges={setFloorBadges}
+      />
+    </PinGate>
+  );
+};
+
+interface IndexInnerProps {
+  session: any;
+  activeTab: Tab;
+  setActiveTab: (t: Tab) => void;
+  handleResetPressStart: () => void;
+  handleResetPressEnd: () => void;
+  handleRefresh: () => void;
+  estimatedMinutes: number;
+  orders: any[];
+  updateOrder: any;
+  qrEnabled: boolean;
+  waitingCount: number;
+  floorBadges: { ground: number; first: number };
+  setFloorBadges: React.Dispatch<React.SetStateAction<{ ground: number; first: number }>>;
+}
+
+function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, handleResetPressEnd, handleRefresh, estimatedMinutes, orders, updateOrder, qrEnabled, waitingCount, floorBadges, setFloorBadges }: IndexInnerProps) {
+  const mode = useAccessMode();
+  const isGuest = mode === 'guest';
+
+  const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [
+    { id: 'queue', label: 'Queue' },
+    { id: 'ground', label: 'Ground', icon: MapPin, badgeKey: 'ground' },
+    { id: 'first', label: '1st Floor', icon: MapPin, badgeKey: 'first' },
+  ];
+
+  return (
+    <div className="flex flex-col h-[100dvh] tally-watercolor">
+      {isGuest && (
+        <div className="flex items-center justify-center h-5 flex-shrink-0 bg-queue/15 text-queue text-[10px] font-bold tracking-wider uppercase">
+          Chế độ khách · Chỉ xem
+        </div>
+      )}
+      {/* Content */}
+      <div className="flex-1 overflow-hidden relative">
+        {activeTab === 'queue' && (
+          <QueueManager
+            sessionId={session.id}
+            sessionType={session.session_type}
+            onResetPressStart={handleResetPressStart}
+            onResetPressEnd={handleResetPressEnd}
+            onRefresh={handleRefresh}
+            estimatedMinutes={estimatedMinutes}
+            orders={orders}
+            updateOrder={updateOrder}
+            qrEnabled={qrEnabled}
+          />
+        )}
+        {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}
+        {activeTab === 'first' && <FloorPlanView sessionId={session.id} floor="first" />}
+        {isGuest && (
+          <div
+            className="absolute inset-0 z-50"
+            style={{ background: 'transparent', cursor: 'not-allowed' }}
+            onClickCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onPointerDownCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onTouchStartCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onMouseDownCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            aria-label="Chế độ khách - chỉ xem"
+          />
+        )}
+      </div>
+
+      {/* Bottom tabs */}
+      <div className="flex border-t border-border frosted-bar safe-area-bottom flex-shrink-0">
+        {tabs.map(tab => {
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                if (tab.badgeKey) {
+                  setFloorBadges(prev => ({ ...prev, [tab.badgeKey!]: 0 }));
+                }
+                if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+                  navigator.vibrate(15);
+                }
+              }}
+              className={`flex-1 flex flex-col items-center py-1 transition-all active:scale-95
+                ${active ? 'text-queue' : 'text-muted-foreground'}`}
+            >
+              {tab.id === 'queue' ? (
+                <span className="text-xl font-black tabular-nums leading-none">{waitingCount}</span>
+              ) : (
+                <span className="relative">
+                  {tab.icon && (
+                    <tab.icon
+                      className={`w-5 h-5 transition-all ${tab.badgeKey && floorBadges[tab.badgeKey] > 0 ? 'text-signal animate-bell-nudge' : ''}`}
+                    />
+                  )}
+                  {tab.badgeKey && floorBadges[tab.badgeKey] > 0 && (
+                    <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 rounded-full bg-available text-[10px] font-black flex items-center justify-center px-0.5 animate-bounce">
+                      {floorBadges[tab.badgeKey]}
+                    </span>
+                  )}
+                </span>
+              )}
+              <span className="text-[10px] font-bold leading-tight">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
     <div className="flex flex-col h-[100dvh] tally-watercolor">
       {/* Content */}
       <div className="flex-1 overflow-hidden">

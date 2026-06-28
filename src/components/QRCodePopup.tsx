@@ -86,8 +86,8 @@ export function QRCodePopup({ orderId, sessionId, orderNumber, groupSize, onClos
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
         <div
           className="bg-card rounded-2xl shadow-2xl p-6 max-w-[320px] w-full border-2 border-border"
           onClick={e => e.stopPropagation()}

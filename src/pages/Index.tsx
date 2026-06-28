@@ -186,7 +186,7 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
             onResetPressStart={guardedResetStart}
             onResetPressEnd={guardedResetEnd}
             onRefresh={guardedRefresh}
-            estimatedMinutes={estimatedMinutes}
+            estimatedMinutes={displayedEstimatedMinutes}
             orders={orders}
             updateOrder={guardedUpdateOrder}
             qrEnabled={qrEnabled}

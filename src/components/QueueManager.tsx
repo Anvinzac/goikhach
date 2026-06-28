@@ -170,7 +170,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
       >
         <div
           key={currentPage}
-          className={`h-full ${
+          className={`h-full ${isReadOnly ? 'pointer-events-none select-none' : ''} ${
             slideDir === 'left' ? 'animate-slide-in-from-right' :
             slideDir === 'right' ? 'animate-slide-in-from-left' :
             ''

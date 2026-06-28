@@ -192,6 +192,7 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
             orders={orders}
             updateOrder={guardedUpdateOrder}
             qrEnabled={qrEnabled}
+            isReadOnly={isGuest}
           />
         )}
         {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}

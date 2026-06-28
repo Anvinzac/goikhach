@@ -153,10 +153,15 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
   // In guest mode, neutralize all write actions while keeping native gestures
   // (swipe pagination, tab switching) fully responsive.
   const guardedUpdateOrder = isGuest ? (() => {}) as typeof updateOrder : updateOrder;
+  const guardedResetStart = isGuest ? () => {} : handleResetPressStart;
+  const guardedResetEnd = isGuest ? () => {} : handleResetPressEnd;
+  const guardedRefresh = isGuest ? () => {} : handleRefresh;
+
   // Guest mode shows a padded estimate: total groups x 4, rounded to nearest 5
   const totalGroups = orders.filter(o => o.group_size != null && o.group_size > 0).length;
   const guestEstimatedMinutes = Math.round((totalGroups * 4) / 5) * 5;
   const displayedEstimatedMinutes = isGuest ? guestEstimatedMinutes : estimatedMinutes;
+
 
 
   const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [

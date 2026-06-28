@@ -143,11 +143,12 @@ interface IndexInnerProps {
   updateOrder: any;
   qrEnabled: boolean;
   waitingCount: number;
+  waitingGroups: number;
   floorBadges: { ground: number; first: number };
   setFloorBadges: React.Dispatch<React.SetStateAction<{ ground: number; first: number }>>;
 }
 
-function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, handleResetPressEnd, handleRefresh, estimatedMinutes, orders, updateOrder, qrEnabled, waitingCount, floorBadges, setFloorBadges }: IndexInnerProps) {
+function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, handleResetPressEnd, handleRefresh, estimatedMinutes, orders, updateOrder, qrEnabled, waitingCount, waitingGroups, floorBadges, setFloorBadges }: IndexInnerProps) {
   const mode = useAccessMode();
   const isGuest = mode === 'guest';
 
@@ -158,8 +159,8 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
   const guardedResetEnd = isGuest ? () => {} : handleResetPressEnd;
   const guardedRefresh = isGuest ? () => {} : handleRefresh;
 
-  // Guest mode shows a padded estimate: uncalled (waiting) groups x 4, rounded to nearest 5
-  const guestEstimatedMinutes = Math.round((waitingCount * 4) / 5) * 5;
+  // Guest mode shows a padded estimate: uncalled groups x 4, rounded up to next multiple of 5
+  const guestEstimatedMinutes = Math.ceil((waitingGroups * 4) / 5) * 5;
   const displayedEstimatedMinutes = isGuest ? guestEstimatedMinutes : estimatedMinutes;
 
 

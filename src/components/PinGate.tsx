@@ -1,8 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Lock, Delete } from 'lucide-react';
 
-const PIN = '8723';
+const ADMIN_PIN = '8723';
+const GUEST_PIN = '6610';
 const STORAGE_KEY = 'queue-pin-verified';
+const MODE_KEY = 'queue-pin-mode';
+
+export type AccessMode = 'admin' | 'guest';
+
+export function getAccessMode(): AccessMode {
+  if (typeof window === 'undefined') return 'admin';
+  return (sessionStorage.getItem(MODE_KEY) as AccessMode) || 'admin';
+}
+
+export function useAccessMode(): AccessMode {
+  const [mode, setMode] = useState<AccessMode>(() => getAccessMode());
+  useEffect(() => {
+    const handler = () => setMode(getAccessMode());
+    window.addEventListener('queue-pin-mode-change', handler);
+    return () => window.removeEventListener('queue-pin-mode-change', handler);
+  }, []);
+  return mode;
+}
 
 export function PinGate({ children }: { children: React.ReactNode }) {
   const [verified, setVerified] = useState(false);
@@ -28,9 +47,12 @@ export function PinGate({ children }: { children: React.ReactNode }) {
     setInput(next);
     if (next.length === 4) {
       setTimeout(() => {
-        if (next === PIN) {
-          setVerified(true);
+        if (next === ADMIN_PIN || next === GUEST_PIN) {
+          const mode: AccessMode = next === GUEST_PIN ? 'guest' : 'admin';
           sessionStorage.setItem(STORAGE_KEY, 'true');
+          sessionStorage.setItem(MODE_KEY, mode);
+          window.dispatchEvent(new Event('queue-pin-mode-change'));
+          setVerified(true);
         } else {
           setError(true);
           if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {

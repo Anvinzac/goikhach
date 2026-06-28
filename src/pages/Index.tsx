@@ -3,7 +3,7 @@ import { useSession } from '@/hooks/useSession';
 import { useQueueOrders } from '@/hooks/useQueueOrders';
 import { QueueManager } from '@/components/QueueManager';
 import { FloorPlanView } from '@/components/FloorPlanView';
-import { PinGate } from '@/components/PinGate';
+import { PinGate, useAccessMode } from '@/components/PinGate';
 import { MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -111,9 +111,60 @@ const Index = () => {
 
   return (
     <PinGate>
+      <IndexInner
+        session={session}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        handleResetPressStart={handleResetPressStart}
+        handleResetPressEnd={handleResetPressEnd}
+        handleRefresh={handleRefresh}
+        estimatedMinutes={estimatedMinutes}
+        orders={orders}
+        updateOrder={updateOrder}
+        qrEnabled={qrEnabled}
+        waitingCount={waitingCount}
+        floorBadges={floorBadges}
+        setFloorBadges={setFloorBadges}
+      />
+    </PinGate>
+  );
+};
+
+interface IndexInnerProps {
+  session: any;
+  activeTab: Tab;
+  setActiveTab: (t: Tab) => void;
+  handleResetPressStart: () => void;
+  handleResetPressEnd: () => void;
+  handleRefresh: () => void;
+  estimatedMinutes: number;
+  orders: any[];
+  updateOrder: any;
+  qrEnabled: boolean;
+  waitingCount: number;
+  floorBadges: { ground: number; first: number };
+  setFloorBadges: React.Dispatch<React.SetStateAction<{ ground: number; first: number }>>;
+}
+
+function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, handleResetPressEnd, handleRefresh, estimatedMinutes, orders, updateOrder, qrEnabled, waitingCount, floorBadges, setFloorBadges }: IndexInnerProps) {
+  const mode = useAccessMode();
+  const isGuest = mode === 'guest';
+
+  const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [
+    { id: 'queue', label: 'Queue' },
+    { id: 'ground', label: 'Ground', icon: MapPin, badgeKey: 'ground' },
+    { id: 'first', label: '1st Floor', icon: MapPin, badgeKey: 'first' },
+  ];
+
+  return (
     <div className="flex flex-col h-[100dvh] tally-watercolor">
+      {isGuest && (
+        <div className="flex items-center justify-center h-5 flex-shrink-0 bg-queue/15 text-queue text-[10px] font-bold tracking-wider uppercase">
+          Chế độ khách · Chỉ xem
+        </div>
+      )}
       {/* Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         {activeTab === 'queue' && (
           <QueueManager
             sessionId={session.id}
@@ -129,6 +180,17 @@ const Index = () => {
         )}
         {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}
         {activeTab === 'first' && <FloorPlanView sessionId={session.id} floor="first" />}
+        {isGuest && (
+          <div
+            className="absolute inset-0 z-50"
+            style={{ background: 'transparent', cursor: 'not-allowed' }}
+            onClickCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onPointerDownCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onTouchStartCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onMouseDownCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            aria-label="Chế độ khách - chỉ xem"
+          />
+        )}
       </div>
 
       {/* Bottom tabs */}
@@ -172,8 +234,8 @@ const Index = () => {
         })}
       </div>
     </div>
-    </PinGate>
   );
-};
+}
+
 
 export default Index;

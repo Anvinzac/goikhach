@@ -92,7 +92,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
   return (
     <div className="flex flex-col h-full">
       {/* Merged header */}
-      <div className="flex items-center justify-between px-1 h-8 frosted-bar border-b border-border flex-shrink-0">
+      <div className={`flex items-center justify-between px-1 h-8 frosted-bar border-b border-border flex-shrink-0 ${isReadOnly ? 'pointer-events-none opacity-60' : ''}`}>
         <div className="flex min-w-0 flex-1 items-center gap-1.5 pr-2 [font-family:'Be_Vietnam_Pro',sans-serif]">
           <span className="font-black text-sm text-queue">🍽</span>
           <span className="truncate font-bold text-sm leading-none">{sessionLabel}</span>

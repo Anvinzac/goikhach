@@ -150,6 +150,13 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
   const mode = useAccessMode();
   const isGuest = mode === 'guest';
 
+  // In guest mode, neutralize all write actions while keeping native gestures
+  // (swipe pagination, tab switching) fully responsive.
+  const guardedUpdateOrder = isGuest ? (() => {}) as typeof updateOrder : updateOrder;
+  const guardedResetStart = isGuest ? () => {} : handleResetPressStart;
+  const guardedResetEnd = isGuest ? () => {} : handleResetPressEnd;
+  const guardedRefresh = isGuest ? () => {} : handleRefresh;
+
   const tabs: { id: Tab; label: string; icon?: typeof MapPin; badgeKey?: 'ground' | 'first' }[] = [
     { id: 'queue', label: 'Queue' },
     { id: 'ground', label: 'Ground', icon: MapPin, badgeKey: 'ground' },
@@ -169,29 +176,19 @@ function IndexInner({ session, activeTab, setActiveTab, handleResetPressStart, h
           <QueueManager
             sessionId={session.id}
             sessionType={session.session_type}
-            onResetPressStart={handleResetPressStart}
-            onResetPressEnd={handleResetPressEnd}
-            onRefresh={handleRefresh}
+            onResetPressStart={guardedResetStart}
+            onResetPressEnd={guardedResetEnd}
+            onRefresh={guardedRefresh}
             estimatedMinutes={estimatedMinutes}
             orders={orders}
-            updateOrder={updateOrder}
+            updateOrder={guardedUpdateOrder}
             qrEnabled={qrEnabled}
           />
         )}
         {activeTab === 'ground' && <FloorPlanView sessionId={session.id} floor="ground" />}
         {activeTab === 'first' && <FloorPlanView sessionId={session.id} floor="first" />}
-        {isGuest && (
-          <div
-            className="absolute inset-0 z-50"
-            style={{ background: 'transparent', cursor: 'not-allowed' }}
-            onClickCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onPointerDownCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onTouchStartCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onMouseDownCapture={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            aria-label="Chế độ khách - chỉ xem"
-          />
-        )}
       </div>
+
 
       {/* Bottom tabs */}
       <div className="flex border-t border-border frosted-bar safe-area-bottom flex-shrink-0">

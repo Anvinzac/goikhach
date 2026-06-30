@@ -74,8 +74,13 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShow
       {/* Dropdown */}
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => { setOpen(false); onUpdate(notes, tempNote || null); }} />
-          <div className={`absolute right-0 z-50 bg-card border-2 border-border rounded-xl shadow-xl p-3 min-w-[200px] ${dropUp ? 'bottom-full mb-1' : 'mt-1'}`}>
+          <button
+            type="button"
+            aria-label="Đóng"
+            onClick={() => { setOpen(false); onUpdate(notes, tempNote || null); }}
+            className="fixed inset-0 z-[80] bg-transparent cursor-default"
+          />
+          <div className={`absolute right-0 z-[90] bg-card border-2 border-border rounded-xl shadow-xl p-3 min-w-[200px] ${dropUp ? 'bottom-full mb-1' : 'mt-1'}`}>
             <div className="flex flex-wrap gap-2 mb-3">
               {TAG_OPTIONS.map(tag => {
                 const Icon = tag.icon;

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Globe, ArrowDown, ArrowUp, Clock, Split, MessageSquare, ChevronDown, QrCode } from 'lucide-react';
 
 const TAG_OPTIONS = [
@@ -21,8 +22,39 @@ interface NotesTagsProps {
 export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShowQR }: NotesTagsProps) {
   const [open, setOpen] = useState(false);
   const [tempNote, setTempNote] = useState(customNote || '');
+  const [menuPosition, setMenuPosition] = useState<{ top?: number; bottom?: number; right: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const hasNotes = notes.length > 0 || !!customNote;
+
+  useLayoutEffect(() => {
+    if (!open) return;
+
+    const updatePosition = () => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const right = Math.max(6, window.innerWidth - rect.right);
+      setMenuPosition(
+        dropUp
+          ? { bottom: Math.max(6, window.innerHeight - rect.top + 4), right }
+          : { top: Math.max(6, rect.bottom + 4), right }
+      );
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('orientationchange', updatePosition);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('orientationchange', updatePosition);
+    };
+  }, [dropUp, open]);
+
+  const closeAndSave = () => {
+    setOpen(false);
+    onUpdate(notes, tempNote || null);
+  };
 
   const toggleTag = (value: string) => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -45,7 +77,7 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShow
   }
 
   return (
-    <div className="flex-1 min-w-0" {...(open ? { 'data-popup-open': '' } : {})}>
+    <div ref={containerRef} className="flex-1 min-w-0" {...(open ? { 'data-popup-open': '' } : {})}>
       {/* Tags display */}
       <button
         onClick={() => setOpen(!open)}
@@ -72,15 +104,18 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShow
       </button>
 
       {/* Dropdown */}
-      {open && (
+      {open && typeof document !== 'undefined' && createPortal(
         <>
           <button
             type="button"
             aria-label="Đóng"
-            onClick={() => { setOpen(false); onUpdate(notes, tempNote || null); }}
+            onClick={closeAndSave}
             className="fixed inset-0 z-[80] bg-transparent cursor-default"
           />
-          <div className={`absolute right-0 z-[90] bg-card border-2 border-border rounded-xl shadow-xl p-3 min-w-[200px] ${dropUp ? 'bottom-full mb-1' : 'mt-1'}`}>
+          <div
+            className="fixed z-[90] bg-card border-2 border-border rounded-xl shadow-xl p-3 min-w-[200px]"
+            style={menuPosition || { top: 6, right: 6 }}
+          >
             <div className="flex flex-wrap gap-2 mb-3">
               {TAG_OPTIONS.map(tag => {
                 const Icon = tag.icon;
@@ -121,6 +156,7 @@ export function NotesTags({ notes, customNote, onUpdate, compact, dropUp, onShow
             />
           </div>
         </>
+        , document.body
       )}
     </div>
   );

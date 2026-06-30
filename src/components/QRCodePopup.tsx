@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { X, QrCode } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -84,10 +85,12 @@ export function QRCodePopup({ orderId, sessionId, orderNumber, groupSize, onClos
     createCertificate();
   }, [orderId, sessionId, orderNumber, groupSize]);
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <>
-      <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" onClick={onClose}>
         <div
           className="bg-card rounded-2xl shadow-2xl p-6 max-w-[320px] w-full border-2 border-border"
           onClick={e => e.stopPropagation()}
@@ -139,6 +142,7 @@ export function QRCodePopup({ orderId, sessionId, orderNumber, groupSize, onClos
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

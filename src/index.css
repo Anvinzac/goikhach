@@ -242,6 +242,16 @@ body.certificate-page,
   40%, 80% { transform: translateX(6px); }
 }
 
+@keyframes key-ripple {
+  0% { transform: scale(0.2); opacity: 0.55; }
+  60% { opacity: 0.22; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.animate-key-ripple {
+  animation: key-ripple 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @layer utilities {
   /* Soft watercolor wash for the tally page — layered radial blooms that
      drift slowly so the surface never feels static. */

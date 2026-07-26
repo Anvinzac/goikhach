@@ -39,7 +39,7 @@ const TAG_LABELS: Record<string, string> = {
   prefer_downstairs: 'Tầng dưới',
   prefer_upstairs: 'Tầng trên',
   will_return: 'Quay lại',
-  separately: 'Tách bàn',
+  separately: 'Bàn riêng',
   dedicated: 'Bàn riêng',
 };
 

@@ -50,7 +50,7 @@ export function PinGate({ children }: { children: React.ReactNode }) {
   const release = () => {
     setPressed(null);
     if (glowTimer.current) clearTimeout(glowTimer.current);
-    glowTimer.current = setTimeout(() => setGlow(null), 520);
+    glowTimer.current = setTimeout(() => setGlow(null), 180);
   };
 
 
@@ -204,7 +204,7 @@ export function PinGate({ children }: { children: React.ReactNode }) {
                       boxShadow:
                         active && !isDel ? '0 8px 28px hsl(var(--queue) / 0.35)' : 'none',
                       transition:
-                        'transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 480ms ease-out, border-color 480ms ease-out',
+                        'transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease-out, border-color 300ms ease-out',
                     }}
                   >
                     {/* Lingering fill + ripple */}
@@ -217,7 +217,7 @@ export function PinGate({ children }: { children: React.ReactNode }) {
                         opacity: active ? 1 : 0,
                         transform: active ? 'scale(1)' : 'scale(1.15)',
                         transition:
-                          'opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 520ms cubic-bezier(0.22, 1, 0.36, 1)',
+                          'opacity 300ms cubic-bezier(0.22, 1, 0.36, 1), transform 300ms cubic-bezier(0.22, 1, 0.36, 1)',
                       }}
                     />
                     {isGlow && (

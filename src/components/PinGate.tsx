@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Lock, Delete } from 'lucide-react';
 
 const ADMIN_PIN = '8723';

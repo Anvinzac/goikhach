@@ -7,7 +7,7 @@ const TAG_OPTIONS = [
   { value: 'prefer_downstairs', icon: ArrowDown, label: 'Tầng dưới' },
   { value: 'prefer_upstairs', icon: ArrowUp, label: 'Tầng trên' },
   { value: 'will_return', icon: Clock, label: 'Quay lại' },
-  { value: 'separately', icon: Split, label: 'Tách bàn' },
+  { value: 'separately', icon: Split, label: 'Bàn riêng' },
 ] as const;
 
 interface NotesTagsProps {

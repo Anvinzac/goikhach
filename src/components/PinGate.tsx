@@ -27,6 +27,7 @@ export function PinGate({ children }: { children: React.ReactNode }) {
   const [verified, setVerified] = useState(false);
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
+  const [pressed, setPressed] = useState<number | 'del' | null>(null);
 
   useEffect(() => {
     if (sessionStorage.getItem(STORAGE_KEY) === 'true') {
@@ -163,11 +164,31 @@ export function PinGate({ children }: { children: React.ReactNode }) {
               <button
                 key={i}
                 onClick={() => handleKey(key as number | 'del')}
-                className="w-[72px] h-[56px] rounded-2xl font-bold text-xl transition-all duration-150 active:scale-90"
+                onPointerDown={() => setPressed(key as number | 'del')}
+                onPointerUp={() => setPressed(null)}
+                onPointerLeave={() => setPressed(null)}
+                onPointerCancel={() => setPressed(null)}
+                className={`w-[72px] h-[56px] rounded-2xl font-bold text-xl transition-all duration-100 ease-out ${
+                  pressed === key ? 'scale-[0.88]' : 'scale-100'
+                }`}
                 style={{
-                  background: key === 'del' ? 'transparent' : 'hsl(220 20% 16%)',
-                  border: key === 'del' ? 'none' : '1px solid hsl(220 20% 22%)',
+                  background:
+                    pressed === key
+                      ? key === 'del'
+                        ? 'hsl(var(--occupied) / 0.18)'
+                        : 'linear-gradient(135deg, hsl(var(--queue)), hsl(var(--queue-end)))'
+                      : key === 'del'
+                      ? 'transparent'
+                      : 'hsl(220 20% 16%)',
+                  border:
+                    key === 'del'
+                      ? 'none'
+                      : `1px solid ${pressed === key ? 'hsl(var(--queue) / 0.7)' : 'hsl(220 20% 22%)'}`,
                   color: key === 'del' ? 'hsl(var(--occupied))' : 'white',
+                  boxShadow:
+                    pressed === key && key !== 'del'
+                      ? '0 6px 24px hsl(var(--queue) / 0.45)'
+                      : 'none',
                 }}
               >
                 {key === 'del' ? <Delete className="w-5 h-5 mx-auto" /> : key}

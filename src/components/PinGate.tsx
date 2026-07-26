@@ -161,38 +161,67 @@ export function PinGate({ children }: { children: React.ReactNode }) {
             key === null ? (
               <div key={i} />
             ) : (
-              <button
-                key={i}
-                onClick={() => handleKey(key as number | 'del')}
-                onPointerDown={() => setPressed(key as number | 'del')}
-                onPointerUp={() => setPressed(null)}
-                onPointerLeave={() => setPressed(null)}
-                onPointerCancel={() => setPressed(null)}
-                className={`w-[72px] h-[56px] rounded-2xl font-bold text-xl transition-all duration-100 ease-out ${
-                  pressed === key ? 'scale-[0.88]' : 'scale-100'
-                }`}
-                style={{
-                  background:
-                    pressed === key
-                      ? key === 'del'
-                        ? 'hsl(var(--occupied) / 0.18)'
-                        : 'linear-gradient(135deg, hsl(var(--queue)), hsl(var(--queue-end)))'
-                      : key === 'del'
-                      ? 'transparent'
-                      : 'hsl(220 20% 16%)',
-                  border:
-                    key === 'del'
-                      ? 'none'
-                      : `1px solid ${pressed === key ? 'hsl(var(--queue) / 0.7)' : 'hsl(220 20% 22%)'}`,
-                  color: key === 'del' ? 'hsl(var(--occupied))' : 'white',
-                  boxShadow:
-                    pressed === key && key !== 'del'
-                      ? '0 6px 24px hsl(var(--queue) / 0.45)'
-                      : 'none',
-                }}
-              >
-                {key === 'del' ? <Delete className="w-5 h-5 mx-auto" /> : key}
-              </button>
+              (() => {
+                const isDown = pressed === key;
+                const isGlow = glow === key;
+                const active = isDown || isGlow;
+                const isDel = key === 'del';
+                return (
+                  <button
+                    key={i}
+                    onClick={() => handleKey(key as number | 'del')}
+                    onPointerDown={() => press(key as number | 'del')}
+                    onPointerUp={() => release()}
+                    onPointerLeave={() => release()}
+                    onPointerCancel={() => release()}
+                    className="relative overflow-hidden w-[72px] h-[56px] rounded-2xl font-bold text-xl"
+                    style={{
+                      background: isDel ? 'transparent' : 'hsl(220 20% 16%)',
+                      border: isDel
+                        ? 'none'
+                        : `1px solid ${active ? 'hsl(var(--queue) / 0.7)' : 'hsl(220 20% 22%)'}`,
+                      color: isDel ? 'hsl(var(--occupied))' : 'white',
+                      transform: isDown ? 'scale(0.94)' : 'scale(1)',
+                      boxShadow:
+                        active && !isDel ? '0 8px 28px hsl(var(--queue) / 0.35)' : 'none',
+                      transition:
+                        'transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 480ms ease-out, border-color 480ms ease-out',
+                    }}
+                  >
+                    {/* Lingering fill + ripple */}
+                    <span
+                      className="absolute inset-0 pointer-events-none rounded-2xl"
+                      style={{
+                        background: isDel
+                          ? 'radial-gradient(circle at center, hsl(var(--occupied) / 0.35), hsl(var(--occupied) / 0.05))'
+                          : 'linear-gradient(135deg, hsl(var(--queue)), hsl(var(--queue-end)))',
+                        opacity: active ? 1 : 0,
+                        transform: active ? 'scale(1)' : 'scale(1.15)',
+                        transition:
+                          'opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 520ms cubic-bezier(0.22, 1, 0.36, 1)',
+                      }}
+                    />
+                    {isGlow && (
+                      <span
+                        key={rippleId}
+                        className="absolute left-1/2 top-1/2 pointer-events-none rounded-full animate-key-ripple"
+                        style={{
+                          width: 96,
+                          height: 96,
+                          marginLeft: -48,
+                          marginTop: -48,
+                          background: isDel
+                            ? 'hsl(var(--occupied) / 0.45)'
+                            : 'hsl(0 0% 100% / 0.5)',
+                        }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center justify-center h-full">
+                      {isDel ? <Delete className="w-5 h-5" /> : key}
+                    </span>
+                  </button>
+                );
+              })()
             )
           )}
         </div>

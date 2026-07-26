@@ -28,12 +28,31 @@ export function PinGate({ children }: { children: React.ReactNode }) {
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
   const [pressed, setPressed] = useState<number | 'del' | null>(null);
+  const [glow, setGlow] = useState<number | 'del' | null>(null);
+  const [rippleId, setRippleId] = useState(0);
+  const glowTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (sessionStorage.getItem(STORAGE_KEY) === 'true') {
       setVerified(true);
     }
   }, []);
+
+  useEffect(() => () => { if (glowTimer.current) clearTimeout(glowTimer.current); }, []);
+
+  const press = (key: number | 'del') => {
+    setPressed(key);
+    setGlow(key);
+    setRippleId(id => id + 1);
+    if (glowTimer.current) clearTimeout(glowTimer.current);
+  };
+
+  const release = () => {
+    setPressed(null);
+    if (glowTimer.current) clearTimeout(glowTimer.current);
+    glowTimer.current = setTimeout(() => setGlow(null), 520);
+  };
+
 
   const handleKey = (key: number | 'del') => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {

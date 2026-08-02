@@ -23,6 +23,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
   const [showWaitTime, setShowWaitTime] = useState(false);
   const [hideDone, setHideDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pendingDoneTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const isLunchSession = (() => {
     const h = new Date().getHours();
     const m = new Date().getMinutes();
@@ -45,6 +46,31 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
   }, []);
 
   useEffect(() => { setCurrentPage(0); }, [hideDone]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(pendingDoneTimersRef.current).forEach(clearTimeout);
+    };
+  }, []);
+
+  const handleOrderUpdate = (id: string, updates: Partial<QueueOrder>) => {
+    const pendingDone = pendingDoneTimersRef.current[id];
+
+    if (pendingDone) {
+      clearTimeout(pendingDone);
+      delete pendingDoneTimersRef.current[id];
+    }
+
+    if (hideDone && updates.status === 'done') {
+      pendingDoneTimersRef.current[id] = setTimeout(() => {
+        delete pendingDoneTimersRef.current[id];
+        updateOrder(id, updates);
+      }, 320);
+      return;
+    }
+
+    updateOrder(id, updates);
+  };
 
   // Keep just-completed rows visible briefly so a double-tap (Done -> Cancelled)
   // isn't broken by the row disappearing between taps in filtered mode.
@@ -213,7 +239,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
                 const isRightCol = i >= 5;
                 return (
                   <div key={order.id} className={(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
-                    <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                     <QueueRow order={order} sessionId={sessionId} onUpdate={handleOrderUpdate} isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                   </div>
                 );
               })}
@@ -222,7 +248,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
             <div className="flex flex-col h-full" style={{ gap: '0', paddingTop: '0', paddingBottom: '0' }}>
               {pageOrders.map((order, i) => (
                 <div key={order.id} className={`flex-1 min-h-0 ${(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'}`} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)', marginTop: '-1px' }}>
-                  <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                   <QueueRow order={order} sessionId={sessionId} onUpdate={handleOrderUpdate} isNearBottom={i >= pageOrders.length - 4} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                 </div>
               ))}
             </div>
@@ -237,7 +263,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
                 const isRightCol = colIndex >= 2;
                 return (
                   <div key={order.id} className={(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
-                    <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                     <QueueRow order={order} sessionId={sessionId} onUpdate={handleOrderUpdate} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                   </div>
                 );
               })}
@@ -250,7 +276,7 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
                 const isRightCol = i >= 10;
                 return (
                 <div key={order.id} className={(i % 2 === 1 ? 'frosted-row-b' : 'frosted-row-a') + ' relative has-[[data-popup-open]]:z-50'} style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.5)' }}>
-                  <QueueRow order={order} sessionId={sessionId} onUpdate={updateOrder} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
+                   <QueueRow order={order} sessionId={sessionId} onUpdate={handleOrderUpdate} compact isNearBottom={isBottom} isRightColumn={isRightCol} qrEnabled={qrEnabled} showWaitTime={showWaitTime} />
                 </div>
                 );
               })}

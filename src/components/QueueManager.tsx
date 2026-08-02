@@ -46,8 +46,36 @@ export function QueueManager({ sessionId, sessionType, onResetPressStart, onRese
 
   useEffect(() => { setCurrentPage(0); }, [hideDone]);
 
+  // Keep just-completed rows visible briefly so a double-tap (Done -> Cancelled)
+  // isn't broken by the row disappearing between taps in filtered mode.
+  const HIDE_GRACE_MS = 700;
+  const prevStatusRef = useRef<Record<string, string>>({});
+  const graceRef = useRef<Record<string, number>>({});
+  const [graceTick, setGraceTick] = useState(0);
 
-  const visibleOrders = hideDone ? orders.filter(o => o.status !== 'done') : orders;
+  useEffect(() => {
+    const now = Date.now();
+    let changed = false;
+    orders.forEach(o => {
+      const prev = prevStatusRef.current[o.id];
+      if (prev !== undefined && prev !== o.status && o.status === 'done') {
+        graceRef.current[o.id] = now + HIDE_GRACE_MS;
+        changed = true;
+      }
+      prevStatusRef.current[o.id] = o.status;
+    });
+    if (changed && hideDone) {
+      const t = setTimeout(() => setGraceTick(v => v + 1), HIDE_GRACE_MS + 20);
+      return () => clearTimeout(t);
+    }
+  }, [orders, hideDone]);
+
+  const now = Date.now();
+  void graceTick;
+  const visibleOrders = hideDone
+    ? orders.filter(o => o.status !== 'done' || (graceRef.current[o.id] ?? 0) > now)
+    : orders;
+
   const pageSize = viewMode === 'full' ? 10 : 20;
   const totalPages = Math.ceil(visibleOrders.length / pageSize);
   const pageOrders = visibleOrders.slice(currentPage * pageSize, (currentPage + 1) * pageSize);

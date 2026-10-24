@@ -40,7 +40,23 @@ export function useSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const createSession = useCallback(async (type: 'lunch' | 'dinner', expiresAt: Date, dailyNotice?: string) => {
+  const createSession = useCallback(async (type: 'lunch' | 'dinner', expiresAt: Date, dailyNotice?: string, force = false) => {
+    // Guard against concurrent auto-creation from multiple devices:
+    // if another device just created an active session of this type, use it
+    // instead of purging its data.
+    if (!force) {
+      const { data: fresh } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('is_active', true)
+        .eq('session_type', type)
+        .gte('expires_at', new Date().toISOString())
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (fresh) return fresh;
+    }
+
     // Clean up all old sessions and their data
     const { data: existingSessions } = await supabase
       .from('sessions')
@@ -77,6 +93,18 @@ export function useSession() {
       .single();
 
     if (error || !data) {
+      // Unique index on active sessions: another device won the race.
+      // Adopt their session instead of failing.
+      if (error?.code === '23505') {
+        const { data: winner } = await supabase
+          .from('sessions')
+          .select('*')
+          .eq('is_active', true)
+          .order('started_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (winner) return winner;
+      }
       toast.error('Failed to start session');
       return null;
     }
@@ -185,7 +213,7 @@ export function useSession() {
     setLoading(true);
     const window = getSessionWindow();
     const expiresAt = window?.expiresAt || (() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; })();
-    const newSession = await createSession(type, expiresAt, dailyNotice);
+    const newSession = await createSession(type, expiresAt, dailyNotice, true);
     if (newSession) {
       setSession(newSession);
       toast.success(`${type === 'lunch' ? 'Ca trưa' : 'Ca tối'} đã bắt đầu!`);

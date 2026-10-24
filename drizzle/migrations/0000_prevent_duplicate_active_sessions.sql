@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX sessions_single_active_idx ON public.sessions (is_active) WHERE is_active;

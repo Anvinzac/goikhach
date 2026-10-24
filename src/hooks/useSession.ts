@@ -213,7 +213,7 @@ export function useSession() {
     setLoading(true);
     const window = getSessionWindow();
     const expiresAt = window?.expiresAt || (() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; })();
-    const newSession = await createSession(type, expiresAt, dailyNotice);
+    const newSession = await createSession(type, expiresAt, dailyNotice, true);
     if (newSession) {
       setSession(newSession);
       toast.success(`${type === 'lunch' ? 'Ca trưa' : 'Ca tối'} đã bắt đầu!`);

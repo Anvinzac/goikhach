@@ -93,6 +93,18 @@ export function useSession() {
       .single();
 
     if (error || !data) {
+      // Unique index on active sessions: another device won the race.
+      // Adopt their session instead of failing.
+      if (error?.code === '23505') {
+        const { data: winner } = await supabase
+          .from('sessions')
+          .select('*')
+          .eq('is_active', true)
+          .order('started_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (winner) return winner;
+      }
       toast.error('Failed to start session');
       return null;
     }

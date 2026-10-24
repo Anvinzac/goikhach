@@ -40,7 +40,23 @@ export function useSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const createSession = useCallback(async (type: 'lunch' | 'dinner', expiresAt: Date, dailyNotice?: string) => {
+  const createSession = useCallback(async (type: 'lunch' | 'dinner', expiresAt: Date, dailyNotice?: string, force = false) => {
+    // Guard against concurrent auto-creation from multiple devices:
+    // if another device just created an active session of this type, use it
+    // instead of purging its data.
+    if (!force) {
+      const { data: fresh } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('is_active', true)
+        .eq('session_type', type)
+        .gte('expires_at', new Date().toISOString())
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (fresh) return fresh;
+    }
+
     // Clean up all old sessions and their data
     const { data: existingSessions } = await supabase
       .from('sessions')

@@ -1,0 +1,2 @@
+DELETE FROM public.queue_orders a USING public.queue_orders b WHERE a.session_id=b.session_id AND a.order_number=b.order_number AND a.id > b.id;
+CREATE UNIQUE INDEX IF NOT EXISTS queue_orders_session_number_uniq ON public.queue_orders(session_id, order_number);

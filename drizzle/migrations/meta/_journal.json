@@ -8,6 +8,13 @@
       "when": 1792841009118,
       "tag": "0000_prevent_duplicate_active_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795521579972,
+      "tag": "0001_dedupe_queue_orders",
+      "breakpoints": true
     }
   ]
 }
